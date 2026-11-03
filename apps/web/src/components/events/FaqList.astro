@@ -1,0 +1,76 @@
+---
+interface Props {
+  faqs: { id: string; data: { q: string; a: string } }[];
+  location: string;
+}
+const { faqs, location } = Astro.props;
+---
+
+<section class="section faq" data-section="faq" aria-labelledby="faq-title">
+  <div class="container grid">
+    <h2 id="faq-title">Questions</h2>
+    <div class="items">
+      {faqs.map((f) => (
+        <details data-faq={f.id} data-location={location}>
+          <summary>{f.data.q}</summary>
+          <p>{f.data.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  import { track } from '../../lib/analytics/track';
+  import { onPage } from '../../lib/lifecycle';
+
+  onPage(() => {
+    const items = [...document.querySelectorAll<HTMLDetailsElement>('details[data-faq]')];
+    items.forEach((d) =>
+      d.addEventListener('toggle', () => {
+        if (!d.open) return;
+        track('faq_open', { faq: d.dataset.faq, location: d.dataset.location });
+        // Anonymous demand signal feeding "most asked" (no visitor identifiers).
+        navigator.sendBeacon?.('/api/signal', JSON.stringify({ type: 'faq_open', id: d.dataset.faq, page: location.pathname }));
+      }),
+    );
+    // Reorder by live demand: the most asked questions on this page rise to the top.
+    if (items.length > 1) {
+      fetch(`/api/scout/trending?page=${encodeURIComponent(location.pathname)}`)
+        .then((r) => r.json())
+        .then(({ faqRank }: { faqRank: Record<string, number> }) => {
+          if (!faqRank || !Object.keys(faqRank).length) return;
+          const parent = items[0].parentElement!;
+          [...items]
+            .sort((a, b) => (faqRank[b.dataset.faq!] ?? 0) - (faqRank[a.dataset.faq!] ?? 0))
+            .forEach((d) => parent.appendChild(d));
+          parent.dataset.order = 'live';
+        })
+        .catch(() => undefined);
+    }
+  }, 'details[data-faq]');
+</script>
+
+<style>
+  .grid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(2rem, 5vw, 5rem); }
+  h2 { font-size: var(--step-4); }
+  .items { border-top: 1px solid var(--line-strong); }
+  details { border-bottom: 1px solid var(--line); }
+  summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 1.35rem;
+    cursor: pointer;
+    list-style: none;
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    line-height: 1.2;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: '+'; font-family: var(--font-body); font-weight: 300; color: var(--accent); transition: transform 0.3s var(--ease-out); }
+  details[open] summary::after { transform: rotate(45deg); }
+  details p { padding-bottom: 1.5rem; color: var(--text-muted); max-width: var(--measure); }
+
+  @media (max-width: 899px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+</style>

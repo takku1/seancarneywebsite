@@ -1,0 +1,236 @@
+---
+/**
+ * Full-bleed hero. The poster <img> is the LCP element (preloaded, high
+ * priority). The 2.5MB loop only loads after first paint, never under
+ * reduced-motion or Save-Data, and has a visible pause control (WCAG 2.2.2).
+ */
+import { Image } from 'astro:assets';
+import poster from '../../assets/photos/hero-poster.jpg';
+import Icon from '../ui/Icon.astro';
+import { loadMedia, pick } from '../../lib/feeds/media';
+
+// "Watch live": the best live-event clip from the media pipeline (pinned: 2025 reel).
+const [reel] = pick(await loadMedia(), 'hero', 1, ['for_events']);
+import InquireLabel from '../ui/InquireLabel.astro';
+---
+
+<section class="hero" data-section="hero" aria-labelledby="hero-title">
+  <div class="media">
+    <Image
+      src={poster}
+      alt="Sean Carney singing with an acoustic guitar in a sunlit drawing room"
+      widths={[640, 960, 1280, 1920]}
+      sizes="100vw"
+      loading="eager"
+      fetchpriority="high"
+      class="poster"
+    />
+    <video class="loop" muted loop playsinline preload="none" aria-hidden="true" data-hero-video>
+      <!-- Phones get a ~0.6MB 640px loop; larger screens the 720p one. -->
+      <source data-src="/media/hero-loop-sm.webm" type="video/webm" data-size="sm" />
+      <source data-src="/media/hero-loop-sm.mp4" type="video/mp4" data-size="sm" />
+      <source data-src="/media/hero-loop.webm" type="video/webm" data-size="lg" />
+      <source data-src="/media/hero-loop.mp4" type="video/mp4" data-size="lg" />
+    </video>
+    <div class="scrim"></div>
+  </div>
+
+  <div class="container content">
+    <p class="label tag">Music for Outlaws</p>
+    <h1 id="hero-title">Sean Carney</h1>
+    <p class="sub">
+      <span class="exp" data-exp="hero_sub" data-variant="status">Singer, guitarist and producer. Heard on the Paris Olympics, the NFL Playoffs and Netflix.</span>
+      <span class="exp" data-exp="hero_sub" data-variant="service">Solo, trio or full band for weddings, galas and private estates in Los Angeles and beyond.</span>
+    </p>
+    <div class="ctas">
+      <a href="/inquire" class="btn" data-track="cta_click" data-track-location="hero"><InquireLabel /></a>
+      {reel ? (
+        <button type="button" class="btn btn--ghost" data-reel-open data-track="watch_live_click" data-track-location="hero"><Icon name="play" /> Watch live</button>
+      ) : (
+        <a href="/music" class="btn btn--ghost" data-track="listen_click" data-track-location="hero"><Icon name="play" /> Listen</a>
+      )}
+    </div>
+  </div>
+
+  <button type="button" class="video-toggle" aria-pressed="false" hidden data-hero-toggle>
+    <span class="t-pause"><Icon name="pause" /><span class="visually-hidden">Pause background video</span></span>
+    <span class="t-play"><Icon name="play" /><span class="visually-hidden">Play background video</span></span>
+  </button>
+</section>
+
+{reel && (
+  <dialog class="reel" aria-label={`${reel.video.title}, video`} data-reel data-yt={reel.video.youtubeId}>
+    <button type="button" class="reel-x" data-reel-close aria-label="Close video"><Icon name="x" /></button>
+    <div class="reel-frame" data-reel-frame></div>
+    <p class="reel-cap">{reel.video.title}{reel.video.note && <span>{reel.video.note}</span>}</p>
+  </dialog>
+)}
+
+<script>
+  import { track } from '../../lib/analytics/track';
+  import { onPage } from '../../lib/lifecycle';
+  import { pause as pausePlayer } from '../../lib/media/player';
+
+  onPage(() => {
+    // ---------- Watch live lightbox (hear Sean in one tap, without leaving home) ----------
+    const reelDlg = document.querySelector<HTMLDialogElement>('[data-reel]');
+    const reelFrame = reelDlg?.querySelector<HTMLElement>('[data-reel-frame]');
+    document.querySelector('[data-reel-open]')?.addEventListener('click', () => {
+      if (!reelDlg || !reelFrame) return;
+      const id = reelDlg.dataset.yt!;
+      const frame = document.createElement('iframe');
+      frame.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
+      frame.title = 'Sean Carney live';
+      frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+      frame.allowFullscreen = true;
+      reelFrame.replaceChildren(frame);
+      reelDlg.showModal();
+      pausePlayer(); // one thing playing at a time
+      document.querySelector<HTMLVideoElement>('[data-hero-video]')?.pause();
+      track('video_play', { video_id: id, location: 'hero_lightbox' });
+    });
+    const closeReel = () => {
+      if (!reelDlg) return;
+      reelDlg.close();
+      reelFrame?.replaceChildren(); // removing the iframe stops playback
+    };
+    reelDlg?.querySelector('[data-reel-close]')?.addEventListener('click', closeReel);
+    reelDlg?.addEventListener('click', (e) => { if (e.target === reelDlg) closeReel(); });
+    reelDlg?.addEventListener('cancel', (e) => { e.preventDefault(); closeReel(); });
+
+    const video = document.querySelector<HTMLVideoElement>('[data-hero-video]');
+    const toggle = document.querySelector<HTMLButtonElement>('[data-hero-toggle]');
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
+
+    if (video && toggle && !reduce && !saveData) {
+      const start = () => {
+        // Pick the file sized for this screen (the <source media> hint isn't reliable for video).
+        const size = matchMedia('(max-width: 767px)').matches ? 'sm' : 'lg';
+        video.querySelectorAll<HTMLSourceElement>('source[data-src]').forEach((s) => {
+          if (s.dataset.size !== size) s.remove();
+          else s.src = s.dataset.src!;
+        });
+        video.load();
+        video.play().then(
+          () => {
+            video.classList.add('is-playing');
+            toggle.hidden = false;
+          },
+          () => {
+            /* autoplay blocked (e.g. low-power mode): poster stays */
+          },
+        );
+      };
+      // Full load: after window load so the reel never competes with LCP. Client navigation: the page is already loaded.
+      if (document.readyState === 'complete') setTimeout(start, 300);
+      else addEventListener('load', () => setTimeout(start, 300), { once: true });
+
+      toggle.addEventListener('click', () => {
+        const paused = toggle.getAttribute('aria-pressed') === 'true';
+        if (paused) void video.play();
+        else video.pause();
+        toggle.setAttribute('aria-pressed', String(!paused));
+        track('hero_video_toggle', { state: paused ? 'play' : 'pause' });
+      });
+    }
+    return () => closeReel();
+  }, '[data-hero-video], [data-reel-open]');
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100dvh;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .media { position: absolute; inset: 0; z-index: -1; }
+  .media :global(.poster), .loop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    object-position: 62% 40%;
+  }
+  .loop { opacity: 0; transition: opacity 1.2s var(--ease-out); }
+  .loop.is-playing { opacity: 1; }
+  .scrim {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to top, rgb(9 8 7 / 0.92) 0%, rgb(9 8 7 / 0.55) 35%, rgb(9 8 7 / 0.1) 65%),
+      linear-gradient(to right, rgb(9 8 7 / 0.55), transparent 55%);
+  }
+
+  .content { padding-block: 0 clamp(3rem, 8vh, 6rem); }
+  .tag { color: var(--accent); margin-bottom: 1rem; }
+  h1 {
+    font-size: var(--step-5);
+    font-weight: 500;
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+  }
+  .sub {
+    margin-top: 1.25rem;
+    max-width: 34ch;
+    font-size: var(--step-1);
+    line-height: 1.45;
+    color: var(--text);
+  }
+  .ctas { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
+
+  /* Cinematic entrance: the eyebrow arrives first, then the name, the line, the buttons. */
+  @media (prefers-reduced-motion: no-preference) {
+    .tag, h1, .sub, .ctas { animation: enter 0.8s var(--ease-out) both; }
+    .tag { animation-delay: 0.15s; }
+    h1 { animation-delay: 0.3s; animation-duration: 1s; }
+    .sub { animation-delay: 0.55s; }
+    .ctas { animation-delay: 0.7s; }
+    .scrim { animation: dim 1.2s ease both; }
+  }
+  /* A focus pull from an already-visible start: text paints on the first frame (so it counts
+     for LCP immediately), then sharpens into place. Starting at opacity 0 delayed LCP ~0.7s. */
+  @keyframes enter { from { opacity: 0.35; transform: translateY(14px); filter: blur(6px); } }
+  @keyframes dim { from { opacity: 0.6; } }
+
+  /* Watch live lightbox */
+  .reel { width: min(1200px, 94vw); max-width: none; padding: 0; margin: auto; background: #000; border: 0; color: var(--on-image); overflow: visible; }
+  .reel::backdrop { background: rgb(5 4 3 / 0.88); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  .reel-frame { aspect-ratio: 16 / 9; }
+  .reel-frame :global(iframe) { width: 100%; height: 100%; border: 0; display: block; }
+  .reel-x { position: absolute; top: -52px; right: 0; width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 1px solid rgb(241 235 224 / 0.35); color: var(--on-image); cursor: pointer; }
+  .reel-x :global(svg) { width: 20px; height: 20px; }
+  .reel-cap { position: absolute; left: 0; bottom: -40px; font-family: var(--font-display); font-size: 1.2rem; }
+  .reel-cap span { margin-left: 0.75rem; font-family: var(--font-body); font-size: 0.85rem; opacity: 0.7; }
+  @media (prefers-reduced-motion: no-preference) {
+    .reel[open] { animation: enter 0.45s var(--ease-out); }
+  }
+
+  .video-toggle {
+    position: absolute;
+    right: var(--gutter);
+    top: calc(var(--header-h) + 1rem); /* top-right: bottom-right belongs to the Scout pick */
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    background: rgb(13 12 11 / 0.5);
+    border: 1px solid var(--line-strong);
+    color: var(--text);
+    cursor: pointer;
+  }
+  .video-toggle :global(svg) { width: 18px; height: 18px; }
+  .t-play { display: none; }
+  .video-toggle[aria-pressed='true'] .t-play { display: inline; }
+  .video-toggle[aria-pressed='true'] .t-pause { display: none; }
+
+  @media (max-width: 767px) {
+    .media :global(.poster), .loop { object-position: 68% 30%; }
+
+  }
+</style>

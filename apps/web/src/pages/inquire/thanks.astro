@@ -1,0 +1,56 @@
+---
+/** Conversion page. Fires generate_lead (GA4 / Ads / Meta standard). */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import YouTubeFacade from '../../components/media/YouTubeFacade.astro';
+import Icon from '../../components/ui/Icon.astro';
+import { site } from '../../config/site';
+---
+
+<BaseLayout zone="events" pageType="inquire_thanks" title="Thank you | Sean Carney" description="Your inquiry has been received." noindex>
+  <section class="section" data-section="thanks">
+    <div class="container grid">
+      <div>
+        <h1>Thank you. Your note is with Sean.</h1>
+        <p class="lede">You will hear back personally {site.responseTime}, with availability and next steps. A confirmation is on its way to your inbox.</p>
+        <p class="follow">While you wait, follow along:</p>
+        <ul class="socials">
+          {site.socials.slice(0, 2).map((s) => (
+            <li><a class="link-arrow" href={s.url} target="_blank" rel="noopener" data-track="social_click" data-track-network={s.id} data-track-location="thanks">{s.label} <Icon name="arrow-up-right" /></a></li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <YouTubeFacade id="vwvdaQuHuJI" title="Perfect, live acoustic" location="thanks" large />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { getItem, setItem, removeItem } from '../../lib/storage';
+  import { track } from '../../lib/analytics/track';
+  import { onPage } from '../../lib/lifecycle';
+
+  onPage(() => {
+    const q = new URLSearchParams(location.search);
+    // Guard against double counting on refresh.
+    let tier: string | undefined;
+    let fired = false;
+    try {
+      tier = getItem('sc_lead_tier') || undefined;
+      fired = getItem('sc_lead_fired') === '1';
+      setItem('sc_lead_fired', '1');
+      removeItem('sc_lead_tier');
+    } catch { /* noop */ }
+    if (!fired) track('generate_lead', { event_type: q.get('type') ?? undefined, lead_tier: tier });
+  }, '[data-section="thanks"]');
+</script>
+
+<style>
+  .grid { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: clamp(2rem, 5vw, 5rem); align-items: center; }
+  h1 { font-size: var(--step-4); max-width: 16ch; }
+  .lede { margin-top: 1.5rem; }
+  .follow { margin-top: 2.5rem; color: var(--text-muted); }
+  .socials { list-style: none; margin: 0.75rem 0 0; padding: 0; display: flex; gap: 2rem; }
+  @media (max-width: 899px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+</style>

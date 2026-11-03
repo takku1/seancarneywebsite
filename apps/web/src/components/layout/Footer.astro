@@ -1,0 +1,158 @@
+---
+import { getCollection } from 'astro:content';
+import { site } from '../../config/site';
+import Icon, { type IconName } from '../ui/Icon.astro';
+import InquireLabel from '../ui/InquireLabel.astro';
+import NotifyForm from '../ui/NotifyForm.astro';
+
+const events = (await getCollection('events')).sort((a, b) => a.data.order - b.data.order);
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="closing">
+      <p class="closing-line">Planning an event? Start with the date.</p>
+      <a href="/inquire" class="btn" data-track="cta_click" data-track-location="footer"><InquireLabel /> <Icon name="arrow-right" /></a>
+    </div>
+
+    <div class="cols">
+      <div>
+        <a href="/" class="wordmark">Sean Carney</a>
+        <p class="muted">{site.role}. {site.home}.</p>
+        <ul class="socials" aria-label="Social">
+          {site.socials.map((s) => (
+            <li>
+              <a href={s.url} rel="me noopener" target="_blank" data-track="social_click" data-track-network={s.id} data-track-location="footer">
+                <Icon name={s.id as IconName} label={s.label} />
+              </a>
+            </li>
+          ))}
+        </ul>
+        <div class="fanlist" data-section="footer_list">
+          <h2 class="col-title">New music, first</h2>
+          <NotifyForm topic="news" tone="surface" cta="Join" location="footer" />
+        </div>
+      </div>
+      <nav aria-label="Private events">
+        <h2 class="col-title">Private events</h2>
+        <ul>
+          <li><a href="/private-events">Overview</a></li>
+          {events.map((e) => <li><a href={`/${e.data.slug}`}>{e.data.navLabel}</a></li>)}
+        </ul>
+      </nav>
+      <nav aria-label="Artist">
+        <h2 class="col-title">Artist</h2>
+        <ul>
+          <li><a href="/music">Music</a></li>
+          <li><a href="/shows">Shows</a></li>
+          <li><a href="/merch">Merch</a></li>
+          <li><a href="/press">Press</a></li>
+          <li><a href="/about">About</a></li>
+        </ul>
+      </nav>
+      <div>
+        <h2 class="col-title">Management and bookings</h2>
+        <ul>
+          <li><a href="/contact">All contacts</a></li>
+          <li><a href={`mailto:${site.email.bookings}`} data-track-location="footer">{site.email.bookings}</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="legal">
+      <p>&copy; {year} Sean Carney Music. All rights reserved.</p>
+      <ul>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+        <li><a href="/privacy#choices">Your privacy choices</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--line);
+    background: var(--bg-sunk);
+    padding-block: clamp(3.5rem, 6vw, 6rem) 2rem;
+    font-size: var(--step--1);
+  }
+  .closing {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem 3rem;
+    padding-bottom: clamp(2.5rem, 5vw, 4rem);
+    border-bottom: 1px solid var(--line);
+  }
+  .closing-line {
+    font-family: var(--font-display);
+    font-size: var(--step-3);
+    line-height: 1.1;
+    max-width: 22ch;
+  }
+  .cols {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.2fr;
+    gap: 2.5rem;
+    padding-block: clamp(2.5rem, 5vw, 4rem);
+  }
+  .wordmark {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .muted { color: var(--text-muted); margin-top: 0.75rem; }
+  .col-title {
+    font-family: var(--font-body);
+    font-size: var(--step--1);
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+  }
+  ul { list-style: none; margin: 0; padding: 0; }
+  .cols nav a, .cols div > ul a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    color: var(--text-muted);
+    text-decoration: none;
+    word-break: break-word;
+  }
+  .cols a:hover { color: var(--text); }
+  .fanlist { margin-top: 2rem; max-width: 28rem; }
+  .fanlist :global(.btn) { min-width: 6.5rem; justify-content: center; }
+  .socials { display: flex; gap: 0.25rem; margin-top: 1.25rem; }
+  .socials a {
+    display: inline-flex;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+  }
+  .socials a:hover { color: var(--accent); }
+  .socials :global(svg) { width: 22px; height: 22px; }
+  .legal {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    color: var(--text-muted);
+  }
+  .legal ul { display: flex; gap: 1.5rem; }
+  .legal a { color: var(--text-muted); }
+
+  @media (max-width: 900px) {
+    .cols { grid-template-columns: 1fr 1fr; }
+    .cols > :first-child { grid-column: 1 / -1; }
+  }
+  @media (max-width: 560px) {
+    .cols { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

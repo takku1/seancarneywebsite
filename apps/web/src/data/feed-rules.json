@@ -1,0 +1,59 @@
+{
+  "youtubeChannelId": "UCx8Os2NEcWuAIf2nlaH9-yw",
+  "spotifyArtistId": "0uh9aOz14Plm26aE3gz823",
+  "instagramHandle": "seanshredseverything",
+  "pins": {
+    "home": [
+      "do-or-die",
+      "the-otherside",
+      "graveyard"
+    ],
+    "event_weddings": [
+      "perfect",
+      "dreams-live",
+      "stargazing"
+    ],
+    "event_corporate": [
+      "reel-2025",
+      "ritz-shut-up-and-dance",
+      "stronger"
+    ],
+    "event_estate": [
+      "tennessee-whiskey",
+      "elevated-live"
+    ],
+    "event_galas": [
+      "invincible",
+      "blinding-lights"
+    ],
+    "event_destination": [
+      "hotel-del-my-girl",
+      "perfect"
+    ],
+    "hero": [
+      "reel-2025"
+    ]
+  },
+  "excludeYoutubeIds": [],
+  "minDurationSec": 60,
+  "showViewsAbove": 10000,
+  "recencyHalfLifeDays": 180,
+  "eventKeywords": [
+    "ritz",
+    "hotel",
+    "wedding",
+    "reel",
+    "event",
+    "elevated",
+    "coronado",
+    "gala",
+    "live at"
+  ],
+  "instagram": {
+    "show": 6,
+    "minLikes": 0
+  },
+  "spotify": {
+    "topTracks": 5
+  }
+}

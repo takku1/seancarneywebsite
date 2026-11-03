@@ -1,0 +1,78 @@
+---
+/**
+ * Asymmetric film grid fed by the media pipeline (src/lib/feeds/media.ts).
+ * placement -> pins from feed-rules.json, then a ranked mix (event fit, newest,
+ * most watched). Exactly as many cells as clips (3 = big + 2, 2 = pair).
+ */
+import YouTubeFacade from '../media/YouTubeFacade.astro';
+import Icon from '../ui/Icon.astro';
+import { loadMedia, pick, viewsLabel, type Slot } from '../../lib/feeds/media';
+
+interface Props {
+  placement: string;
+  heading?: string;
+  count?: number;
+  /** Extra pinned IDs, ahead of feed-rules pins (e.g. from events.json). */
+  ids?: string[];
+  mix?: Slot['reason'][];
+}
+const { placement, heading = 'On film', count = 3, ids = [], mix } = Astro.props;
+
+const media = await loadMedia();
+let slots = pick(media, placement, count, mix);
+if (ids.length) {
+  const pinned = ids.map((id) => media.videos.find((v) => v.id === id)).filter((v): v is NonNullable<typeof v> => !!v);
+  const rest = slots.filter((s) => !pinned.some((p) => p.youtubeId === s.video.youtubeId));
+  slots = [...pinned.map((video) => ({ video, reason: 'pinned' as const })), ...rest].slice(0, count);
+}
+const [big, ...small] = slots;
+const meta = (s: Slot) => [s.video.note, viewsLabel(s.video), s.reason === 'newest' && s.video.published ? 'New' : undefined].filter(Boolean).join(', ');
+---
+
+{big && (
+  <section class="section film" data-section="film" aria-labelledby={`film-title-${placement}`}>
+    <div class="container">
+      <div class="head">
+        <h2 id={`film-title-${placement}`}>{heading}</h2>
+        <a class="link-arrow" href="/music#film">All videos <Icon name="arrow-right" /></a>
+      </div>
+      <div class:list={['grid', { pair: slots.length === 2, solo: slots.length === 1 }]}>
+        <figure class="big reveal" data-pick={big.reason} data-published={big.video.published?.toISOString()}>
+          <YouTubeFacade id={big.video.youtubeId} title={big.video.title} location={placement} large />
+          <figcaption><span class="t">{big.video.title}<span data-new-slot></span></span>{meta(big) && <span class="n">{meta(big)}</span>}</figcaption>
+        </figure>
+        {small.map((s) => (
+          <figure class="reveal" data-pick={s.reason} data-published={s.video.published?.toISOString()}>
+            <YouTubeFacade id={s.video.youtubeId} title={s.video.title} location={placement} />
+            <figcaption><span class="t">{s.video.title}<span data-new-slot></span></span>{meta(s) && <span class="n">{meta(s)}</span>}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  .film { background: var(--bg-sunk); }
+  .head { display: flex; justify-content: space-between; align-items: end; gap: 1rem; margin-bottom: 2.5rem; }
+  h2 { font-size: var(--step-4); }
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    gap: 1.5rem;
+  }
+  .big { grid-row: span 2; }
+  .grid.pair { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+  .grid.pair .big { grid-row: auto; }
+  .grid.solo { grid-template-columns: minmax(0, 1fr); max-width: 60rem; }
+  figure { margin: 0; }
+  figcaption { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; align-items: baseline; margin-top: 0.85rem; }
+  .t { font-family: var(--font-display); font-size: var(--step-1); }
+  .n { font-size: var(--step--1); color: var(--text-muted); }
+
+  @media (max-width: 767px) {
+    .grid, .grid.pair { grid-template-columns: minmax(0, 1fr); }
+    .big { grid-row: auto; }
+  }
+</style>

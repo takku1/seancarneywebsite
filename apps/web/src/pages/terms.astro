@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/ui/PageHeader.astro';
+import { site } from '../config/site';
+---
+
+<BaseLayout pageType="terms" title="Terms of Use | Sean Carney" description="Terms of use for seancarneymusic.com, including the Scout AI assistant and text message program terms.">
+  <PageHeader title="Terms" intro="Plain language. Last updated November 2026." />
+  <section class="section">
+    <div class="container prose body">
+      <h2>Using this site</h2>
+      <p>This website is operated by Sean Carney Music. By using it you agree to these terms. If you don't agree, please don't use the site.</p>
+
+      <h2>Content and ownership</h2>
+      <p>Music, video, photographs, text and logos on this site belong to Sean Carney Music or are used with permission. Press photos and biographies on the <a href="/press">press page</a> may be used for editorial coverage of Sean Carney. Any other use needs written permission.</p>
+
+      <h2>Inquiries and bookings</h2>
+      <p>Submitting an inquiry, or checking a date, does not reserve a date or create a booking. A booking exists only once a written performance agreement is signed by both parties. Availability shown on this site is indicative.</p>
+
+      <h2 id="scout">Scout, the AI assistant</h2>
+      <p>Scout is an automated assistant that can make mistakes. Its answers are general information, not a quote, offer, or commitment. Pricing, availability and terms are confirmed by Sean personally. Please don't share sensitive personal information in the chat. See the <a href="/privacy#scout">privacy page</a> for how messages are handled.</p>
+
+      <h2 id="sms">Text message program</h2>
+      <p><strong>Program:</strong> Sean Carney Music booking messages. If you opt in on the inquiry form, you'll receive texts about your inquiry and event, such as replies, scheduling and booking details.</p>
+      <p><strong>Frequency:</strong> message frequency varies. <strong>Cost:</strong> message and data rates may apply.</p>
+      <p><strong>Opt out:</strong> reply STOP to any message to stop texts. <strong>Help:</strong> reply HELP, or email <a href={`mailto:${site.email.bookings}`}>{site.email.bookings}</a>.</p>
+      <p>Consent to receive texts is not a condition of booking. Carriers are not liable for delayed or undelivered messages. Mobile information is not shared with third parties or affiliates for marketing purposes. See the <a href="/privacy">privacy page</a>.</p>
+
+      <h2>Email updates</h2>
+      <p>If you join the shows or merch list, you'll get occasional emails about new dates or merch. Every email includes an unsubscribe link.</p>
+
+      <h2>No warranty</h2>
+      <p>The site is provided as is. We work to keep information accurate, but we don't guarantee it is complete or current. To the extent the law allows, Sean Carney Music isn't liable for indirect damages arising from use of the site.</p>
+
+      <h2>Changes and contact</h2>
+      <p>We may update these terms; the date above shows the latest version. Questions: <a href={`mailto:${site.email.management}`}>{site.email.management}</a>.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .body h2 { font-size: var(--step-2); margin: 2.5rem 0 0.75rem; color: var(--text); }
+  .body h2:first-child { margin-top: 0; }
+  .body a { color: var(--text); }
+</style>

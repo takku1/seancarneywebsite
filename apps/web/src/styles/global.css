@@ -1,0 +1,269 @@
+/*
+ * Sean Carney design system
+ * Read: luxury event booking + celebrity-coded artist hub.
+ * Language: cinematic, editorial, restrained. "Black and tan": warm off-black
+ * ground, bone text, one tan accent pulled from the drawing-room session film.
+ * Theme: dark-locked by brand (stage + film); tokens make a light theme a
+ * one-block change. Shape: all-sharp (radius 0) everywhere.
+ * Dials: VARIANCE 7 / MOTION 5 / DENSITY 3.
+ */
+
+:root {
+  color-scheme: dark;
+
+  --bg: #0d0c0b;
+  --bg-raised: #161412;
+  --bg-sunk: #090807;
+  --text: #ece5d8;
+  --text-muted: #a69d8f; /* 7.3:1 on --bg */
+  --text-faint: #8a8276; /* 5.1:1 on --bg, labels only */
+  --line: rgb(236 229 216 / 0.14);
+  --line-strong: rgb(236 229 216 / 0.28);
+  --accent: #c99f6e; /* 8.4:1 on --bg */
+  --accent-ink: #0d0c0b;
+  --danger: #e38b77;
+
+  --font-display: 'Cormorant Garamond', 'Cormorant Fallback', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'Geist Variable', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif;
+
+  --step--1: clamp(0.84rem, 0.82rem + 0.1vw, 0.9rem);
+  --step-0: clamp(1.02rem, 0.98rem + 0.2vw, 1.12rem);
+  --step-1: clamp(1.25rem, 1.15rem + 0.45vw, 1.5rem);
+  --step-2: clamp(1.6rem, 1.4rem + 0.9vw, 2.2rem);
+  --step-3: clamp(2.1rem, 1.7rem + 1.8vw, 3.3rem);
+  --step-4: clamp(2.8rem, 2.1rem + 3.2vw, 5rem);
+  --step-5: clamp(3.4rem, 2.4rem + 5vw, 7.25rem);
+
+  --space-section: clamp(5rem, 3.5rem + 7vw, 10rem);
+  --gutter: clamp(1rem, 0.6rem + 2vw, 2.5rem);
+  --max: 1400px;
+  --measure: 62ch;
+  --header-h: 68px;
+
+  --header-bg: rgb(13 12 11 / 0.92);
+  /* Text placed over photography stays light in both themes. */
+  --on-image: #f1ebe0;
+  --on-image-muted: rgb(241 235 224 / 0.8);
+  --scrim: 9 8 7;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* z-index scale (the only values in use) */
+  --z-header: 50;
+  --z-menu: 60;
+  --z-grain: 70;
+  --z-skip: 80;
+}
+
+/*
+ * Ivory: the events zone (private events, event pages, inquiry).
+ * Brand-justified light palette: carries the airy, romantic register of
+ * Sean's existing "Sean Carney Luxury Events" pages that planners and couples
+ * respond to, while the artist zone stays cinematic.
+ */
+[data-theme='ivory'] {
+  color-scheme: light;
+  --bg: #f3efe7;
+  --bg-raised: #fbf9f5;
+  --bg-sunk: #ebe5da;
+  --text: #24201b;
+  --text-muted: #5f574d; /* 6.6:1 on --bg */
+  --text-faint: #6b6358; /* 5.3:1 on --bg, 4.7:1 on --bg-sunk */
+  --line: rgb(36 32 27 / 0.12);
+  --line-strong: rgb(36 32 27 / 0.26);
+  --accent: #8c6a42; /* 4.9:1 on --bg */
+  --accent-ink: #fbf9f5;
+  --danger: #a8432e;
+  --header-bg: rgb(243 239 231 / 0.92);
+}
+[data-theme='ivory'] h1 { font-style: italic; }
+[data-theme='ivory'] body::after { opacity: 0.035; }
+
+/*
+ * Metric-matched fallbacks: while the web fonts load, text renders in a local
+ * font scaled to the same width and line box, so the swap moves nothing (CLS).
+ * Values measured from the font files (advance width over sample text, hhea
+ * ascent/descent): Cormorant ~90% of Georgia, its italic ~80% of Georgia
+ * Italic, Geist ~104% of Arial.
+ */
+@font-face { font-family: 'Cormorant Fallback'; src: local('Georgia'); size-adjust: 90%; ascent-override: 102.7%; descent-override: 31.9%; line-gap-override: 0%; }
+@font-face { font-family: 'Cormorant Fallback'; font-style: italic; src: local('Georgia Italic'), local('Georgia-Italic'); size-adjust: 79.7%; ascent-override: 115.9%; descent-override: 36%; line-gap-override: 0%; }
+@font-face { font-family: 'Geist Fallback'; src: local('Arial'), local('ArialMT'), local('Helvetica'); size-adjust: 104.3%; ascent-override: 96.4%; descent-override: 28.3%; line-gap-override: 0%; }
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+/* The hidden attribute always wins, even over components that set display. */
+[hidden] { display: none !important; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-h) + 1rem);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  font-feature-settings: 'ss01', 'cv11';
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Film grain on a fixed layer only (never on scrolling content). */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-grain);
+  pointer-events: none;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+img, video, svg { display: block; max-width: 100%; }
+img, video { height: auto; }
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+p { margin: 0; text-wrap: pretty; }
+
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+::selection { background: var(--accent); color: var(--accent-ink); }
+
+.container {
+  width: 100%;
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section { padding-block: var(--space-section); }
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Small tracked label. Rationed: max one per three sections. */
+.label {
+  font-family: var(--font-body);
+  font-size: var(--step--1);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.lede { font-size: var(--step-1); color: var(--text-muted); max-width: var(--measure); line-height: 1.5; }
+.prose { max-width: var(--measure); color: var(--text-muted); }
+.prose p + p { margin-top: 1em; }
+
+/* Buttons: one primary style, one quiet text link. Sharp, 44px min target. */
+.btn {
+  --_bg: var(--accent);
+  --_fg: var(--accent-ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  min-height: 48px;
+  padding: 0.8em 1.5em;
+  border: 1px solid var(--_bg);
+  background: var(--_bg);
+  color: var(--_fg);
+  font: 500 var(--step--1) / 1 var(--font-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.3s var(--ease-out), color 0.3s var(--ease-out), transform 0.15s;
+}
+.btn:hover { --_bg: var(--text); }
+.btn:active { transform: translateY(1px); }
+.btn svg { width: 1.1em; height: 1.1em; }
+
+.btn--ghost { --_bg: transparent; --_fg: var(--text); border-color: var(--line-strong); }
+.btn--ghost:hover { --_bg: transparent; border-color: var(--text); }
+
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  min-height: 44px;
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line-strong);
+  transition: border-color 0.3s var(--ease-out), gap 0.3s var(--ease-out);
+}
+.link-arrow:hover { border-color: var(--accent); gap: 0.8em; }
+.link-arrow svg { width: 1em; height: 1em; }
+
+/* Experiment variants: everything hidden until its arm is active (see Experiments.astro). */
+.exp { display: none; }
+
+/*
+ * Page transitions (ClientRouter): a short cross-fade; the header holds still.
+ * The router skips animation under prefers-reduced-motion.
+ */
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.28s; animation-timing-function: var(--ease-out); }
+.site-header { view-transition-name: site-header; }
+
+/* "New since your last visit" (src/lib/analytics/new-since.ts). */
+.new-badge {
+  display: inline-block;
+  margin-left: 0.6em;
+  padding: 0.15em 0.5em 0.1em;
+  vertical-align: 0.25em;
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  background: var(--accent);
+}
+
+/* Scroll reveal with zero JS: CSS scroll-driven animation, motion-safe only. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 22%;
+    }
+  }
+  @view-transition { navigation: auto; }
+}
+
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: none; }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) { animation-duration: 0.35s; }

@@ -1,0 +1,56 @@
+---
+/** Phosphor (light weight) icons, inlined at build. One family, project-wide. */
+import arrowRight from '@phosphor-icons/core/assets/light/arrow-right-light.svg?raw';
+import arrowUpRight from '@phosphor-icons/core/assets/light/arrow-up-right-light.svg?raw';
+import play from '@phosphor-icons/core/assets/light/play-light.svg?raw';
+import pause from '@phosphor-icons/core/assets/light/pause-light.svg?raw';
+import speakerHigh from '@phosphor-icons/core/assets/light/speaker-high-light.svg?raw';
+import speakerSlash from '@phosphor-icons/core/assets/light/speaker-slash-light.svg?raw';
+import instagram from '@phosphor-icons/core/assets/light/instagram-logo-light.svg?raw';
+import youtube from '@phosphor-icons/core/assets/light/youtube-logo-light.svg?raw';
+import spotify from '@phosphor-icons/core/assets/light/spotify-logo-light.svg?raw';
+import facebook from '@phosphor-icons/core/assets/light/facebook-logo-light.svg?raw';
+import soundcloud from '@phosphor-icons/core/assets/light/soundcloud-logo-light.svg?raw';
+import envelope from '@phosphor-icons/core/assets/light/envelope-simple-light.svg?raw';
+import list from '@phosphor-icons/core/assets/light/list-light.svg?raw';
+import x from '@phosphor-icons/core/assets/light/x-light.svg?raw';
+import check from '@phosphor-icons/core/assets/light/check-light.svg?raw';
+import caretDown from '@phosphor-icons/core/assets/light/caret-down-light.svg?raw';
+import caretLeft from '@phosphor-icons/core/assets/light/caret-left-light.svg?raw';
+
+const icons = {
+  'arrow-right': arrowRight,
+  'arrow-up-right': arrowUpRight,
+  play,
+  pause,
+  'speaker-high': speakerHigh,
+  'speaker-slash': speakerSlash,
+  instagram,
+  youtube,
+  spotify,
+  facebook,
+  soundcloud,
+  envelope,
+  list,
+  x,
+  check,
+  'caret-down': caretDown,
+  'caret-left': caretLeft,
+} as const;
+
+export type IconName = keyof typeof icons;
+
+interface Props {
+  name: IconName;
+  label?: string;
+  class?: string;
+}
+
+const { name, label, class: cls } = Astro.props;
+const svg = icons[name].replace(
+  '<svg ',
+  `<svg ${label ? `role="img" aria-label="${label}"` : 'aria-hidden="true" focusable="false"'} class="icon ${cls ?? ''}" `,
+);
+---
+
+<Fragment set:html={svg /* soc2-ignore: SVG from the pinned @phosphor-icons package, inlined at build */} />

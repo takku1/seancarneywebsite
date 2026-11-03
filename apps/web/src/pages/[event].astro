@@ -1,0 +1,89 @@
+---
+/**
+ * Event-type landing pages: /weddings, /corporate, /estate, /galas, /destination.
+ * Shared: the intro (who, proof, inquire within two screens, for Instagram and
+ * search arrivals). Everything after it is composed per event type from
+ * src/data/events.json blocks.
+ */
+import type { GetStaticPaths } from 'astro';
+import { Image, getImage } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EventBlocks from '../components/events/EventBlocks.astro';
+import Icon from '../components/ui/Icon.astro';
+import InquireLabel from '../components/ui/InquireLabel.astro';
+import ScoutInvite from '../components/scout/ScoutInvite.astro';
+import { eventTypes, faqsFor } from '../lib/content';
+import { site } from '../config/site';
+import { graph, breadcrumbSchema, faqSchema, serviceSchema } from '../lib/seo/schema';
+
+export const getStaticPaths = (async () => {
+  const events = await eventTypes();
+  return events.map((e) => ({ params: { event: e.data.slug }, props: { entry: e } }));
+}) satisfies GetStaticPaths;
+
+const { entry } = Astro.props;
+const e = entry.data;
+const faqs = await faqsFor(e.slug);
+const hasFilm = e.blocks.some((b) => b.type === 'film');
+const og = await getImage({ src: e.image, width: 1200, height: 630, fit: 'cover', format: 'jpg', quality: 80 });
+const inquireHref = `/inquire?type=${e.formType}`;
+const SCOUT: Record<string, [string, string[]]> = {"weddings": ["Planning a wedding? Scout can check your date or play a first-dance favorite.", ["Is my date open?", "Play a first-dance song"]], "corporate": ["Have a date and a brief? Scout can check availability and share live corporate footage.", ["Check a date", "Show live event footage"]], "estate": ["Questions about a private evening? Scout answers discreetly.", ["Can the music stay quiet?", "Check a date"]], "galas": ["Building a gala program? Scout can check your date and show a featured set.", ["Check a date", "Show a featured set"]], "destination": ["Tell Scout where and when, and it will check the date and explain travel.", ["How does travel work?", "Check a date"]]};
+const [scoutText, scoutPrompts] = SCOUT[e.slug] ?? ['Questions? Scout can help.', []];
+
+const jsonLd = graph(
+  breadcrumbSchema([
+    { name: 'Home', path: '/' },
+    { name: 'Private events', path: '/private-events' },
+    { name: e.label, path: `/${e.slug}` },
+  ]),
+  { ...serviceSchema(), name: e.seoTitle.split('|')[0].trim(), url: `${site.url}/${e.slug}` },
+  faqSchema(faqs.map((f) => f.data)),
+);
+---
+
+<BaseLayout zone="events" pageType={`event_${e.slug}`} title={e.seoTitle} description={e.seoDescription} image={og.src} imageAlt={e.imageAlt} jsonLd={jsonLd}>
+  <section class="intro" data-section="event_intro">
+    <div class="container grid">
+      <div class="copy">
+        <nav class="crumb" aria-label="Breadcrumb"><a href="/private-events">Private events</a> <span aria-hidden="true">/</span> {e.label}</nav>
+        <h1>{e.headline}</h1>
+        <p class="lede">{e.intro}</p>
+        <div class="ctas">
+          <a href={inquireHref} class="btn" data-track="cta_click" data-track-location="event_intro" data-track-event_type={e.slug}><InquireLabel /></a>
+          {hasFilm && <a href="#film" class="link-arrow">Watch him perform <Icon name="arrow-right" /></a>}
+        </div>
+        <p class="promise">Replies {site.responseTime}.</p>
+      </div>
+      <div class="photo">
+        <Image src={e.image} alt={e.imageAlt} widths={[480, 800, 1200]} sizes="(min-width: 900px) 45vw, 92vw" loading="eager" fetchpriority="high" />
+      </div>
+    </div>
+  </section>
+
+  <div class="container scout-row"><ScoutInvite text={scoutText} prompts={scoutPrompts} source={`event_${e.slug}`} /></div>
+  <EventBlocks entry={entry} />
+</BaseLayout>
+
+<style>
+  .intro { padding-block: clamp(2.5rem, 6vw, 5rem); border-bottom: 1px solid var(--line); }
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: center;
+  }
+  .crumb { font-size: var(--step--1); color: var(--text-muted); margin-bottom: 1.5rem; }
+  .crumb a { color: var(--text-muted); }
+  h1 { font-size: var(--step-5); max-width: 13ch; }
+  .lede { margin-top: 1.5rem; }
+  .ctas { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 2rem; margin-top: 2.25rem; }
+  .promise { margin-top: 1rem; font-size: var(--step--1); color: var(--text-muted); }
+  .photo :global(img) { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; }
+  .scout-row { padding-block: 1.5rem; }
+
+  @media (max-width: 899px) {
+    .grid { grid-template-columns: minmax(0, 1fr); }
+    .photo { order: -1; }
+    .photo :global(img) { aspect-ratio: 4 / 3; }
+  }
+</style>

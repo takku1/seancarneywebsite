@@ -1,0 +1,319 @@
+---
+/**
+ * Renders an event page's own sequence of sections. Each event type composes
+ * a different page from these blocks (see src/data/events.json), so a planner
+ * moving from /weddings to /corporate sees a different argument, not the same
+ * template with new words.
+ */
+import { Image } from 'astro:assets';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import FilmGrid from '../home/FilmGrid.astro';
+import Testimonials from '../home/Testimonials.astro';
+import FaqList from './FaqList.astro';
+import SpotifyFacade from '../media/SpotifyFacade.astro';
+import Icon from '../ui/Icon.astro';
+import { creditsBy, faqsFor } from '../../lib/content';
+import { site } from '../../config/site';
+import arena from '../../assets/photos/arena.jpg';
+
+interface Props {
+  entry: CollectionEntry<'events'>;
+}
+const { entry } = Astro.props;
+const e = entry.data;
+const slug = e.slug;
+
+type Item = { title?: string; body?: string; k?: string; v?: string };
+const asItems = (items?: (string | Item)[]) => (items ?? []).map((i) => (typeof i === 'string' ? { title: i } : i)) as Item[];
+
+const clients = await creditsBy('client');
+const BIG_ROOMS = ['crypto-arena', 'el-rey', 'hotel-del', 'terranea', 'beverly-hills-hotel'];
+const venues = (await creditsBy('venue')).filter((v) => BIG_ROOMS.includes(v.id));
+const press = await getCollection('press');
+const faqs = await faqsFor(slug);
+const split = (s: string) => {
+  const [song, artist] = s.split(', ');
+  return { song, artist };
+};
+---
+
+{e.blocks.map((b, idx) => {
+  const id = `${slug}-${b.type}-${idx}`;
+  const items = asItems(b.items);
+  switch (b.type) {
+    case 'timeline':
+      return (
+        <section class="section timeline" data-section={`event_${b.type}`} aria-labelledby={id}>
+          <div class="container tl-grid">
+            <h2 id={id}>{b.title}</h2>
+            <ol>
+              {items.map((it) => (
+                <li class="reveal">
+                  <h3>{it.title}</h3>
+                  <p>{it.body}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+      );
+    case 'columns':
+      return (
+        <section class="section columns" data-section={`event_${b.type}`} aria-labelledby={id}>
+          <div class="container">
+            <h2 id={id}>{b.title}</h2>
+            <ul>
+              {items.map((it) => (
+                <li class="reveal"><h3>{it.title}</h3><p>{it.body}</p></li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      );
+    case 'program':
+      return (
+        <section class="section program" data-section={`event_${b.type}`} aria-labelledby={id}>
+          <div class="container">
+            <h2 id={id}>{b.title}</h2>
+            <ol>
+              {items.map((it) => (
+                <li class="reveal"><h3>{it.title}</h3><p>{it.body}</p></li>
+              ))}
+            </ol>
+          </div>
+        </section>
+      );
+    case 'steps':
+      return (
+        <section class="section steps" data-section={`event_${b.type}`} aria-labelledby={id}>
+          <div class="container">
+            <h2 id={id}>{b.title}</h2>
+            <ol>
+              {items.map((it) => (
+                <li class="reveal"><h3>{it.title}</h3><p>{it.body}</p></li>
+              ))}
+            </ol>
+          </div>
+        </section>
+      );
+    case 'feature':
+      return b.image ? (
+        <figure class="feature" data-section="event_feature">
+          <Image src={b.image} alt={b.alt ?? ''} widths={[768, 1280, 1920, 2400]} sizes="100vw" />
+          {b.caption && <figcaption class="container">{b.caption}</figcaption>}
+        </figure>
+      ) : null;
+    case 'film':
+      return <div id="film"><FilmGrid placement={`event_${slug}`} ids={b.ids} count={b.ids?.length ?? 3} heading={b.title} mix={['for_events', 'most_watched', 'newest']} /></div>;
+    case 'repertoire':
+      return (
+        <section class="section repertoire" data-section="event_repertoire" aria-labelledby={id}>
+          <div class="container rep-grid">
+            <div>
+              <h2 id={id}>{b.title}</h2>
+              {b.note && <p class="rep-note">{b.note}</p>}
+              {b.playlist && <div class="rep-player"><SpotifyFacade uri={b.playlist} title="Sean Carney, Acoustic Covers" location={`event_${slug}_repertoire`} /></div>}
+            </div>
+            <div class="lists">
+              <div>
+                <h3>Solo acoustic</h3>
+                <ul>{(b.solo ?? []).map((s) => <li><span>{split(s).song}</span><small>{split(s).artist}</small></li>)}</ul>
+              </div>
+              <div>
+                <h3>With The Hustlers</h3>
+                <ul>{(b.band ?? []).map((s) => <li><span>{split(s).song}</span><small>{split(s).artist}</small></li>)}</ul>
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    case 'clients':
+      return (
+        <section class="section clients" data-section="event_clients" aria-labelledby={id}>
+          <div class="container">
+            <h2 id={id} class="small-h">{b.title}</h2>
+            <p class="names">{clients.map((c, i) => <><span>{c.data.name}</span>{i < clients.length - 1 && <>{' '}<span class="sep" aria-hidden="true">/</span>{' '}</>}</>)}</p>
+            {b.story && <p class="story">{b.story}</p>}
+          </div>
+        </section>
+      );
+    case 'specs':
+      return (
+        <section class="section specs" data-section="event_specs" aria-labelledby={id}>
+          <div class="container sp-grid">
+            <h2 id={id}>{b.title}</h2>
+            <dl>
+              {items.map((it) => <div><dt>{it.k}</dt><dd>{it.v}</dd></div>)}
+            </dl>
+          </div>
+        </section>
+      );
+    case 'checklist':
+      return (
+        <section class="section checklist" data-section="event_checklist" aria-labelledby={id}>
+          <div class="container ck-grid">
+            <h2 id={id}>{b.title}</h2>
+            <ul>{items.map((it) => <li><Icon name="check" /> {it.title}</li>)}</ul>
+          </div>
+        </section>
+      );
+    case 'statement':
+      return (
+        <section class="section statement" data-section="event_statement" aria-labelledby={id}>
+          <div class="container">
+            <h2 id={id}>{b.title}</h2>
+            <p>{b.body}</p>
+          </div>
+        </section>
+      );
+    case 'testimonials':
+      return <Testimonials eventType={b.eventType} strict={b.strict} limit={b.limit} />;
+    case 'quote': {
+      const q = press.find((p) => p.id === b.pressId);
+      return q ? (
+        <section class="section pq" data-section="event_press_quote">
+          <div class="container">
+            <blockquote><p>&ldquo;{q.data.quote}&rdquo;</p></blockquote>
+            <a href={q.data.url} target="_blank" rel="noopener" data-track="press_click" data-track-outlet={q.data.outlet} data-track-location={`event_${slug}`}>{q.data.outlet} <Icon name="arrow-up-right" /></a>
+          </div>
+        </section>
+      ) : null;
+    }
+    case 'stages':
+      return (
+        <section class="section big-rooms" data-section="event_stages" aria-labelledby={id}>
+          <div class="container br-grid">
+            <Image src={arena} alt="Sean Carney inside an arena before a performance" widths={[480, 904]} sizes="(min-width: 900px) 40vw, 92vw" />
+            <div>
+              <h2 id={id}>{b.title}</h2>
+              <ul>{venues.map((v) => <li><span>{v.data.name}</span>{v.data.detail && <small>{v.data.detail}</small>}</li>)}</ul>
+            </div>
+          </div>
+        </section>
+      );
+    case 'reach':
+      return (
+        <section class="section reach" data-section="event_reach">
+          <div class="container rc-grid">
+            <p class="big">{site.stats.countries}</p>
+            <div>
+              <h2>Countries performed in</h2>
+              <p>Based in Los Angeles, available worldwide. Destination weddings, villas, yachts and resorts by arrangement.</p>
+            </div>
+          </div>
+        </section>
+      );
+    case 'faq':
+      return <FaqList faqs={faqs} location={slug} />;
+    default:
+      return null;
+  }
+})}
+
+<style>
+  h2 { font-size: var(--step-4); }
+  h3 { font-size: var(--step-2); }
+
+  /* timeline: sticky title, vertical rule */
+  .tl-grid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: clamp(2rem, 5vw, 5rem); align-items: start; }
+  .timeline h2 { position: sticky; top: calc(var(--header-h) + 2rem); }
+  .timeline ol { list-style: none; margin: 0; padding: 0 0 0 2rem; border-left: 1px solid var(--line-strong); display: grid; gap: 2.5rem; }
+  .timeline li { position: relative; }
+  .timeline li::before { content: ''; position: absolute; left: calc(-2rem - 4px); top: 0.6em; width: 7px; height: 7px; background: var(--accent); }
+  .timeline p { margin-top: 0.5rem; color: var(--text-muted); max-width: 46ch; }
+
+  /* columns: asymmetric with accent rule */
+  .columns h2 { margin-bottom: 2.5rem; }
+  .columns ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: clamp(2rem, 4vw, 4rem); }
+  .columns li { padding-top: 1.5rem; border-top: 1px solid var(--accent); }
+  .columns p { margin-top: 0.75rem; color: var(--text-muted); }
+
+  /* program: horizontal run-of-show strip */
+  .program { background: var(--bg-sunk); }
+  .program h2 { margin-bottom: 3rem; }
+  .program ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 2px solid var(--accent); }
+  .program li { padding: 1.75rem 1.5rem 0 0; }
+  .program li + li { padding-left: 1.5rem; border-left: 1px solid var(--line); }
+  .program p { margin-top: 0.6rem; color: var(--text-muted); font-size: var(--step--1); }
+
+  /* steps: large stacked rows */
+  .steps h2 { margin-bottom: 2rem; }
+  .steps ol { list-style: none; margin: 0; padding: 0; }
+  .steps li { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 2rem; padding-block: 1.75rem; border-top: 1px solid var(--line); }
+  .steps h3 { font-size: var(--step-3); }
+  .steps p { color: var(--text-muted); align-self: center; }
+
+  /* feature: full-bleed photograph */
+  .feature { position: relative; margin: 0; }
+  .feature :global(img) { width: 100%; height: auto; max-height: 88vh; object-fit: cover; }
+  .feature figcaption {
+    position: absolute;
+    inset: auto 0 clamp(1.25rem, 3vw, 2.5rem) 0;
+    color: var(--on-image);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--step-2);
+    text-shadow: 0 2px 24px rgb(0 0 0 / 0.6);
+  }
+
+  /* repertoire */
+  .repertoire { background: var(--bg-sunk); }
+  .rep-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(2rem, 5vw, 5rem); }
+  .rep-note { margin-top: 1.25rem; color: var(--text-muted); max-width: 40ch; }
+  .rep-player { margin-top: 2rem; max-width: 30rem; }
+  .lists { display: grid; grid-template-columns: 1.4fr 1fr; gap: 2.5rem; }
+  .lists h3, .small-h { font-family: var(--font-body); font-size: var(--step--1); font-weight: 500; color: var(--text-muted); margin-bottom: 1.25rem; }
+  .lists ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
+  .lists li { display: flex; flex-direction: column; }
+  .lists span { font-family: var(--font-display); font-size: var(--step-2); line-height: 1.15; }
+  .lists small { color: var(--text-muted); font-size: var(--step--1); }
+
+  /* clients: typographic wall */
+  .clients { border-bottom: 1px solid var(--line); }
+  .names { font-family: var(--font-display); font-size: var(--step-4); line-height: 1.15; max-width: 22ch; }
+  .names .sep { color: var(--accent); font-style: italic; }
+  .story { margin-top: 2rem; max-width: 58ch; color: var(--text-muted); font-size: var(--step-1); line-height: 1.5; }
+
+  /* specs */
+  .sp-grid, .ck-grid, .br-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(2rem, 5vw, 5rem); align-items: start; }
+  .specs dl { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem 2.5rem; }
+  .specs dt { font-size: var(--step--1); color: var(--text-muted); }
+  .specs dd { margin: 0.4rem 0 0; font-family: var(--font-display); font-size: var(--step-1); line-height: 1.3; }
+
+  /* checklist */
+  .checklist ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem 2.5rem; }
+  .checklist li { display: flex; gap: 0.75rem; align-items: baseline; }
+  .checklist li :global(svg) { width: 18px; height: 18px; color: var(--accent); flex: none; transform: translateY(3px); }
+
+  /* statement: one centered idea */
+  .statement { text-align: center; border-block: 1px solid var(--line); }
+  .statement h2 { font-style: italic; font-size: var(--step-5); }
+  .statement p { margin: 1.75rem auto 0; max-width: 52ch; color: var(--text-muted); font-size: var(--step-1); line-height: 1.5; }
+
+  /* press quote */
+  .pq blockquote { margin: 0; }
+  .pq p { font-family: var(--font-display); font-style: italic; font-size: var(--step-4); line-height: 1.12; max-width: 24ch; padding-bottom: 0.1em; }
+  .pq a { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 44px; margin-top: 1rem; color: var(--text-muted); text-decoration: none; }
+  .pq a :global(svg) { width: 16px; height: 16px; }
+
+  /* big rooms */
+  .br-grid :global(img) { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; }
+  .big-rooms ul { list-style: none; margin: 2rem 0 0; padding: 0; display: grid; gap: 1rem; }
+  .big-rooms li { display: flex; flex-direction: column; }
+  .big-rooms li span { font-family: var(--font-display); font-size: var(--step-2); line-height: 1.15; }
+  .big-rooms li small { color: var(--text-muted); font-size: var(--step--1); }
+
+  /* reach */
+  .rc-grid { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: clamp(2rem, 6vw, 6rem); align-items: center; }
+  .big { font-family: var(--font-display); font-size: clamp(6rem, 4rem + 12vw, 16rem); line-height: 0.85; color: var(--accent); }
+  .reach p:not(.big) { margin-top: 1rem; color: var(--text-muted); max-width: 48ch; font-size: var(--step-1); line-height: 1.5; }
+
+  @media (max-width: 899px) {
+    .tl-grid, .rep-grid, .lists, .sp-grid, .ck-grid, .br-grid, .rc-grid, .steps li { grid-template-columns: minmax(0, 1fr); }
+    .timeline h2 { position: static; }
+    .columns ul, .checklist ul, .specs dl { grid-template-columns: minmax(0, 1fr); }
+    .program ol { grid-template-columns: minmax(0, 1fr); border-top: 0; border-left: 2px solid var(--accent); }
+    .program li, .program li + li { padding: 0 0 1.75rem 1.5rem; border-left: 0; }
+    .feature :global(img) { aspect-ratio: 4 / 3; }
+  }
+</style>

@@ -1,0 +1,14 @@
+// Merged by @astrojs/cloudflare into the generated Worker config at build.
+{
+  "name": "seancarneymusic",
+  "compatibility_date": "2026-11-01",
+  "observability": { "enabled": true },
+  // Anonymous Scout signals (topic counts, date demand). No id: wrangler provisions it on first deploy.
+  "kv_namespaces": [{ "binding": "SCOUT_KV" }],
+  // Cloudflare Rate Limiting bindings (periods must be 10 or 60 s). Keys are per route + hashed client.
+  // src/middleware.ts picks the tier per route; the in-memory fallback covers dev only.
+  "ratelimits": [
+    { "name": "RATE_LIMITER_STRICT", "namespace_id": "1001", "simple": { "limit": 3, "period": 60 } },
+    { "name": "RATE_LIMITER", "namespace_id": "1002", "simple": { "limit": 20, "period": 60 } }
+  ]
+}

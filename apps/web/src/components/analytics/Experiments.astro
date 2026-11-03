@@ -1,0 +1,7 @@
+---
+/** Inline CSS that shows each experiment's assigned arm before first paint. */
+import { experimentsCss } from '../../lib/analytics/experiments';
+const css = experimentsCss();
+---
+
+<style is:inline set:html={css /* soc2-ignore: WEB003 - CSS generated at build from static experiment config; CSP-hashed by integrations/csp-header-hashes.mjs */}></style>

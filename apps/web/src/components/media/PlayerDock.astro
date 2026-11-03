@@ -1,0 +1,49 @@
+---
+/**
+ * Mini-player. Lives in a transition:persist container (BaseLayout), so a
+ * video keeps playing while the visitor scrolls away or browses other pages.
+ * Driven entirely by src/lib/media/player.ts; never takes focus.
+ */
+import Icon from '../ui/Icon.astro';
+---
+
+<aside class="dock" data-dock aria-label="Now playing" hidden>
+  <div class="frame" data-dock-slot></div>
+  <div class="bar">
+    <p class="title" data-dock-title></p>
+    <button type="button" class="ctl" data-dock-back aria-label="Back to the video"><Icon name="arrow-up-right" /></button>
+    <button type="button" class="ctl" data-dock-close aria-label="Close the player"><Icon name="x" /></button>
+  </div>
+</aside>
+
+<script>
+  import { back, close } from '../../lib/media/player';
+  const dock = document.querySelector<HTMLElement>('[data-dock]');
+  dock?.querySelector('[data-dock-back]')?.addEventListener('click', () => void back());
+  dock?.querySelector('[data-dock-close]')?.addEventListener('click', () => close());
+</script>
+
+<style>
+  .dock {
+    position: fixed;
+    z-index: var(--z-header);
+    left: max(var(--gutter), env(safe-area-inset-left));
+    bottom: max(1.25rem, env(safe-area-inset-bottom));
+    width: min(22rem, calc(100vw - 2 * var(--gutter) - 4.5rem));
+    background: var(--bg-raised);
+    border: 1px solid var(--line-strong);
+    box-shadow: 0 24px 60px rgb(0 0 0 / 0.5);
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.35s var(--ease-out), transform 0.45s var(--ease-out);
+  }
+  .dock.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .dock { transform: none; } }
+  .frame { position: relative; aspect-ratio: 16 / 9; background: #000; }
+  .frame :global(iframe) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .bar { display: flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.25rem 0.25rem 0.9rem; }
+  .title { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-family: var(--font-display); font-size: var(--step-1); }
+  .ctl { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: none; border: 0; color: var(--text-muted); cursor: pointer; }
+  .ctl:hover { color: var(--text); }
+  .ctl :global(svg) { width: 18px; height: 18px; }
+</style>

@@ -1,0 +1,494 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/ui/Icon.astro';
+import { PUBLIC_TURNSTILE_SITE_KEY, PUBLIC_CALL_BOOKING_URL } from 'astro:env/client';
+import { EVENT_TYPES, GUESTS, FORMATS, MOMENTS, BUDGETS, ROLES } from '../../lib/inquiry/schema';
+import { site } from '../../config/site';
+import { headlineCredits } from '../../lib/content';
+import ScoutInvite from '../../components/scout/ScoutInvite.astro';
+
+const credits = (await headlineCredits()).slice(0, 4).map((c) => c.data.name);
+const steps = ['Occasion', 'Date and place', 'The event', 'Investment', 'Your details'];
+---
+
+<BaseLayout zone="events"
+  pageType="inquire"
+  title="Inquire | Sean Carney"
+  description="Check Sean Carney's availability for your wedding, corporate event, gala or private celebration. Personal reply within one business day."
+>
+  <section class="wrap" data-section="inquiry_form">
+    <div class="container grid">
+      <aside class="side">
+        <h1>Tell us about the date</h1>
+        <p class="lede">Five short steps, about two minutes. Sean reads every inquiry and replies personally {site.responseTime}.</p>
+        <div class="scout-side"><ScoutInvite variant="inline" source="inquire" text="Rather talk it through? Scout can take your details conversationally." /></div>
+        <p class="proof">Heard on the {credits.slice(0, 3).join(', ')} and {credits[3]}.</p>
+        {PUBLIC_CALL_BOOKING_URL && (
+          <p class="alt">
+            Prefer to talk first? <a href={PUBLIC_CALL_BOOKING_URL} target="_blank" rel="noopener" data-track="call_booking_click" data-track-location="inquire_side">Book a 15-minute call</a>
+          </p>
+        )}
+        <p class="alt">
+          Prefer email? <a href={`mailto:${site.email.bookings}?subject=Event%20inquiry`} data-track-location="inquire_side">{site.email.bookings}</a>
+        </p>
+      </aside>
+
+      <form class="form" novalidate data-clarity-mask="true" data-inquiry data-email={site.email.bookings} data-turnstile={PUBLIC_TURNSTILE_SITE_KEY ?? ''}>
+        <div class="progress" aria-hidden="true"><span data-progress-bar></span></div>
+        <p class="step-count" aria-live="polite"><span data-step-num>1</span> of {steps.length}: <span data-step-name>{steps[0]}</span></p>
+
+        <!-- 1. Occasion -->
+        <fieldset data-step="0" data-name="occasion">
+          <legend>What is the occasion?</legend>
+          <div class="choices">
+            {EVENT_TYPES.map((t) => (
+              <label class="choice"><input type="radio" name="event_type" value={t.value} required /><span>{t.label}</span></label>
+            ))}
+          </div>
+          <p class="error" data-error="event_type" hidden>Choose the closest match.</p>
+        </fieldset>
+
+        <!-- 2. Date and place -->
+        <fieldset data-step="1" data-name="date_place" hidden>
+          <legend>When and where?</legend>
+          <div class="field">
+            <label for="event_date">Event date</label>
+            <input type="date" id="event_date" name="event_date" />
+            <label class="check"><input type="checkbox" name="date_flexible" /> The date is flexible or not set yet</label>
+            <p class="error" data-error="event_date" hidden>Add a date, or tick the box if it is flexible.</p>
+            <p class="avail" data-avail aria-live="polite" hidden></p>
+          </div>
+          <div class="field">
+            <label for="location">City or venue</label>
+            <input type="text" id="location" name="location" autocomplete="address-level2" placeholder="e.g. Malibu, or the venue name" required />
+            <p class="error" data-error="location" hidden>Add a city or venue.</p>
+          </div>
+        </fieldset>
+
+        <!-- 3. The event -->
+        <fieldset data-step="2" data-name="event_details" hidden>
+          <legend>A little more about it</legend>
+          <div class="field">
+            <label for="guests">Guest count</label>
+            <select id="guests" name="guests">
+              <option value="">Select</option>
+              {GUESTS.map((g) => <option value={g}>{g}</option>)}
+            </select>
+          </div>
+          <div class="field">
+            <span class="flabel" id="format-l">Preferred format</span>
+            <div class="choices compact" role="radiogroup" aria-labelledby="format-l">
+              {FORMATS.map((f, idx) => (
+                <label class="choice"><input type="radio" name="format" value={f.value} checked={idx === 3} /><span>{f.label}</span></label>
+              ))}
+            </div>
+          </div>
+          <div class="field">
+            <span class="flabel" id="moments-l">Moments to cover</span>
+            <div class="choices compact" role="group" aria-labelledby="moments-l">
+              {MOMENTS.map((m) => (
+                <label class="choice"><input type="checkbox" name="moments" value={m} /><span>{m}</span></label>
+              ))}
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- 4. Investment -->
+        <fieldset data-step="3" data-name="budget" hidden>
+          <legend>What music budget are you working with?</legend>
+          <p class="hint">A range helps tailor the proposal, from a solo ceremony to the full band. It stays between you and Sean.</p>
+          <div class="choices">
+            {BUDGETS.map((b) => (
+              <label class="choice"><input type="radio" name="budget" value={b.value} required /><span>{b.label}</span></label>
+            ))}
+          </div>
+          <p class="error" data-error="budget" hidden>Choose a range, or "Prefer to discuss".</p>
+        </fieldset>
+
+        <!-- 5. Details -->
+        <fieldset data-step="4" data-name="contact" hidden>
+          <legend>Where should Sean reply?</legend>
+          <div class="row">
+            <div class="field">
+              <label for="name">Full name</label>
+              <input type="text" id="name" name="name" autocomplete="name" required />
+              <p class="error" data-error="name" hidden>Add your name.</p>
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" autocomplete="email" inputmode="email" required />
+              <p class="error" data-error="email" hidden>Add a valid email.</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="phone">Phone <span class="opt">(optional)</span></label>
+              <input type="tel" id="phone" name="phone" autocomplete="tel" inputmode="tel" />
+            </div>
+            <div class="field">
+              <label for="role">You are</label>
+              <select id="role" name="role" required>
+                <option value="">Select</option>
+                {ROLES.map((r) => <option value={r.value}>{r.label}</option>)}
+              </select>
+              <p class="error" data-error="role" hidden>Let us know who you are.</p>
+            </div>
+          </div>
+          <div class="field" data-company-field>
+            <label for="company">Company or planning firm <span class="opt">(optional)</span></label>
+            <input type="text" id="company" name="company" autocomplete="organization" />
+          </div>
+          <div class="field">
+            <label for="message">Anything else? <span class="opt">(optional)</span></label>
+            <textarea id="message" name="message" rows="4" placeholder="Songs you love, the feel of the night, timings"></textarea>
+          </div>
+          <label class="check"><input type="checkbox" name="sms_consent" /> I consent to receive text messages from Sean Carney Music about this inquiry. Message frequency varies; message and data rates may apply. Reply STOP to opt out, HELP for help. <a href="/terms#sms">Terms</a></label>
+          <div class="hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
+          <div class="turnstile" data-turnstile-slot></div>
+        </fieldset>
+
+        <div class="nav">
+          <button type="button" class="back" data-back hidden><Icon name="caret-left" /> Back</button>
+          <button type="button" class="btn" data-next>Continue <Icon name="arrow-right" /></button>
+          <button type="submit" class="btn" data-submit hidden>Send inquiry <Icon name="arrow-right" /></button>
+        </div>
+        <p class="error form-error" data-form-error role="alert" hidden></p>
+      </form>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { getItem, setItem, removeItem } from '../../lib/storage';
+  import { track, adsAllowed, newEventId } from '../../lib/analytics/track';
+  import { getAttribution } from '../../lib/analytics/attribution';
+  import { getExperimentProps } from '../../lib/analytics/experiments';
+  import { onPage } from '../../lib/lifecycle';
+  import { navigate } from 'astro:transitions/client';
+
+  onPage(() => {
+    const form = document.querySelector<HTMLFormElement>('[data-inquiry]')!;
+    const steps = [...form.querySelectorAll<HTMLFieldSetElement>('fieldset[data-step]')];
+    const btnNext = form.querySelector<HTMLButtonElement>('[data-next]')!;
+    const btnBack = form.querySelector<HTMLButtonElement>('[data-back]')!;
+    const btnSubmit = form.querySelector<HTMLButtonElement>('[data-submit]')!;
+    const bar = form.querySelector<HTMLElement>('[data-progress-bar]')!;
+    const formError = form.querySelector<HTMLElement>('[data-form-error]')!;
+    const DRAFT = 'sc_inquiry_draft';
+
+    let current = 0;
+    let started = false;
+    let submitted = false;
+    let stepStart = performance.now();
+    const startedAt = Date.now();
+    let turnstileToken = '';
+
+    // ---------- helpers ----------
+    const fd = () => new FormData(form);
+    const val = (n: string) => String(fd().get(n) ?? '').trim();
+    const showError = (name: string, show: boolean) => {
+      const el = form.querySelector<HTMLElement>(`[data-error="${name}"]`);
+      if (el) el.hidden = !show;
+      const input = form.querySelector<HTMLInputElement>(`[name="${name}"]`);
+      input?.setAttribute('aria-invalid', String(show));
+      if (show) track('inquiry_validation_error', { step: current + 1, field: name });
+    };
+
+    function validate(step: number): boolean {
+      let ok = true;
+      const req = (name: string, cond: boolean) => {
+        showError(name, !cond);
+        if (!cond) ok = false;
+      };
+      if (step === 0) req('event_type', !!val('event_type'));
+      if (step === 1) {
+        req('event_date', !!val('event_date') || fd().get('date_flexible') === 'on');
+        req('location', val('location').length >= 2);
+      }
+      if (step === 3) req('budget', !!val('budget'));
+      if (step === 4) {
+        req('name', val('name').length >= 2);
+        req('email', /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val('email')));
+        req('role', !!val('role'));
+      }
+      if (!ok) form.querySelector<HTMLElement>(`fieldset[data-step="${step}"] [aria-invalid="true"]`)?.focus();
+      return ok;
+    }
+
+    function render() {
+      steps.forEach((s, i) => (s.hidden = i !== current));
+      btnBack.hidden = current === 0;
+      btnNext.hidden = current === steps.length - 1;
+      btnSubmit.hidden = current !== steps.length - 1;
+      bar.style.transform = `scaleX(${(current + 1) / steps.length})`;
+      form.querySelector('[data-step-num]')!.textContent = String(current + 1);
+      form.querySelector('[data-step-name]')!.textContent = steps[current].querySelector('legend')!.textContent!;
+      track('inquiry_step_view', { step: current + 1, step_name: steps[current].dataset.name });
+      stepStart = performance.now();
+      if (current === steps.length - 1) loadTurnstile();
+    }
+
+    function go(next: number) {
+      current = Math.max(0, Math.min(steps.length - 1, next));
+      render();
+      steps[current].querySelector<HTMLElement>('input, select, textarea')?.focus({ preventScroll: true });
+      form.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    }
+
+    // ---------- draft persistence (per-tab convenience only) ----------
+    function saveDraft() {
+      try {
+        const obj: Record<string, unknown> = { step: current };
+        for (const el of form.elements as unknown as Iterable<HTMLInputElement>) {
+          // Contact details are never written to browser storage (ASVS 14.3.3).
+          if (!el.name || ['website', 'name', 'email', 'phone', 'company', 'message'].includes(el.name)) continue;
+          if (el.type === 'radio') { if (el.checked) obj[el.name] = el.value; }
+          else if (el.type === 'checkbox') { if (el.name === 'moments') { ((obj.moments as string[]) ||= []); if (el.checked) (obj.moments as string[]).push(el.value); } else obj[el.name] = el.checked; }
+          else obj[el.name] = el.value;
+        }
+        setItem(DRAFT, JSON.stringify(obj));
+      } catch { /* storage blocked */ }
+    }
+
+    function restore() {
+      let draft: Record<string, unknown> = {};
+      try { draft = JSON.parse(getItem(DRAFT) || '{}'); } catch { /* noop */ }
+      const qp = new URLSearchParams(location.search);
+      const qType = qp.get('type');
+      if (qType && !draft.event_type) draft.event_type = qType;
+      const qDate = qp.get('date');
+      if (qDate && /^\d{4}-\d{2}-\d{2}$/.test(qDate) && !draft.event_date) draft.event_date = qDate;
+      for (const el of form.elements as unknown as Iterable<HTMLInputElement>) {
+        if (!el.name || !(el.name in draft)) continue;
+        const v = draft[el.name];
+        if (el.type === 'radio') el.checked = el.value === v;
+        else if (el.type === 'checkbox') el.checked = el.name === 'moments' ? Array.isArray(v) && v.includes(el.value) : !!v;
+        else el.value = String(v ?? '');
+      }
+      if (qType) track('inquiry_prefill', { event_type: qType });
+    }
+
+    // ---------- Turnstile (only when configured, loaded on the last step) ----------
+    let turnstileRendered = false;
+    function loadTurnstile() {
+      const key = form.dataset.turnstile;
+      if (!key || turnstileRendered) return;
+      const w = window as unknown as { turnstile?: { render: (el: Element, o: object) => void } };
+      const render = () => {
+        if (turnstileRendered || !w.turnstile) return;
+        turnstileRendered = true;
+        w.turnstile.render(form.querySelector('[data-turnstile-slot]')!, {
+          sitekey: key,
+          theme: 'dark',
+          appearance: 'interaction-only',
+          callback: (t: string) => (turnstileToken = t),
+        });
+      };
+      // The script loads once per full page load; on a later client navigation it is already here.
+      if (w.turnstile) return render();
+      const existing = document.getElementById('cf-turnstile');
+      if (existing) return void existing.addEventListener('load', render, { once: true });
+      const s = document.createElement('script');
+      s.id = 'cf-turnstile';
+      s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+      s.async = true;
+      s.onload = render;
+      document.head.appendChild(s);
+    }
+
+    // ---------- events ----------
+    form.addEventListener('input', () => {
+      if (!started) {
+        started = true;
+        track('inquiry_start', { event_type: val('event_type') || undefined });
+      }
+      saveDraft();
+    });
+    // ---------- live availability (indicative only, free/busy from Google Calendar) ----------
+    const availEl = form.querySelector<HTMLElement>('[data-avail]')!;
+    const AVAIL_COPY: Record<string, string> = {
+      open: 'That date looks open. Send the details and Sean will confirm.',
+      busy: 'That date may already be spoken for. Send it anyway: there may be options, and Sean will reply either way.',
+    };
+    let availSeq = 0;
+    async function checkAvailability(date: string) {
+      availEl.hidden = true;
+      if (!date) return;
+      const seq = ++availSeq;
+      try {
+        const res = await fetch(`/api/availability?date=${encodeURIComponent(date)}`);
+        const out = (await res.json()) as { status?: string };
+        if (seq !== availSeq) return; // a newer check superseded this one
+        const msg = out.status ? AVAIL_COPY[out.status] : undefined;
+        if (msg) {
+          availEl.textContent = msg;
+          availEl.dataset.status = out.status;
+          availEl.hidden = false;
+        }
+        track('availability_check', { result: out.status ?? 'error', lead_days: Math.round((Date.parse(date) - Date.now()) / 86_400_000) });
+      } catch {
+        /* stay quiet: availability is a bonus, never a blocker */
+      }
+    }
+
+    form.addEventListener('change', (e) => {
+      const t = e.target as HTMLInputElement;
+      if (t.name === 'event_date') void checkAvailability(t.value);
+      if (t.name === 'event_type' && current === 0) setTimeout(() => btnNext.click(), 180); // one tap advances
+      if (t.name === 'role') (form.querySelector('[data-company-field]') as HTMLElement).hidden = t.value === 'couple';
+    });
+
+    btnNext.addEventListener('click', () => {
+      if (!validate(current)) return;
+      track('inquiry_step_complete', { step: current + 1, step_name: steps[current].dataset.name, ms: Math.round(performance.now() - stepStart) });
+      go(current + 1);
+    });
+    btnBack.addEventListener('click', () => {
+      track('inquiry_back', { from_step: current + 1 });
+      go(current - 1);
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!validate(current)) return;
+      formError.hidden = true;
+      btnSubmit.disabled = true;
+      btnSubmit.setAttribute('aria-busy', 'true');
+      const data = fd();
+      const payload = {
+        event_type: val('event_type'),
+        event_date: val('event_date'),
+        date_flexible: data.get('date_flexible') === 'on',
+        location: val('location'),
+        guests: val('guests') || undefined,
+        format: val('format') || 'unsure',
+        moments: data.getAll('moments').map(String),
+        budget: val('budget'),
+        name: val('name'),
+        email: val('email'),
+        phone: val('phone'),
+        role: val('role'),
+        company: val('company'),
+        message: val('message'),
+        sms_consent: data.get('sms_consent') === 'on',
+        attribution: getAttribution(),
+        experiments: getExperimentProps(),
+        page: location.pathname + location.search,
+        website: val('website'),
+        started_at: startedAt,
+        turnstile_token: turnstileToken || undefined,
+        event_id: newEventId() || undefined,
+        ads_ok: adsAllowed(),
+      };
+      try {
+        const res = await fetch('/api/inquire', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) });
+        const out = (await res.json()) as { ok: boolean; tier?: string; error?: string };
+        if (!res.ok || !out.ok) throw new Error(out.error || `http_${res.status}`);
+        submitted = true;
+        track('inquiry_submit', { event_type: payload.event_type, budget: payload.budget, role: payload.role, format: payload.format, lead_tier: out.tier, ms_total: Date.now() - startedAt, event_id: payload.event_id });
+        removeItem(DRAFT);
+        setItem('sc_lead_tier', out.tier ?? '');
+        await navigate(`/inquire/thanks?type=${encodeURIComponent(payload.event_type)}`);
+      } catch (err) {
+        track('inquiry_error', { reason: (err as Error).message });
+        formError.textContent = `Something went wrong sending your inquiry. Please try again, or email ${form.dataset.email} directly.`;
+        formError.hidden = false;
+        btnSubmit.disabled = false;
+        btnSubmit.removeAttribute('aria-busy');
+      }
+    });
+
+    let abandonSent = false;
+    const abandon = () => {
+      if (abandonSent || !started || submitted) return;
+      abandonSent = true;
+      track('inquiry_abandon', { last_step: current + 1, step_name: steps[current].dataset.name });
+    };
+    addEventListener('pagehide', abandon);
+
+    restore();
+    track('inquiry_view', { prefilled: !!new URLSearchParams(location.search).get('type') });
+    render();
+    // Leaving through the client router does not fire pagehide.
+    return () => {
+      abandon();
+      removeEventListener('pagehide', abandon);
+    };
+  }, '[data-inquiry]');
+</script>
+
+<style>
+  .wrap { padding-block: clamp(3rem, 7vw, 6rem) var(--space-section); }
+  .grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(2.5rem, 6vw, 6rem); align-items: start; }
+  .side { position: sticky; top: calc(var(--header-h) + 2rem); }
+  h1 { font-size: var(--step-4); max-width: 12ch; }
+  .lede { margin-top: 1.25rem; }
+  .proof { margin-top: 2rem; padding-left: 1rem; border-left: 1px solid var(--accent); color: var(--text-muted); font-size: var(--step--1); max-width: 34ch; }
+  .scout-side { margin-top: 1.75rem; }
+  .alt { margin-top: 1.5rem; font-size: var(--step--1); color: var(--text-muted); }
+
+  .form { background: var(--bg-raised); border: 1px solid var(--line); padding: clamp(1.5rem, 4vw, 3rem); }
+  .progress { height: 2px; background: var(--line); margin-bottom: 1.25rem; overflow: hidden; }
+  .progress span { display: block; height: 100%; background: var(--accent); transform-origin: left; transform: scaleX(0.2); transition: transform 0.5s var(--ease-out); }
+  .step-count { font-size: var(--step--1); color: var(--text-muted); margin-bottom: 1.5rem; }
+
+  fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+  legend { font-family: var(--font-display); font-size: var(--step-3); line-height: 1.1; margin-bottom: 1.75rem; padding: 0; }
+  .hint { color: var(--text-muted); margin: -0.75rem 0 1.5rem; max-width: 50ch; font-size: var(--step--1); }
+
+  .choices { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr)); gap: 0.6rem; }
+  .choices.compact { grid-template-columns: repeat(auto-fill, minmax(min(100%, 10.5rem), 1fr)); }
+  .choice { position: relative; display: block; cursor: pointer; }
+  .choice input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+  .choice span {
+    display: flex;
+    align-items: center;
+    min-height: 52px;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--line-strong);
+    transition: border-color 0.2s, background 0.2s, color 0.2s;
+  }
+  .choice:hover span { border-color: var(--text-muted); }
+  .choice input:checked + span { border-color: var(--accent); background: rgb(201 159 110 / 0.12); color: var(--text); }
+  .choice input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .field { display: grid; gap: 0.5rem; margin-bottom: 1.5rem; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.25rem; }
+  label, .flabel { font-size: var(--step--1); color: var(--text); }
+  .opt { color: var(--text-muted); }
+  input[type='text'], input[type='email'], input[type='tel'], input[type='date'], select, textarea {
+    width: 100%;
+    min-height: 50px;
+    padding: 0.75rem 0.9rem;
+    background: var(--bg);
+    border: 1px solid var(--line-strong);
+    border-radius: 0;
+    color: var(--text);
+    font: inherit;
+    color-scheme: dark;
+  }
+  textarea { min-height: 7rem; resize: vertical; }
+  input::placeholder, textarea::placeholder { color: var(--text-faint); }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: var(--accent); }
+  [aria-invalid='true'] { border-color: var(--danger) !important; }
+  .check { display: flex; gap: 0.7rem; align-items: flex-start; margin-top: 0.75rem; color: var(--text-muted); font-size: var(--step--1); line-height: 1.5; cursor: pointer; }
+  .check input { width: 20px; height: 20px; margin: 0.1rem 0 0; accent-color: var(--accent); flex: none; }
+  .error { color: var(--danger); font-size: var(--step--1); margin-top: 0.5rem; }
+  .avail { margin-top: 0.5rem; padding: 0.7rem 0.9rem; font-size: var(--step--1); border-left: 2px solid var(--accent); background: var(--bg); color: var(--text); }
+  .avail[data-status='busy'] { border-left-color: var(--text-muted); color: var(--text-muted); }
+  .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+  .turnstile { margin-top: 1rem; }
+
+  .nav { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 2.25rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+  .nav .btn { margin-left: auto; }
+  .back { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 44px; background: none; border: 0; color: var(--text-muted); font: inherit; cursor: pointer; padding: 0; }
+  .back:hover { color: var(--text); }
+  .back :global(svg) { width: 16px; height: 16px; }
+  .btn[disabled] { opacity: 0.6; cursor: progress; }
+
+  @media (max-width: 899px) {
+    .grid { grid-template-columns: minmax(0, 1fr); }
+    .side { position: static; }
+    .row { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

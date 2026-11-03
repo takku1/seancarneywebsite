@@ -1,0 +1,129 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/ui/PageHeader.astro';
+import FaqList from '../components/events/FaqList.astro';
+import Icon from '../components/ui/Icon.astro';
+import InquireLabel from '../components/ui/InquireLabel.astro';
+import { eventTypes, faqsFor } from '../lib/content';
+import { graph, breadcrumbSchema, serviceSchema, faqSchema } from '../lib/seo/schema';
+
+const events = await eventTypes();
+const faqs = await faqsFor('private-events');
+const jsonLd = graph(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Private events', path: '/private-events' }]), serviceSchema(), faqSchema(faqs.map((f) => f.data)));
+
+const formats = [
+  { name: 'Solo', body: 'Voice and acoustic guitar. Ceremonies, dinners, salons and residences.' },
+  { name: 'Duo or trio', body: 'Added harmony and rhythm for cocktail hours and mid-size rooms.' },
+  { name: 'Sean Carney and The Hustlers', body: 'The full band for receptions, galas and dance floors.' },
+];
+---
+
+<BaseLayout zone="events"
+  pageType="private_events"
+  title="Private Events, Weddings and Corporate Music | Sean Carney"
+  description="Book Sean Carney for weddings, corporate events, charity galas, private estates and destination events. Solo, trio or with his band, The Hustlers."
+  jsonLd={jsonLd}
+>
+  <PageHeader title="Private events" intro="More than a thousand events across fifteen years, from candlelit ceremonies to arena crowds. Choose the occasion to see how Sean shapes the night.">
+    <a href="/inquire" class="btn hdr-cta" data-track="cta_click" data-track-location="private_events_header"><InquireLabel /></a>
+  </PageHeader>
+
+  <section class="section types" data-section="event_types" aria-label="Event types">
+    <div class="container">
+      <ul>
+        {events.map((e, i) => (
+          <li class:list={['reveal', { wide: i === 0 }]}>
+            <a href={`/${e.data.slug}`} data-track="event_type_click" data-track-event_type={e.data.slug} data-track-location="private_events">
+              <Image src={e.data.image} alt={e.data.imageAlt} widths={[480, 800, 1200]} sizes={i === 0 ? '(min-width: 900px) 66vw, 92vw' : '(min-width: 900px) 33vw, 92vw'} loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : 'auto'} />
+              <span class="meta">
+                <span class="name">{e.data.label}</span>
+                <span class="hl">{e.data.headline}</span>
+              </span>
+              <Icon name="arrow-right" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section formats" data-section="formats" aria-labelledby="formats-title">
+    <div class="container">
+      <h2 id="formats-title">Formats</h2>
+      <dl>
+        {formats.map((f) => (
+          <div class="reveal">
+            <dt>{f.name}</dt>
+            <dd>{f.body}</dd>
+          </div>
+        ))}
+      </dl>
+      <p class="note">Every proposal is built around the date, the room and the hours of music. Investment is shared once we know a little about the event.</p>
+    </div>
+  </section>
+
+  <FaqList faqs={faqs} location="private_events" />
+</BaseLayout>
+
+<style>
+  .hdr-cta { margin-top: 2rem; }
+  .types ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+  .types li.wide { grid-column: span 2; grid-row: span 2; }
+  /* After the 2x2 lead, tiles fill rows of three; a final row of two stretches its last tile so no cell sits empty. */
+  @media (min-width: 900px) { .types li:last-child:nth-child(3n + 2) { grid-column: span 2; } }
+  .types a {
+    position: relative;
+    display: block;
+    height: 100%;
+    min-height: 18rem;
+    overflow: hidden;
+    text-decoration: none;
+    isolation: isolate;
+    color: var(--on-image);
+  }
+  .types :global(img) {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    transition: transform 1s var(--ease-out);
+  }
+  .types a::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(to top, rgb(9 8 7 / 0.92), rgb(9 8 7 / 0.15) 65%);
+  }
+  .types a:hover :global(img) { transform: scale(1.04); }
+  .meta { position: absolute; left: 1.5rem; right: 3.5rem; bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.35rem; }
+  .name { font-family: var(--font-display); font-size: var(--step-3); line-height: 1; }
+  .wide .name { font-size: var(--step-4); }
+  .hl { color: var(--on-image-muted); font-size: var(--step--1); }
+  .types a > :global(svg) { position: absolute; right: 1.5rem; bottom: 1.75rem; width: 24px; height: 24px; }
+
+  .formats h2 { font-size: var(--step-4); margin-bottom: 2.5rem; }
+  dl { margin: 0; display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 2rem 3rem; }
+  dl div { padding-top: 1.25rem; border-top: 1px solid var(--line-strong); }
+  dt { font-family: var(--font-display); font-size: var(--step-2); margin-bottom: 0.75rem; }
+  dd { margin: 0; color: var(--text-muted); }
+  .note { margin-top: 3rem; max-width: var(--measure); color: var(--text-muted); }
+
+  @media (max-width: 899px) {
+    .types ul { grid-template-columns: minmax(0, 1fr); }
+    .types li.wide { grid-column: auto; grid-row: auto; }
+    .types a { min-height: 22rem; }
+    dl { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

@@ -1,0 +1,109 @@
+---
+import '@fontsource/cormorant-garamond/500.css';
+import '@fontsource/cormorant-garamond/500-italic.css';
+import '@fontsource/cormorant-garamond/600.css';
+import '@fontsource-variable/geist';
+import '../styles/global.css';
+// Fonts are deliberately NOT preloaded: measured on throttled mobile, preloads competed with the
+// render-blocking CSS and delayed first paint ~250ms. Metric-matched fallbacks (global.css) keep CLS at 0 instead.
+
+import Seo from '../components/seo/Seo.astro';
+import Analytics from '../components/analytics/Analytics.astro';
+import Experiments from '../components/analytics/Experiments.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import Scout from '../components/scout/Scout.astro';
+import ConsentBar from '../components/analytics/ConsentBar.astro';
+import FanPrompt from '../components/ui/FanPrompt.astro';
+import PlayerDock from '../components/media/PlayerDock.astro';
+import { ClientRouter } from 'astro:transitions';
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  imageAlt?: string;
+  type?: 'website' | 'article' | 'music.album' | 'profile';
+  noindex?: boolean;
+  jsonLd?: object;
+  /** Page-level id used as an analytics dimension (page_type). */
+  pageType: string;
+  /** Header sits over a full-bleed hero. */
+  overlayHeader?: boolean;
+  /**
+   * artist = cinematic night theme. events = booking zone; its theme is the
+   * events_theme A/B test (ivory default, night challenger).
+   */
+  zone?: 'artist' | 'events';
+  /** No header/footer/Scout: link-in-bio and print pages. */
+  bare?: boolean;
+  /** Engagement-triggered fan-list prompt (it only ever shows in the artist zone). */
+  fanPrompt?: boolean;
+}
+
+const { pageType, overlayHeader = false, zone = 'artist', bare = false, fanPrompt = !bare, ...seo } = Astro.props;
+const theme = zone === 'events' ? 'ivory' : 'night';
+---
+
+<!doctype html>
+<html lang="en" data-page-type={pageType} data-zone={zone} data-theme={theme}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content={theme === 'ivory' ? '#f3efe7' : '#0d0c0b'} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <Experiments />
+    <Analytics />
+    <Seo {...seo} />
+    <slot name="head" />
+    {/* Client router: page changes swap in place, so Scout, the player dock and
+        the fan prompt persist and video keeps playing. Bare pages (link-in-bio,
+        print) stay plain full-load pages. */}
+    {!bare && <ClientRouter fallback="swap" />}
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    {!bare && <Header overlay={overlayHeader} />}
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    {!bare && <Footer />}
+    {!bare && <div transition:persist="scout"><Scout /></div>}
+    {!bare && <div transition:persist="player"><PlayerDock /></div>}
+    {fanPrompt && <div transition:persist="fan-prompt"><FanPrompt /></div>}
+    <div transition:persist="consent"><ConsentBar /></div>
+  </body>
+</html>
+
+<script>
+  // Router bridge: the router replaces <html> attributes on every swap, so carry
+  // the A/B assignments over and re-apply the events-zone theme arm (the pre-paint
+  // boot script only runs on full loads).
+  document.addEventListener('astro:before-swap', (e) => {
+    const next = e.newDocument.documentElement;
+    for (const a of [...document.documentElement.attributes]) if (a.name.startsWith('data-exp-')) next.setAttribute(a.name, a.value);
+    if (next.getAttribute('data-zone') === 'events') {
+      const v = next.getAttribute('data-exp-events-theme');
+      if (v === 'ivory' || v === 'night') next.setAttribute('data-theme', v);
+    }
+  });
+</script>
+
+<style>
+  .skip {
+    position: fixed;
+    left: 1rem;
+    top: -4rem;
+    z-index: var(--z-skip);
+    padding: 0.75rem 1rem;
+    background: var(--accent);
+    color: var(--accent-ink);
+    text-decoration: none;
+  }
+  .skip:focus { top: 1rem; }
+  main:focus { outline: none; }
+</style>

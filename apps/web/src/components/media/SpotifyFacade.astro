@@ -1,0 +1,46 @@
+---
+/**
+ * Click-to-load Spotify player. Emits audio_play. `uri` like "album/3y85...".
+ */
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  uri: string;
+  title: string;
+  location: string;
+}
+const { uri, title, location } = Astro.props;
+const [kind] = uri.split('/');
+const height = kind === 'track' ? 152 : 352;
+---
+
+<div class="sp" data-sp={uri} data-title={title} data-location={location} data-height={height}>
+  <button type="button" class="btn btn--ghost sp-btn">
+    <Icon name="spotify" /> Play on Spotify
+  </button>
+</div>
+
+<script>
+  import { track } from '../../lib/analytics/track';
+  import { pause } from '../../lib/media/player';
+
+  // Delegated once, so players on any page the router swaps in work.
+  document.addEventListener('click', (e) => {
+    const el = (e.target as Element | null)?.closest?.<HTMLElement>('[data-sp]');
+    const btn = (e.target as Element | null)?.closest?.('button');
+    if (!el || !btn || !el.contains(btn) || el.querySelector('iframe')) return;
+    pause(); // one thing playing at a time
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://open.spotify.com/embed/${el.dataset.sp}?utm_source=generator&theme=0`;
+    iframe.title = `Spotify: ${el.dataset.title}`;
+    iframe.height = el.dataset.height || '352';
+    iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+    iframe.loading = 'lazy';
+    el.replaceChildren(iframe);
+    track('audio_play', { provider: 'spotify', uri: el.dataset.sp, title: el.dataset.title, location: el.dataset.location });
+  });
+</script>
+
+<style>
+  .sp :global(iframe) { width: 100%; border: 0; border-radius: 12px; }
+</style>

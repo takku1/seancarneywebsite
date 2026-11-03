@@ -1,0 +1,724 @@
+---
+/**
+ * Scout: Sean's AI concierge. One panel per page (in BaseLayout), opened by
+ * any [data-scout-open] element (see ScoutInvite.astro), never by a popup.
+ *
+ * Modes:
+ *  - guided (no AI backend): scripted flows. Date check, music, live "most
+ *    asked" answers from FAQs, hand-off into the prefilled inquiry form.
+ *  - ai (GET /api/scout says so): free conversation with the same tools/cards.
+ */
+import { getCollection } from 'astro:content';
+import { PUBLIC_SCOUT_ENABLED } from 'astro:env/client';
+import { loadMedia, pick } from '../../lib/feeds/media';
+import { INTENTS } from '../../lib/scout/intents';
+import { EVENT_TYPES } from '../../lib/inquiry/schema';
+import { site } from '../../config/site';
+import { appearancesSplit, fmtDay } from '../../lib/content';
+import Icon from '../ui/Icon.astro';
+
+const enabled = PUBLIC_SCOUT_ENABLED !== 'false';
+const media = enabled ? await loadMedia() : null;
+const faqs = enabled ? await getCollection('faqs') : [];
+const upcoming = enabled ? (await appearancesSplit()).upcoming.filter((a) => a.data.visibility === 'public').slice(0, 3) : [];
+const data = enabled
+  ? {
+      videos: pick(media!, 'home', 3, ['for_events', 'most_watched', 'newest']).map((s) => ({ id: s.video.id, youtubeId: s.video.youtubeId, title: s.video.title, note: s.video.note })),
+      faqs: Object.fromEntries(faqs.map((f) => [f.id, { q: f.data.q, a: f.data.a }])),
+      intents: INTENTS.map((i) => ({ id: i.id, question: i.question, faq: i.faq, re: i.re.source, flags: i.re.flags })),
+      eventTypes: EVENT_TYPES.filter((e) => e.value !== 'other'),
+      shows: upcoming.map((a) => ({ when: fmtDay(a.data.date), venue: a.data.venue, city: a.data.city, url: a.data.url })),
+      responseTime: site.responseTime,
+      bookings: site.email.bookings,
+    }
+  : null;
+---
+
+{enabled && (
+  <>
+    <script type="application/json" id="scout-data" set:html={JSON.stringify(data).replace(/</g, '\\u003c') /* soc2-ignore: build-time site content, "<" escaped */} />
+    <dialog class="scout" aria-labelledby="scout-title" data-scout data-clarity-mask="true">
+      <header class="s-head">
+        <span class="mark" aria-hidden="true">S</span>
+        <div>
+          <h2 id="scout-title">Scout</h2>
+          <p class="sub">Sean's AI assistant</p>
+        </div>
+        <button type="button" class="s-twang" data-scout-twang hidden aria-label="Country flavor">Easygoing</button>
+        <button type="button" class="s-x" data-scout-close aria-label="Close Scout"><Icon name="x" /></button>
+      </header>
+      <div class="s-log" data-scout-log aria-live="polite"></div>
+      <div class="s-chips" data-scout-chips></div>
+      <form class="s-input" data-scout-form>
+        <label class="visually-hidden" for="scout-text">Message Scout</label>
+        <input id="scout-text" name="text" type="text" autocomplete="off" maxlength="1000" placeholder="Ask about dates, music or booking" />
+        <button type="submit" class="s-send" aria-label="Send"><Icon name="arrow-right" /></button>
+      </form>
+      <p class="s-foot">
+        You're chatting with an AI assistant, not Sean. Messages are processed by our AI provider to reply and are cleared when you close this tab. <a href="/privacy#scout">Privacy</a>
+        <button type="button" class="s-clear" data-scout-clear>Clear chat</button>
+      </p>
+    </dialog>
+
+    <!-- Launcher: a tortoiseshell guitar pick, not a chat bubble. -->
+    <button type="button" class="pick" data-scout-open="launcher" data-scout-pick aria-label="Ask Scout, Sean's AI assistant">
+      <span class="pick-label">
+        <span class="pl-text"><strong>Howdy, ask Scout</strong><small data-scout-pick-label>Dates, music, booking</small></span>
+        <svg class="pl-cue" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M213.66 165.66a8 8 0 0 1-11.32 0L128 91.31l-74.34 74.35a8 8 0 0 1-11.32-11.32l80-80a8 8 0 0 1 11.32 0l80 80a8 8 0 0 1 0 11.32Z" fill="currentColor" /></svg>
+      </span>
+      <svg class="pick-shape" viewBox="0 0 100 112" aria-hidden="true" focusable="false">
+        <defs>
+          <radialGradient id="tort-a" cx="30%" cy="28%" r="80%">
+            <stop offset="0" stop-color="#e2b77d" />
+            <stop offset="0.45" stop-color="#b27637" />
+            <stop offset="1" stop-color="#5a2f12" />
+          </radialGradient>
+          <radialGradient id="tort-b" cx="72%" cy="62%" r="38%">
+            <stop offset="0" stop-color="#2b1407" stop-opacity="0.75" />
+            <stop offset="1" stop-color="#2b1407" stop-opacity="0" />
+          </radialGradient>
+          <radialGradient id="tort-c" cx="22%" cy="70%" r="26%">
+            <stop offset="0" stop-color="#3a1c0a" stop-opacity="0.6" />
+            <stop offset="1" stop-color="#3a1c0a" stop-opacity="0" />
+          </radialGradient>
+          <linearGradient id="gloss" x1="0" y1="0" x2="0.6" y2="1">
+            <stop offset="0" stop-color="#fff" stop-opacity="0.55" />
+            <stop offset="0.35" stop-color="#fff" stop-opacity="0.08" />
+            <stop offset="1" stop-color="#fff" stop-opacity="0" />
+          </linearGradient>
+          <clipPath id="pick-clip"><path d="M50 109C35 93 4 62 4 33 4 12 23 3 50 3s46 9 46 30c0 29-31 60-46 76Z" /></clipPath>
+        </defs>
+        <g clip-path="url(#pick-clip)">
+          <rect width="100" height="112" fill="url(#tort-a)" />
+          <rect width="100" height="112" fill="url(#tort-b)" />
+          <rect width="100" height="112" fill="url(#tort-c)" />
+          <path d="M8 30C10 14 26 7 50 7c18 0 30 4 37 12C70 13 34 16 8 30Z" fill="url(#gloss)" />
+        </g>
+        <path d="M50 109C35 93 4 62 4 33 4 12 23 3 50 3s46 9 46 30c0 29-31 60-46 76Z" fill="none" stroke="#2a1608" stroke-opacity="0.45" stroke-width="1.5" />
+        <text x="50" y="60" text-anchor="middle" class="pick-s">S</text>
+      </svg>
+    </button>
+  </>
+)}
+
+<script>
+  import { getItem, setItem, removeItem } from '../../lib/storage';
+  import { track } from '../../lib/analytics/track';
+  import { getAttribution } from '../../lib/analytics/attribution';
+  import { getExperimentProps } from '../../lib/analytics/experiments';
+  import { navigate } from 'astro:transitions/client';
+
+  type Card =
+    | { kind: 'link'; href: string; label: string }
+    | { kind: 'availability'; date: string; status: string }
+    | { kind: 'media'; items: { type: string; id: string; title: string; note?: string; youtubeId?: string; url?: string }[] }
+    | { kind: 'inquiry'; leadId: string; tier: string };
+  interface Entry { who: 'scout' | 'you'; text?: string; cards?: Card[] }
+  interface Data {
+    videos: { id: string; youtubeId: string; title: string; note?: string }[];
+    faqs: Record<string, { q: string; a: string }>;
+    intents: { id: string; question: string; faq?: string; re: string; flags: string }[];
+    eventTypes: { value: string; label: string }[];
+    shows: { when: string; venue: string; city: string; url?: string }[];
+    responseTime: string;
+    bookings: string;
+  }
+
+  const dlg = document.querySelector<HTMLDialogElement>('[data-scout]');
+  const dataEl = document.getElementById('scout-data');
+  if (dlg && dataEl) {
+    const D = JSON.parse(dataEl.textContent || '{}') as Data;
+    const log = dlg.querySelector<HTMLElement>('[data-scout-log]')!;
+    const chips = dlg.querySelector<HTMLElement>('[data-scout-chips]')!;
+    const form = dlg.querySelector<HTMLFormElement>('[data-scout-form]')!;
+    const input = form.querySelector<HTMLInputElement>('input')!;
+    const KEY = 'sc_scout_v1';
+    // Scout persists across client navigation (transition:persist), so the page it talks about follows the visitor.
+    let page = location.pathname;
+    const intents = D.intents.map((i) => ({ ...i, rx: new RegExp(i.re, i.flags) }));
+
+    let mode: 'ai' | 'guided' | 'unknown' = 'unknown';
+    let state: { entries: Entry[]; transcript: unknown[]; sig?: string; lastPage?: string; twang?: number; sentTwang?: number } = { entries: [], transcript: [] };
+    try { state = JSON.parse(getItem(KEY) || 'null') ?? state; } catch { /* corrupt */ }
+    const save = () => setItem(KEY, JSON.stringify(state));
+    let busy = false;
+    let opened = false;
+
+    // ---------- rendering ----------
+    // Everything is built with DOM APIs (createElement / textContent). No HTML
+    // strings, so model output can never become markup (OWASP LLM05, ASVS 1.2.1/3.2.2).
+    type Child = Node | string | null | undefined | false;
+    function h(tag: string, attrs: Record<string, string> = {}, ...children: Child[]): HTMLElement {
+      const el = document.createElement(tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      for (const c of children) if (c) el.append(c);
+      return el;
+    }
+    // Only known site routes and plain email addresses become links. External URLs never do.
+    const ROUTES = new Set(['/inquire', '/private-events', '/weddings', '/corporate', '/estate', '/galas', '/destination', '/music', '/shows', '/merch', '/press', '/about', '/contact', '/privacy', '/terms']);
+    const TOKEN = /(^|[\s(])(\/[a-z-]+|[\w.+-]+@[\w-]+\.[a-z]{2,})(?=[\s).,!?]|$)/gi;
+    function richText(text: string): DocumentFragment {
+      const frag = document.createDocumentFragment();
+      let last = 0;
+      for (const m of text.matchAll(TOKEN)) {
+        const [whole, pre, token] = m;
+        const at = (m.index ?? 0) + pre.length;
+        const isMail = token.includes('@');
+        if (!isMail && !ROUTES.has(token)) continue;
+        frag.append(text.slice(last, at), h('a', { href: isMail ? `mailto:${token}` : token }, token));
+        last = (m.index ?? 0) + whole.length;
+      }
+      frag.append(text.slice(last));
+      return frag;
+    }
+    const safeUrl = (u: string | undefined) => (u && /^https:\/\//.test(u) ? u : '/music');
+
+    function card(c: Card): HTMLElement | null {
+      if (c.kind === 'link') {
+        if (!ROUTES.has(c.href)) return null;
+        return h('a', { class: 'card go', href: c.href, 'data-track': 'scout_navigate', 'data-track-to': c.href }, h('strong', {}, c.label), h('span', { 'aria-hidden': 'true' }, '→'));
+      }
+      if (c.kind === 'availability') {
+        const msg = c.status === 'open' ? 'Looks open' : c.status === 'busy' ? 'May be spoken for' : c.status === 'past' ? 'That date has passed' : 'Sean will confirm';
+        const d = new Date(`${c.date}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+        const ok = /^\d{4}-\d{2}-\d{2}$/.test(c.date);
+        return h('div', { class: 'card avail', 'data-status': c.status }, h('strong', {}, d), h('span', {}, msg),
+          c.status !== 'past' && ok && h('a', { class: 'c-link', href: `/inquire?date=${c.date}`, 'data-track': 'scout_handoff', 'data-track-from': 'availability' }, 'Send this date to Sean'));
+      }
+      if (c.kind === 'media') {
+        return h('div', { class: 'card media' }, ...c.items.map((i) => {
+          const label = h('span', {}, i.title, i.note && h('small', {}, i.note));
+          if (i.youtubeId && /^[\w-]{11}$/.test(i.youtubeId)) {
+            return h('button', { type: 'button', class: 'm-item', 'data-yt-play': i.youtubeId, 'aria-label': `Play ${i.title}` },
+              h('img', { src: `https://i.ytimg.com/vi/${i.youtubeId}/mqdefault.jpg`, alt: '', loading: 'lazy', width: '320', height: '180' }), label);
+          }
+          return h('a', { class: 'm-item rel', href: safeUrl(i.url), target: '_blank', rel: 'noopener' }, label);
+        }));
+      }
+      return h('div', { class: 'card done' }, h('strong', {}, 'Inquiry sent'), h('span', {}, `Sean replies personally ${D.responseTime}. Reference ${c.leadId}.`));
+    }
+
+    function render() {
+      log.replaceChildren(...state.entries.map((e) =>
+        h('div', { class: `msg ${e.who}` },
+          e.text && h('p', {}, e.who === 'scout' ? richText(e.text) : e.text),
+          ...(e.cards ?? []).map(card))));
+      log.scrollTop = log.scrollHeight;
+    }
+    const say = (who: Entry['who'], text?: string, cards?: Card[]) => { state.entries.push({ who, text, cards }); save(); render(); };
+
+    function setChips(list: { label: string; action: string }[]) {
+      chips.replaceChildren(...list.map((c) => h('button', { type: 'button', class: 'chip', 'data-action': c.action }, c.label)));
+    }
+
+    async function defaultChips() {
+      const core = [
+        { label: 'Book Sean', action: 'inquire' },
+        { label: 'Explore music', action: 'music' },
+        { label: 'Upcoming shows', action: 'shows' },
+      ];
+      setChips(core);
+      try {
+        const res = await fetch(`/api/scout/trending?page=${encodeURIComponent(page)}`);
+        const t = (await res.json()) as { items: { id: string; question: string; faq?: string; source: string }[] };
+        // Once the visitor has engaged, add the live "most asked" questions for this page.
+        const engaged = state.entries.some((e) => e.who === 'you');
+        const asked = engaged ? t.items.filter((i) => i.id !== 'music_style').slice(0, 2).map((i) => ({ label: i.question, action: `ask:${i.id}` })) : [];
+        setChips([...core, ...asked]);
+      } catch { /* trending is a bonus */ }
+    }
+
+    // ---------- greeting (context-aware, no API call) ----------
+    function greet() {
+      const ch = getAttribution().first_channel;
+      const byPage: Record<string, string> = {
+        '/weddings': "Howdy. I'm Scout, Sean's AI assistant. I handle the details so Sean can handle the music. Planning a wedding? I can check your date or play you a first-dance favorite.",
+        '/corporate': "Hello, I'm Scout, Sean's AI assistant. I can check a date, share live footage from corporate events, or send your brief straight to Sean.",
+        '/estate': "Welcome. I'm Scout, Sean's AI assistant. I can check a date or answer questions about private performances, discreetly.",
+        '/galas': "Hello, I'm Scout, Sean's AI assistant. I can check your gala date or share what a featured set looks like.",
+        '/destination': "Howdy. I'm Scout, Sean's AI assistant. Tell me where and when, and I'll check the date and how travel works.",
+        '/music': "Howdy. I'm Scout. Tell me what you're in the mood for and I'll point you to the right Sean Carney songs.",
+      };
+      const social = ch === 'organic_social' || ch === 'paid_social' ? "Howdy, glad the reel brought you by. I'm Scout, Sean's AI assistant. Want to check a date, or see more of Sean live?" : '';
+      say('scout', byPage[page] ?? (social || "Howdy, partner. I'm Scout, Sean's AI assistant. I handle the details so Sean can handle the music. Looking to book a show, hear something good, or just passing through?"));
+    }
+
+    // ---------- guided flows ----------
+    function guidedAnswer(text: string) {
+      const wantsMedia = /(play|hear|watch|show|footage|clips?|listen|playlist|drive|mood)/i.test(text);
+      const hit = wantsMedia ? intents.find((i) => i.id === 'music_style') : intents.find((i) => i.rx.test(text));
+      navigator.sendBeacon?.('/api/signal', JSON.stringify({ type: 'question', text, page }));
+      if (hit?.id === 'availability') return startDate();
+      if (hit?.id === 'music_style') return showMusic();
+      if (hit?.faq && D.faqs[hit.faq]) {
+        say('scout', D.faqs[hit.faq].a);
+        track('scout_answer', { intent: hit.id, mode: 'guided' });
+        return defaultChips();
+      }
+      say('scout', `Good question for Sean himself. Send it with your inquiry and he'll answer personally ${D.responseTime}, or email ${D.bookings}.`);
+      track('scout_answer', { intent: 'unmatched', mode: 'guided' });
+      setChips([{ label: 'Start an inquiry', action: 'inquire' }, { label: 'Check a date', action: 'date' }]);
+    }
+
+    function startDate() {
+      say('scout', 'What date are you looking at?');
+      chips.replaceChildren(h('form', { class: 'date-row', 'data-date-form': '' },
+        h('label', { class: 'visually-hidden', for: 'scout-date' }, 'Event date'),
+        h('input', { id: 'scout-date', type: 'date', required: '' }),
+        h('button', { type: 'submit', class: 'chip' }, 'Check')));
+      chips.querySelector<HTMLInputElement>('input')?.focus();
+    }
+
+    async function checkDate(date: string) {
+      say('you', new Date(`${date}T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' }));
+      try {
+        const res = await fetch(`/api/availability?date=${date}`);
+        const out = (await res.json()) as { status?: string };
+        const status = out.status ?? 'unknown';
+        const line = status === 'open' ? "That date looks open. Sean confirms personally, so let's get it to him." : status === 'busy' ? "That one may already be spoken for, but send it anyway. There may be options." : status === 'past' ? 'That date has already passed. Pick another?' : "I can't see the calendar right now, but Sean will confirm as soon as you send it.";
+        say('scout', line, [{ kind: 'availability', date, status }]);
+        track('scout_tool', { tool: 'check_availability', result: status, mode });
+      } catch {
+        say('scout', "I couldn't reach the calendar. Send the date with an inquiry and Sean will confirm.");
+      }
+      defaultChips();
+    }
+
+    function showMusic() {
+      say('scout', 'Here is Sean live, in rooms like yours.', [{ kind: 'media', items: D.videos.map((v) => ({ type: 'video', id: v.id, title: v.title, note: v.note, youtubeId: v.youtubeId })) }]);
+      track('scout_tool', { tool: 'show_media', mode: 'guided' });
+      defaultChips();
+    }
+
+    function showShows() {
+      if (D.shows.length) {
+        say('scout', `Next up: ${D.shows.map((s) => `${s.when} at ${s.venue}, ${s.city}`).join('; ')}. Tickets and the full list on /shows.`);
+      } else {
+        say('scout', "No public dates are announced right now. Most of Sean's calendar is private events. Want me to check a date for yours? New shows land on /shows first, and you can get notified there.");
+      }
+      track('scout_tool', { tool: 'shows', count: D.shows.length });
+      setChips([{ label: 'Book Sean', action: 'inquire' }, { label: 'Check a date', action: 'date' }, { label: 'Explore music', action: 'music' }]);
+    }
+
+    function startInquiry() {
+      say('scout', "Let's get you on Sean's radar. What kind of event is it?");
+      setChips(D.eventTypes.map((e) => ({ label: e.label, action: `type:${e.value}` })));
+    }
+
+    // ---------- AI turn ----------
+    async function aiTurn(text: string) {
+      busy = true;
+      log.append(h('div', { class: 'msg scout typing', 'data-typing': '' }, h('p', {}, h('span'), h('span'), h('span'))));
+      log.scrollTop = log.scrollHeight;
+      const t0 = performance.now();
+      try {
+        const res = await fetch('/api/scout', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ text, transcript: state.transcript, sig: state.sig, page, attribution: getAttribution(), experiments: getExperimentProps(), newContext: state.lastPage !== page || (state.twang ?? 1) !== (state.sentTwang ?? 1), twang: state.twang ?? 1 }),
+        });
+        const out = (await res.json()) as { ok: boolean; reply?: string; cards?: Card[]; transcript?: unknown[]; sig?: string; toolCalls?: string[]; mode?: string; handoff?: boolean; reset?: boolean };
+        log.querySelector('[data-typing]')?.remove();
+        if (out.reset) { state.transcript = []; state.sig = undefined; }
+        if (out.mode === 'guided') { mode = 'guided'; if (out.reply) say('scout', out.reply); guidedAnswer(text); return; }
+        if (out.transcript) { state.transcript = out.transcript; state.sig = out.sig; }
+        state.lastPage = page;
+        state.sentTwang = state.twang ?? 1;
+        say('scout', out.reply || '', out.cards ?? []);
+        track('scout_reply', { ms: Math.round(performance.now() - t0), tools: (out.toolCalls ?? []).join(',') || 'none', turn: state.entries.filter((e) => e.who === 'you').length });
+        for (const c of out.cards ?? []) if (c.kind === 'inquiry') track('inquiry_submit', { via: 'scout', lead_tier: c.tier });
+        if (out.handoff) setChips([{ label: 'Open the inquiry form', action: 'form' }]);
+        else defaultChips();
+      } catch {
+        log.querySelector('[data-typing]')?.remove();
+        mode = 'guided';
+        guidedAnswer(text);
+        track('scout_error', { stage: 'ai_turn' });
+      } finally {
+        busy = false;
+      }
+    }
+
+    // ---------- events ----------
+    chips.addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-action]');
+      if (!b) return;
+      const a = b.dataset.action!;
+      track('scout_chip', { action: a.split(':')[0], value: a.split(':')[1] });
+      if (a === 'date') return startDate();
+      if (a === 'shows') { say('you', 'Upcoming shows'); return mode === 'ai' ? void aiTurn('Where is Sean playing next?') : showShows(); }
+      if (a === 'music') { say('you', 'Explore music'); return mode === 'ai' ? void aiTurn('Show me Sean performing live at events.') : showMusic(); }
+      if (a === 'inquire') { say('you', 'Book Sean'); return startInquiry(); }
+      if (a === 'form') { dlg.close(); void navigate('/inquire'); return; }
+      if (a.startsWith('type:')) {
+        const v = a.slice(5);
+        say('you', b.textContent || v);
+        if (mode === 'ai') return void aiTurn(`I'd like to inquire about a ${b.textContent}.`);
+        say('scout', "Perfect. The inquiry takes about two minutes and I've filled in what I know.");
+        track('scout_handoff', { to: 'form', event_type: v });
+        setTimeout(() => { dlg.close(); void navigate(`/inquire?type=${encodeURIComponent(v)}`); }, 600);
+        return;
+      }
+      if (a.startsWith('ask:')) {
+        const intent = intents.find((i) => i.id === a.slice(4));
+        if (!intent) return;
+        say('you', intent.question);
+        return mode === 'ai' ? void aiTurn(intent.question) : guidedAnswer(intent.question);
+      }
+    });
+    chips.addEventListener('submit', (e) => {
+      const f = (e.target as HTMLElement).closest<HTMLFormElement>('[data-date-form]');
+      if (!f) return;
+      e.preventDefault();
+      const v = f.querySelector<HTMLInputElement>('input')!.value;
+      if (!v) return;
+      if (mode === 'ai') { say('you', `Is ${v} available?`); void aiTurn(`Is ${v} available?`); } else void checkDate(v);
+    });
+    log.addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-yt-play]');
+      if (!b) return;
+      const id = b.dataset.ytPlay!;
+      const f = document.createElement('iframe');
+      f.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1`;
+      f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+      f.title = b.getAttribute('aria-label') || 'Video';
+      f.className = 'm-frame';
+      b.replaceWith(f);
+      track('video_play', { video_id: id, location: 'scout' });
+    });
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text || busy) return;
+      input.value = '';
+      say('you', text);
+      track('scout_message', { mode, length: text.length });
+      if (mode === 'ai') void aiTurn(text);
+      else guidedAnswer(text);
+    });
+
+    async function open(source: string, prompt?: string) {
+      if (!dlg) return;
+      if (!dlg.open) dlg.showModal();
+      if (!opened) {
+        opened = true;
+        try { mode = ((await (await fetch('/api/scout')).json()) as { mode: 'ai' | 'guided' }).mode; } catch { mode = 'guided'; }
+        dlg.dataset.mode = mode;
+        // "Turn up the country": vocabulary only, AI mode only.
+        const tw = dlg.querySelector<HTMLButtonElement>('[data-scout-twang]');
+        const TW = ['Polished', 'Easygoing', 'Full cowboy'];
+        if (tw && mode === 'ai') {
+          tw.hidden = false;
+          tw.textContent = TW[state.twang ?? 1];
+          tw.addEventListener('click', () => {
+            state.twang = ((state.twang ?? 1) + 1) % 3;
+            tw.textContent = TW[state.twang];
+            save();
+            track('scout_twang', { level: state.twang });
+          });
+        }
+        if (!state.entries.length) greet(); else render();
+        void defaultChips();
+      }
+      setItem('sc_scout_engaged', '1');
+      track('scout_open', { source, mode, page_type: document.documentElement.dataset.pageType });
+      if (prompt) {
+        say('you', prompt);
+        if (mode === 'ai') void aiTurn(prompt);
+        else guidedAnswer(prompt);
+      } else input.focus({ preventScroll: true });
+    }
+    // ---------- pick launcher ----------
+    const pickBtn = document.querySelector<HTMLButtonElement>('[data-scout-pick]');
+    const pickLabel = document.querySelector<HTMLElement>('[data-scout-pick-label]');
+    const PICK_LABELS: Record<string, string> = { '/weddings': 'Check your wedding date', '/destination': 'Check your date', '/corporate': 'Check a date or brief', '/galas': 'Check your gala date', '/estate': 'Private questions, answered', '/music': 'Find the right song', '/inquire': 'Talk it through instead' };
+    const syncPage = () => {
+      page = location.pathname;
+      if (pickLabel) pickLabel.textContent = PICK_LABELS[page] ?? 'Dates, music, booking';
+    };
+    syncPage();
+    document.addEventListener('astro:page-load', syncPage);
+    const syncPick = () => pickBtn?.classList.toggle('hidden', dlg.open);
+    new MutationObserver(syncPick).observe(dlg, { attributes: true, attributeFilter: ['open'] });
+    // ---------- attention nudges: earned, rare, never naggy ----------
+    // A nudge = one short strum + the label peeking out. It fires only after real
+    // attention (visible tab, recent activity), at most 2 per page and 4 per visit,
+    // at least 60s apart, and never once the visitor has opened Scout, hovered the
+    // pick, is typing in a form, or prefers reduced motion.
+    (() => {
+      if (!pickBtn || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const S_KEY = 'sc_pick_nudges';
+      const read = () => Number(getItem(S_KEY) ?? 0);
+      const engagedWithScout = () => getItem('sc_scout_engaged') === '1';
+      let pageNudges = 0;
+      let lastNudge = -Infinity; // the 60s gap applies between nudges, not from page load
+      let attentiveMs = 0;
+      let lastActivity = performance.now();
+      let hovered = false;
+      const thresholds = [25_000, 90_000]; // attentive time for nudge 1 and 2
+
+      const nudge = (why: string) => {
+        const now = performance.now();
+        if (dlg.open || hovered || engagedWithScout() || pageNudges >= 2 || read() >= 4 || now - lastNudge < 60_000) return;
+        const typing = document.activeElement?.matches('input, textarea, select, [contenteditable]');
+        if (typing) return;
+        pageNudges++;
+        lastNudge = now;
+        setItem(S_KEY, String(read() + 1));
+        pickBtn.classList.add('strum');
+        setTimeout(() => pickBtn.classList.remove('strum'), 2600);
+        track('scout_pick_nudge', { why, n: pageNudges, page_type: document.documentElement.dataset.pageType });
+      };
+
+      // Attention clock: counts only while visible and active within the last 30s.
+      for (const ev of ['scroll', 'pointermove', 'keydown', 'touchstart']) addEventListener(ev, () => (lastActivity = performance.now()), { passive: true });
+      let tick = performance.now();
+      setInterval(() => {
+        const now = performance.now();
+        if (document.visibilityState === 'visible' && now - lastActivity < 30_000) attentiveMs += now - tick;
+        tick = now;
+        if (attentiveMs >= (thresholds[pageNudges] ?? Infinity)) nudge('time');
+      }, 1000);
+
+      // Reading signal: crossing the middle of the page earns the first nudge early.
+      // Re-armed on every page the router swaps in (each page gets its own budget of 2).
+      let midObs: IntersectionObserver | undefined;
+      const armPage = () => {
+        midObs?.disconnect();
+        const mid = document.createElement('div');
+        mid.setAttribute('aria-hidden', 'true');
+        mid.style.cssText = 'position:absolute;left:0;top:55%;width:1px;height:1px;pointer-events:none;';
+        document.body.appendChild(mid);
+        midObs = new IntersectionObserver(([en], obs) => {
+          if (en.isIntersecting && attentiveMs > 8_000) { nudge('read_half'); obs.disconnect(); }
+        });
+        midObs.observe(mid);
+      };
+      armPage();
+      document.addEventListener('astro:after-swap', () => { pageNudges = 0; attentiveMs = 0; armPage(); });
+
+      pickBtn.addEventListener('pointerenter', () => (hovered = true), { once: true });
+    })();
+
+    const close = () => { dlg.close(); track('scout_close', { turns: state.entries.filter((e) => e.who === 'you').length }); };
+
+    document.addEventListener('click', (e) => {
+      const t = (e.target as HTMLElement).closest<HTMLElement>('[data-scout-open]');
+      if (!t) return;
+      e.preventDefault();
+      void open(t.dataset.scoutOpen || 'invite', t.dataset.scoutPrompt);
+    });
+    dlg.querySelector('[data-scout-close]')?.addEventListener('click', close);
+    dlg.querySelector('[data-scout-clear]')?.addEventListener('click', () => {
+      state = { entries: [], transcript: [] };
+      removeItem(KEY);
+      greet();
+      void defaultChips();
+      track('scout_clear', {});
+    });
+    dlg.addEventListener('cancel', (e) => { e.preventDefault(); close(); }); // Esc
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) close(); }); // backdrop
+    // A site link inside the chat navigates in place: step out of the way (the conversation is kept).
+    dlg.addEventListener('click', (e) => {
+      const a = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[href]');
+      if (a && a.origin === location.origin && !a.target) dlg.close();
+    });
+    // Reopen automatically on the next page if the conversation is in progress.
+    if (state.entries.length > 1 && getItem('sc_scout_open') === '1') void open('resume');
+    dlg.addEventListener('close', () => { removeItem('sc_scout_open'); });
+    addEventListener('pagehide', () => { if (dlg.open) setItem('sc_scout_open', '1'); });
+  }
+</script>
+
+<style>
+  /* Backstage concierge: always the night palette (even on ivory pages), glass over a blurred page. */
+  .scout {
+    --bg: #0d0c0b;
+    --bg-raised: rgb(22 20 18 / 0.78);
+    --text: #ece5d8;
+    --text-muted: #a69d8f;
+    --text-faint: #8a8276;
+    --line: rgb(236 229 216 / 0.12);
+    --line-strong: rgb(236 229 216 / 0.24);
+    --accent: #c99f6e;
+    --accent-ink: #0d0c0b;
+    color-scheme: dark;
+    position: fixed;
+    inset: 0 0 0 auto;
+    z-index: var(--z-menu);
+    width: min(440px, 100vw);
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    display: none;
+    flex-direction: column;
+    background: var(--bg-raised);
+    backdrop-filter: blur(22px) saturate(140%);
+    -webkit-backdrop-filter: blur(22px) saturate(140%);
+    color: var(--text);
+    border: 0;
+    border-left: 1px solid rgb(236 229 216 / 0.14);
+    box-shadow: -30px 0 80px rgb(0 0 0 / 0.45), inset 1px 0 0 rgb(255 255 255 / 0.04);
+  }
+  .scout[open] { display: flex; }
+  .scout::backdrop { background: rgb(9 8 7 / 0.35); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+  @media (prefers-reduced-motion: no-preference) {
+    .scout[open] { animation: slide-in 0.5s var(--ease-out); }
+    .scout[open]::backdrop { animation: fade 0.4s ease; }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .scout { background: #161412; backdrop-filter: none; -webkit-backdrop-filter: none; }
+    .scout::backdrop { backdrop-filter: none; background: rgb(9 8 7 / 0.6); }
+  }
+  @keyframes slide-in { from { transform: translateX(100%); } }
+  @keyframes fade { from { opacity: 0; } }
+
+  .s-head { display: flex; align-items: center; gap: 0.85rem; padding: 1.25rem 1.25rem 1rem; border-bottom: 1px solid var(--line); }
+  .mark {
+    display: grid; place-items: center; width: 36px; height: 36px; flex: none;
+    border-radius: 50%; background: var(--accent); color: var(--accent-ink);
+    font-family: var(--font-display); font-weight: 600; font-size: 1.3rem;
+  }
+  .s-head h2 { font-size: 1.6rem; line-height: 1; }
+  .sub { font-size: var(--step--1); color: var(--text-muted); }
+  .s-twang { margin-left: auto; min-height: 32px; padding: 0 0.65rem; background: none; border: 1px solid var(--line-strong); color: var(--text-muted); font: inherit; font-size: 0.75rem; letter-spacing: 0.04em; cursor: pointer; }
+  .s-twang:hover { color: var(--accent); border-color: var(--accent); }
+  .s-twang:not([hidden]) + .s-x { margin-left: 0.25rem; }
+  .s-x { margin-left: auto; width: 40px; height: 40px; display: grid; place-items: center; background: none; border: 0; color: var(--text-muted); cursor: pointer; }
+  .s-x :global(svg) { width: 20px; height: 20px; }
+
+  /* Conversation then options, flowing from the top; free space sits below so options stay beside the greeting. */
+  .s-log { flex: 0 1 auto; min-height: 0; overflow-y: auto; padding: 1.25rem 1.25rem 0.75rem; display: flex; flex-direction: column; gap: 0.75rem; overscroll-behavior: contain; }
+  .s-log :global(.msg) { max-width: 88%; display: grid; gap: 0.5rem; }
+  .s-log :global(.msg p) { margin: 0; padding: 0.65rem 0.85rem; font-size: 0.95rem; line-height: 1.5; }
+  .s-log :global(.msg.scout p) { background: rgb(255 255 255 / 0.04); border: 1px solid var(--line); }
+  .s-log :global(.msg.scout:first-child p) { font-family: var(--font-display); font-size: 1.2rem; line-height: 1.35; padding: 0.2rem 0 0.4rem; background: none; border: 0; }
+  .s-log :global(.msg.you) { align-self: flex-end; }
+  .s-log :global(.msg.you p) { background: var(--accent); color: var(--accent-ink); }
+  .s-log :global(.msg a) { color: inherit; }
+  .s-log :global(.typing p) { display: flex; gap: 4px; }
+  .s-log :global(.typing span) { width: 6px; height: 6px; background: var(--text-muted); border-radius: 50%; animation: blink 1s infinite; }
+  .s-log :global(.typing span:nth-child(2)) { animation-delay: 0.15s; }
+  .s-log :global(.typing span:nth-child(3)) { animation-delay: 0.3s; }
+  @keyframes blink { 50% { opacity: 0.3; } }
+
+  .s-log :global(.card) { display: grid; gap: 0.3rem; padding: 0.75rem 0.85rem; border: 1px solid var(--line-strong); font-size: 0.9rem; }
+  .s-log :global(.card.avail[data-status='open']) { border-left: 2px solid var(--accent); }
+  .s-log :global(.card span) { color: var(--text-muted); }
+  .s-log :global(.c-link) { color: var(--accent) !important; font-size: 0.85rem; }
+  .s-log :global(.card.go) { display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: var(--text); border-color: var(--accent); }
+  .s-log :global(.card.go:hover) { background: rgb(201 159 110 / 0.12); }
+  .s-log :global(.card.media) { padding: 0; border: 0; gap: 0.5rem; }
+  .s-log :global(.m-item) { display: grid; grid-template-columns: 96px 1fr; gap: 0.6rem; align-items: center; padding: 0; background: none; border: 1px solid var(--line); color: inherit; text-align: left; font: inherit; font-size: 0.9rem; cursor: pointer; text-decoration: none; }
+  .s-log :global(.m-item.rel) { grid-template-columns: minmax(0, 1fr); padding: 0.6rem 0.75rem; }
+  .s-log :global(.m-item img) { width: 96px; height: 54px; object-fit: cover; }
+  .s-log :global(.m-item small) { display: block; color: var(--text-muted); font-size: 0.8rem; }
+  .s-log :global(.m-frame) { width: 100%; aspect-ratio: 16 / 9; border: 0; }
+
+  .s-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.25rem 1.25rem 1rem; margin-bottom: auto; }
+  .s-chips :global(.chip) { min-height: 36px; padding: 0.35rem 0.8rem; background: none; border: 1px solid var(--line-strong); color: var(--text); font: inherit; font-size: 0.85rem; cursor: pointer; }
+  .s-chips :global(.chip:hover) { border-color: var(--accent); color: var(--accent); }
+  .s-chips :global(.date-row) { display: flex; gap: 0.4rem; width: 100%; }
+  .s-chips :global(.date-row input) { flex: 1; min-height: 40px; padding: 0 0.6rem; background: var(--bg); border: 1px solid var(--line-strong); color: var(--text); font: inherit; color-scheme: light dark; }
+
+  .s-input { display: flex; border-top: 1px solid var(--line); }
+  .s-input input { flex: 1; min-height: 52px; padding: 0 1rem; background: none; border: 0; color: var(--text); font: inherit; font-size: 0.95rem; }
+  .s-input input:focus { outline: none; }
+  .s-input:focus-within { box-shadow: inset 0 0 0 2px var(--accent); }
+  .s-send { width: 52px; display: grid; place-items: center; background: none; border: 0; color: var(--accent); cursor: pointer; }
+  .s-send :global(svg) { width: 20px; height: 20px; }
+  .s-foot { padding: 0.4rem 1rem 0.6rem; font-size: 0.72rem; line-height: 1.45; color: var(--text-faint); }
+  .s-foot a { color: inherit; }
+  .s-clear { margin-left: 0.35rem; padding: 0; background: none; border: 0; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; }
+
+  /* ---------- pick launcher ---------- */
+  .pick {
+    position: fixed;
+    right: max(var(--gutter), env(safe-area-inset-right));
+    bottom: max(1.25rem, env(safe-area-inset-bottom));
+    z-index: var(--z-header);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pick.hidden,
+  :global(html.menu-open) .pick { opacity: 0; pointer-events: none; transform: translateY(12px); }
+  .pick-shape {
+    width: 52px;
+    height: 58px;
+    filter: drop-shadow(0 10px 18px rgb(0 0 0 / 0.38)) drop-shadow(0 2px 3px rgb(0 0 0 / 0.3));
+    transform-origin: 50% 8%;
+    transition: transform 0.45s var(--ease-out), filter 0.45s var(--ease-out);
+  }
+  .pick-s {
+    font-family: var(--font-display);
+    font-size: 40px;
+    font-weight: 600;
+    fill: #2a1608;
+    fill-opacity: 0.55;
+    paint-order: stroke;
+    stroke: #f3d9b0;
+    stroke-opacity: 0.35;
+    stroke-width: 1px;
+  }
+  .pick-label {
+    order: -1;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-right: -26px; /* tucks behind the pick so it appears to unroll from it */
+    padding: 0.55rem 2.2rem 0.55rem 0.95rem;
+    background: var(--bg-raised);
+    color: var(--text);
+    border: 1px solid var(--line-strong);
+    border-right: 0;
+    box-shadow: 0 10px 28px rgb(0 0 0 / 0.22);
+    clip-path: inset(0 0 0 100%);
+    pointer-events: none;
+    transition: clip-path 0.5s var(--ease-out);
+  }
+  .pl-text { display: grid; line-height: 1.2; text-align: left; transform: translateX(14px); opacity: 0; transition: transform 0.5s var(--ease-out) 0.08s, opacity 0.35s ease 0.12s; }
+  .pl-text strong { font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; white-space: nowrap; }
+  .pl-text small { font-family: var(--font-body); font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; }
+  .pl-cue { width: 14px; height: 14px; color: var(--accent); flex: none; opacity: 0; transition: opacity 0.3s ease 0.25s; }
+  .pick:hover .pick-label,
+  .pick:focus-visible .pick-label,
+  .pick.strum .pick-label { clip-path: inset(0 0 0 0); }
+  .pick:hover .pl-text,
+  .pick:focus-visible .pl-text,
+  .pick.strum .pl-text { transform: none; opacity: 1; }
+  .pick:hover .pl-cue,
+  .pick:focus-visible .pl-cue,
+  .pick.strum .pl-cue { opacity: 1; }
+  @media (prefers-reduced-motion: no-preference) {
+    .pick:hover .pl-cue, .pick:focus-visible .pl-cue { animation: cue 1.4s ease-in-out 0.4s infinite; }
+    .pick { transition: transform 0.45s var(--ease-out), opacity 0.35s var(--ease-out); }
+  }
+  @keyframes cue { 0%, 100% { transform: translateY(2px); } 50% { transform: translateY(-3px); } }
+  .pick:hover .pick-shape,
+  .pick:focus-visible .pick-shape { transform: translateX(-4px) translateY(-3px) rotate(-12deg) scale(1.06); filter: drop-shadow(0 16px 24px rgb(0 0 0 / 0.42)) drop-shadow(0 2px 3px rgb(0 0 0 / 0.3)); }
+  .pick:active .pick-shape { transform: translateY(-1px) rotate(-4deg) scale(0.97); }
+  .pick:focus-visible { outline: none; }
+  .pick:focus-visible .pick-shape { outline: 2px solid var(--accent); outline-offset: 4px; }
+  @media (prefers-reduced-motion: no-preference) {
+    .pick-shape { animation: sway 6s ease-in-out infinite; }
+    .pick:hover .pick-shape, .pick:focus-visible .pick-shape { animation: none; }
+    .pick.strum .pick-shape { animation: strum 1.1s var(--ease-out) 1; }
+  }
+  @keyframes sway { 0%, 100% { rotate: -3deg; } 50% { rotate: 3deg; } }
+  @keyframes strum {
+    0% { rotate: 0deg; } 15% { rotate: -16deg; } 35% { rotate: 11deg; } 55% { rotate: -6deg; } 75% { rotate: 3deg; } 100% { rotate: 0deg; }
+  }
+
+  @media (max-width: 599px) {
+    .pick-shape { width: 46px; height: 52px; }
+    .scout { width: 100vw; border-left: 0; }
+  }
+</style>

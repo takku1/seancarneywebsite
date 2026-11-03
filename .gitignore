@@ -1,0 +1,21 @@
+node_modules/
+apps/web/dist/
+apps/web/.astro/
+reference/current-site/media/
+.dev.vars
+.env
+.env.*
+!.env.example
+
+# Tool output (e.g. AuditForge universal_audit writes reports/ into the target)
+reports/
+
+# Local tool and runtime state (never commit)
+.wrangler/
+apps/web/.wrangler/
+.claude-flow/
+apps/web/.claude-flow/
+.claude/
+.tunic/
+graphify-out/
+*.log

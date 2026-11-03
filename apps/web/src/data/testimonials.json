@@ -1,0 +1,109 @@
+[
+  {
+    "id": "jordan-isabela",
+    "quote": "Sean is HIM. I really can't say enough about the experience. He knows every song, he's a great guy, and everyone loved him.",
+    "name": "Jordan and Isabela",
+    "role": "Wedding, Santa Monica",
+    "eventType": "wedding",
+    "consent": "granted",
+    "featured": true
+  },
+  {
+    "id": "timea-kris",
+    "quote": "He arrived on time, managed everything with ease, and wasn't just there to perform. Without us even asking, he stepped in and knew exactly what to do.",
+    "name": "Timea and Kris",
+    "role": "Wedding reception, Orange County",
+    "eventType": "wedding",
+    "consent": "granted",
+    "featured": true
+  },
+  {
+    "id": "olivia-john",
+    "quote": "I couldn't believe how many people were on the dance floor. It wasn't empty at any time.",
+    "name": "Olivia and John",
+    "role": "Wedding with the full band, Fullerton",
+    "eventType": "wedding",
+    "consent": "granted",
+    "featured": true
+  },
+  {
+    "id": "corporate-band",
+    "quote": "Sean and his band made our corporate event an absolute hit. Their energy and professionalism were beyond expectations.",
+    "role": "Corporate client",
+    "eventType": "corporate",
+    "featured": true
+  },
+  {
+    "id": "wedding-reception",
+    "quote": "Thank you for making our wedding reception magical. Our guests are still talking about how much fun they had.",
+    "role": "Wedding couple",
+    "eventType": "wedding",
+    "featured": false
+  },
+  {
+    "id": "expo",
+    "quote": "Exceeded all our expectations at our expo. His music and stage presence kept the energy high all night.",
+    "role": "Expo organizer",
+    "eventType": "corporate",
+    "featured": true
+  },
+  {
+    "id": "anniversary",
+    "quote": "We hired Sean for our anniversary party and he had everyone on their feet, singing along with every song.",
+    "role": "Private client, anniversary celebration",
+    "eventType": "celebration"
+  },
+  {
+    "id": "private-vision",
+    "quote": "I explained my vision for the entertainment and it was like he read my mind. He did exactly what I wanted.",
+    "role": "Private client",
+    "eventType": "celebration"
+  },
+  {
+    "id": "private-celebration",
+    "quote": "Their ability to engage the audience and create an amazing atmosphere made the event unforgettable.",
+    "role": "Private client, private celebration",
+    "eventType": "estate"
+  },
+  {
+    "id": "sugarman",
+    "quote": "He is my top call for the Los Angeles area.",
+    "name": "Alexander Sugarman",
+    "role": "Client, Los Angeles",
+    "eventType": "corporate",
+    "consent": "granted"
+  },
+  {
+    "id": "alisonv",
+    "quote": "The perfect entertainment for a 70th birthday celebration.",
+    "name": "Alison V.",
+    "role": "70th birthday celebration",
+    "eventType": "estate",
+    "consent": "granted",
+    "featured": false
+  },
+  {
+    "id": "gina",
+    "quote": "I highly, highly recommend him. He made my celebration so special.",
+    "name": "Gina",
+    "role": "Private celebration",
+    "eventType": "celebration",
+    "consent": "granted"
+  },
+  {
+    "id": "austin",
+    "quote": "Genuine, kind, flexible, on time, talented, and had great energy.",
+    "name": "Austin",
+    "role": "Private event",
+    "eventType": "estate",
+    "consent": "granted"
+  },
+  {
+    "id": "morison",
+    "quote": "I would absolutely book Sean again for my next event, without hesitation.",
+    "name": "Anthony Morison",
+    "role": "Private event",
+    "eventType": "celebration",
+    "consent": "granted"
+  }
+]

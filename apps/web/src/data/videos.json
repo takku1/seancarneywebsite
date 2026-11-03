@@ -1,0 +1,124 @@
+[
+  {
+    "id": "reel-2025",
+    "title": "Live Performance Reel 2025",
+    "youtubeId": "ui_WlqtfgRc",
+    "context": "live",
+    "note": "Sean Carney and The Hustlers",
+    "order": 0
+  },
+  {
+    "id": "do-or-die",
+    "title": "Do Or Die",
+    "youtubeId": "NB6c_5NsoDM",
+    "context": "original",
+    "note": "Featured in the 2025 NFL Playoffs",
+    "order": 1
+  },
+  {
+    "id": "stronger",
+    "title": "Stronger",
+    "youtubeId": "6SUsyFqWmGE",
+    "context": "original",
+    "order": 2
+  },
+  {
+    "id": "the-otherside",
+    "title": "The Otherside",
+    "youtubeId": "uq9IdUhf7W4",
+    "context": "original",
+    "order": 2
+  },
+  {
+    "id": "invincible",
+    "title": "Invincible",
+    "youtubeId": "k58Zuc_MmMY",
+    "context": "original",
+    "order": 3
+  },
+  {
+    "id": "wanted-video",
+    "title": "WANTED",
+    "youtubeId": "TLuOObXzf6M",
+    "context": "original",
+    "order": 3
+  },
+  {
+    "id": "graveyard",
+    "title": "Graveyard (with Kirsten Collins)",
+    "youtubeId": "3zYkoWnyalU",
+    "context": "original",
+    "order": 4
+  },
+  {
+    "id": "tennessee-whiskey",
+    "title": "Tennessee Whiskey",
+    "youtubeId": "R5_SWpCimc0",
+    "context": "cover",
+    "note": "Chris Stapleton",
+    "order": 5
+  },
+  {
+    "id": "perfect",
+    "title": "Perfect",
+    "youtubeId": "vwvdaQuHuJI",
+    "context": "cover",
+    "note": "Ed Sheeran",
+    "order": 6
+  },
+  {
+    "id": "blinding-lights",
+    "title": "Blinding Lights",
+    "youtubeId": "CPC_ON3MHqg",
+    "context": "cover",
+    "note": "The Weeknd",
+    "order": 7
+  },
+  {
+    "id": "stargazing",
+    "title": "Stargazing",
+    "youtubeId": "rKrEghT5c38",
+    "context": "cover",
+    "note": "Myles Smith",
+    "order": 8
+  },
+  {
+    "id": "ritz-shut-up-and-dance",
+    "title": "Shut Up and Dance",
+    "youtubeId": "QOWrjmPqjSU",
+    "context": "live",
+    "note": "Live at the Ritz-Carlton",
+    "order": 9
+  },
+  {
+    "id": "hotel-del-my-girl",
+    "title": "My Girl",
+    "youtubeId": "0JWYVStsLto",
+    "context": "live",
+    "note": "Live at Hotel del Coronado",
+    "order": 10
+  },
+  {
+    "id": "elevated-live",
+    "title": "Elevated Live Music Entertainment",
+    "youtubeId": "Yfw1xjxayf4",
+    "context": "live",
+    "order": 11
+  },
+  {
+    "id": "dreams-live",
+    "title": "Dreams",
+    "youtubeId": "HnWnwvCNhQ8",
+    "context": "live",
+    "note": "Fleetwood Mac, live in San Diego",
+    "order": 12
+  },
+  {
+    "id": "two-sean-carneys",
+    "title": "The Tale of Two Sean Carneys",
+    "youtubeId": "iBLdS53jpa4",
+    "context": "original",
+    "note": "Featuring Sean Carney",
+    "order": 20
+  }
+]

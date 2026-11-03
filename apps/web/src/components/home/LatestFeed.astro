@@ -1,0 +1,60 @@
+---
+/** Dated "Latest" feed. Collapses entirely when there is nothing dated. */
+import { latestFeed, fmtMonth } from '../../lib/content';
+import Icon from '../ui/Icon.astro';
+
+const items = await latestFeed(4);
+---
+
+{items.length > 0 && (
+  <section class="section latest" data-section="latest" aria-labelledby="latest-title">
+    <div class="container">
+      <h2 id="latest-title">Latest</h2>
+      <ol>
+        {items.map((it) => (
+          <li class="reveal" data-published={it.date.toISOString()}>
+            <a href={it.href} target={it.external ? '_blank' : undefined} rel={it.external ? 'noopener' : undefined} data-track="feed_click" data-track-kind={it.kind.toLowerCase()}>
+              <time datetime={it.date.toISOString().slice(0, 10)}>{fmtMonth(it.date)}</time>
+              <span class="kind">{it.kind}</span>
+              <span class="what">
+                <span class="t">{it.title}<span data-new-slot></span></span>
+                {it.detail && <span class="d">{it.detail}</span>}
+              </span>
+              <Icon name={it.external ? 'arrow-up-right' : 'arrow-right'} />
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+)}
+
+<style>
+  .latest { padding-top: 0; }
+  h2 { font-size: var(--step-4); margin-bottom: 2.5rem; }
+  ol { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line-strong); }
+  a {
+    display: grid;
+    grid-template-columns: 8rem 7rem minmax(0, 1fr) auto;
+    gap: 1.5rem;
+    align-items: baseline;
+    padding-block: 1.6rem;
+    text-decoration: none;
+    transition: background 0.3s;
+  }
+  li + li a { border-top: 1px solid var(--line); }
+  a:hover .t { color: var(--accent); }
+  time, .kind { font-size: var(--step--1); color: var(--text-muted); }
+  .what { display: flex; flex-direction: column; gap: 0.25rem; }
+  .t { font-family: var(--font-display); font-size: var(--step-2); line-height: 1.15; transition: color 0.3s; }
+  .d { color: var(--text-muted); font-size: var(--step--1); }
+  a :global(svg) { width: 20px; height: 20px; color: var(--text-muted); align-self: center; }
+
+  @media (max-width: 767px) {
+    a { grid-template-columns: 1fr auto; gap: 0.35rem 1rem; }
+    time { grid-column: 1; }
+    .kind { display: none; }
+    .what { grid-column: 1; }
+    a :global(svg) { grid-column: 2; grid-row: 1 / span 2; }
+  }
+</style>

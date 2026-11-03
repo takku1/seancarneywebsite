@@ -1,0 +1,52 @@
+---
+import { getCollection } from 'astro:content';
+import Icon from '../ui/Icon.astro';
+
+const press = (await getCollection('press')).sort((a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0));
+---
+
+{press.length > 0 && (
+  <section class="section press" data-section="press_quotes" aria-labelledby="press-title">
+    <div class="container">
+      <p class="label">Press</p>
+      <h2 id="press-title" class="visually-hidden">Press</h2>
+      <ul>
+        {press.map((p) => (
+          <li class="reveal">
+            <blockquote><p>&ldquo;{p.data.quote}&rdquo;</p></blockquote>
+            <a href={p.data.url} target="_blank" rel="noopener" data-track="press_click" data-track-outlet={p.data.outlet} data-track-location="home">
+              {p.data.outlet} <Icon name="arrow-up-right" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+)}
+
+<style>
+  .press { border-top: 1px solid var(--line); }
+  .label { margin-bottom: 2.5rem; }
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: clamp(2.5rem, 5vw, 4rem); }
+  li { max-width: 46rem; }
+  li:nth-child(2) { margin-left: auto; }
+  li:nth-child(3) { margin-left: 12%; }
+  blockquote { margin: 0; }
+  p { font-family: var(--font-display); font-size: var(--step-2); line-height: 1.25; }
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 44px;
+    margin-top: 0.5rem;
+    font-size: var(--step--1);
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+  a:hover { color: var(--accent); }
+  a :global(svg) { width: 16px; height: 16px; }
+
+  @media (max-width: 767px) {
+    li:nth-child(n) { margin-left: 0; }
+  }
+</style>

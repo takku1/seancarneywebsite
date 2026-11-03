@@ -1,0 +1,76 @@
+---
+/**
+ * Names display only when consent === 'granted'. Until then attribution is by
+ * role and occasion (honest, and still specific).
+ */
+import { getCollection } from 'astro:content';
+
+interface Props {
+  eventType?: string;
+  /** Exact testimonial ids, in order (overrides eventType/featured). */
+  ids?: string[];
+  /** Only show quotes from this event type. */
+  strict?: boolean;
+  limit?: number;
+}
+const { eventType, ids, strict = false, limit = 3 } = Astro.props;
+
+let items = await getCollection('testimonials');
+if (ids?.length) {
+  items = ids.map((id) => items.find((t) => t.id === id)).filter((t): t is NonNullable<typeof t> => !!t);
+} else if (eventType) {
+  const match = items.filter((t) => t.data.eventType === eventType);
+  items = strict ? match : [...match, ...items.filter((t) => t.data.eventType !== eventType)];
+} else {
+  items = [...items.filter((t) => t.data.featured), ...items.filter((t) => !t.data.featured)];
+}
+const [lead, ...rest] = items.slice(0, limit);
+const who = (t: (typeof items)[number]) => (t.data.consent === 'granted' && t.data.name ? `${t.data.name}, ${t.data.role}` : t.data.role);
+---
+
+{lead && (
+  <section class="section quotes" data-section="testimonials" aria-labelledby="quotes-title">
+    <div class:list={['container', 'grid', { single: rest.length === 0 }]}>
+      <h2 id="quotes-title" class="visually-hidden">What clients say</h2>
+      <figure class="lead reveal">
+        <blockquote><p>&ldquo;{lead.data.quote}&rdquo;</p></blockquote>
+        <figcaption>{who(lead)}</figcaption>
+      </figure>
+      <div class="rest">
+        {rest.map((t) => (
+          <figure class="reveal">
+            <blockquote><p>&ldquo;{t.data.quote}&rdquo;</p></blockquote>
+            <figcaption>{who(t)}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+    gap: clamp(2.5rem, 6vw, 7rem);
+    align-items: start;
+  }
+  .grid.single { grid-template-columns: minmax(0, 1fr); max-width: 60rem; }
+  figure { margin: 0; }
+  blockquote { margin: 0; }
+  .lead p {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--step-3);
+    line-height: 1.2;
+    padding-bottom: 0.1em;
+  }
+  .rest { display: grid; gap: 2.5rem; padding-top: 0.75rem; }
+  .rest p { font-size: var(--step-0); color: var(--text); line-height: 1.55; }
+  .rest figure { padding-left: 1.25rem; border-left: 1px solid var(--accent); }
+  figcaption { margin-top: 1rem; font-size: var(--step--1); color: var(--text-muted); }
+
+  @media (max-width: 899px) {
+    .grid { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

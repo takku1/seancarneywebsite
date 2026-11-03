@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/ui/Icon.astro';
+---
+
+<BaseLayout pageType="404" title="Page not found | Sean Carney" description="This page could not be found." noindex>
+  <section class="section" data-page="not-found">
+    <div class="container">
+      <h1>This trail goes cold.</h1>
+      <p class="lede">The page may have moved when the site was rebuilt.</p>
+      <ul>
+        <li><a class="link-arrow" href="/">Home <Icon name="arrow-right" /></a></li>
+        <li><a class="link-arrow" href="/private-events">Private events <Icon name="arrow-right" /></a></li>
+        <li><a class="link-arrow" href="/music">Music <Icon name="arrow-right" /></a></li>
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { track } from '../lib/analytics/track';
+  import { onPage } from '../lib/lifecycle';
+
+  onPage(() => {
+    track('not_found', { path: location.pathname, referrer: document.referrer || undefined });
+  }, '[data-page="not-found"]');
+</script>
+
+<style>
+  h1 { font-size: var(--step-5); max-width: 14ch; }
+  .lede { margin-top: 1.25rem; }
+  ul { list-style: none; margin: 2.5rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem 2rem; }
+</style>

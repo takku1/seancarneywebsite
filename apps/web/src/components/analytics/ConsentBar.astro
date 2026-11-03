@@ -1,0 +1,55 @@
+---
+/**
+ * Optional-cookie consent (GDPR / ePrivacy). Rendered only when a cookie-setting
+ * vendor (GA4, Clarity, Meta) is configured, shown only until the visitor
+ * chooses, and never blocks the page. Bottom-left so it never covers the pick.
+ */
+import { PUBLIC_GA4_ID, PUBLIC_CLARITY_ID, PUBLIC_META_PIXEL_ID } from 'astro:env/client';
+const needed = !!(PUBLIC_GA4_ID || PUBLIC_CLARITY_ID || PUBLIC_META_PIXEL_ID);
+---
+
+{needed && (
+  <div class="consent" role="region" aria-label="Cookie preferences" data-consent hidden>
+    <p>Optional analytics cookies help improve this site. <a href="/privacy#choices">Privacy</a></p>
+    <div class="acts">
+      <button type="button" data-consent-choice="denied">Decline</button>
+      <button type="button" class="yes" data-consent-choice="granted">Allow</button>
+    </div>
+  </div>
+)}
+
+<script>
+  const bar = document.querySelector<HTMLElement>('[data-consent]');
+  const w = window as Window & { __scConsentNeeded?: boolean; __scSetConsent?: (v: string) => void };
+  if (bar && w.__scConsentNeeded) {
+    bar.hidden = false;
+    bar.querySelectorAll<HTMLButtonElement>('[data-consent-choice]').forEach((b) =>
+      b.addEventListener('click', () => {
+        w.__scSetConsent?.(b.dataset.consentChoice!);
+        bar.hidden = true;
+      }),
+    );
+  }
+</script>
+
+<style>
+  .consent {
+    position: fixed;
+    left: max(var(--gutter), env(safe-area-inset-left));
+    bottom: max(1.25rem, env(safe-area-inset-bottom));
+    z-index: var(--z-header);
+    max-width: min(26rem, calc(100vw - 2 * var(--gutter) - 70px));
+    display: grid;
+    gap: 0.75rem;
+    padding: 0.9rem 1rem;
+    background: var(--bg-raised);
+    color: var(--text);
+    border: 1px solid var(--line-strong);
+    box-shadow: 0 12px 32px rgb(0 0 0 / 0.25);
+    font-size: 0.85rem;
+  }
+  .consent a { color: inherit; }
+  .acts { display: flex; gap: 0.5rem; }
+  button { min-height: 40px; padding: 0 1rem; background: none; border: 1px solid var(--line-strong); color: var(--text); font: inherit; cursor: pointer; }
+  .yes { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+</style>

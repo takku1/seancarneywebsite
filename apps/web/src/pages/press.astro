@@ -1,0 +1,151 @@
+---
+/** HTML press kit (replaces the 20MB image-only PDF). Indexable and copy-pasteable. */
+import { Image, getImage } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/ui/PageHeader.astro';
+import Icon from '../components/ui/Icon.astro';
+import { site } from '../config/site';
+import { bios } from '../config/press';
+import { creditsBy, fmtMonth } from '../lib/content';
+import { graph, breadcrumbSchema, personSchema } from '../lib/seo/schema';
+import p1 from '../assets/photos/portrait-desert-hat.jpg';
+import p2 from '../assets/photos/hero-desert.jpg';
+import p3 from '../assets/photos/live-bandshell.jpg';
+import p4 from '../assets/photos/tunnel-bw.jpg';
+
+const press = (await getCollection('press')).sort((a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0));
+const sync = [...(await creditsBy('sync')), ...(await creditsBy('broadcast')), ...(await creditsBy('chart'))];
+
+const photos = [
+  { src: p1, alt: 'Portrait of Sean Carney in a western shirt, holding a black hat in desert light' },
+  { src: p2, alt: 'Sean Carney in a black hat and embroidered shirt against desert hills' },
+  { src: p3, alt: 'Sean Carney performing on electric guitar' },
+  { src: p4, alt: 'Black and white image of Sean Carney walking through a tunnel' },
+];
+// Downloads: the largest size we hold, as JPG (print originals stay on request).
+const downloads = await Promise.all(
+  photos.map(async (ph, i) => {
+    const img = await getImage({ src: ph.src, width: ph.src.width, format: 'jpg', quality: 90 });
+    return { href: img.src, label: `${ph.src.width} × ${ph.src.height}`, file: `sean-carney-press-${i + 1}.jpg` };
+  }),
+);
+const og = await getImage({ src: p2, width: 1200, height: 630, fit: 'cover', format: 'jpg', quality: 80 });
+const jsonLd = graph(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Press', path: '/press' }]), personSchema(sync.map((s) => s.data.name)));
+---
+
+<BaseLayout pageType="press" image={og.src} imageAlt="Sean Carney portrait" title="Press Kit and Media | Sean Carney" description="Sean Carney press kit: biographies, credits, press quotes, approved photos and media contacts." type="profile" jsonLd={jsonLd}>
+  <PageHeader title="Press" intro="Biographies, credits, coverage and approved photography. For interviews and features, contact press below.">
+    <div class="hdr">
+      <a class="btn btn--ghost" href={`mailto:${site.email.press}?subject=Press%20inquiry`} data-track="press_contact_click"><Icon name="envelope" /> Press contact</a>
+      <a class="link-arrow" href="/press/one-sheet" data-track="one_sheet_click" data-track-location="press_header">One-sheet (print or PDF) <Icon name="arrow-right" /></a>
+    </div>
+  </PageHeader>
+
+  <section class="section" data-section="bios" aria-labelledby="bio-title">
+    <div class="container cols">
+      <h2 id="bio-title">Biography</h2>
+      <div class="bios">
+        <div><h3>Short</h3><p data-copy>{bios.short}</p><button type="button" class="copy" data-copy-btn data-bio="short">Copy</button></div>
+        <div><h3>Medium</h3><p data-copy>{bios.medium}</p><button type="button" class="copy" data-copy-btn data-bio="medium">Copy</button></div>
+        <div><h3>Long</h3><p data-copy>{bios.long}</p><button type="button" class="copy" data-copy-btn data-bio="long">Copy</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section alt" data-section="press_credits" aria-labelledby="credits-title">
+    <div class="container cols">
+      <h2 id="credits-title">Credits</h2>
+      <ul class="credits">
+        {sync.map((c) => <li><span>{c.data.name}</span>{c.data.detail && <small>{c.data.detail}</small>}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" data-section="coverage" aria-labelledby="coverage-title">
+    <div class="container cols">
+      <h2 id="coverage-title">Coverage</h2>
+      <ul class="coverage">
+        {press.map((p) => (
+          <li>
+            <blockquote>&ldquo;{p.data.quote}&rdquo;</blockquote>
+            <a href={p.data.url} target="_blank" rel="noopener" data-track="press_click" data-track-outlet={p.data.outlet} data-track-location="press_page">
+              {p.data.outlet}{p.data.date && `, ${fmtMonth(p.data.date)}`} <Icon name="arrow-up-right" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section alt" data-section="photos" aria-labelledby="photos-title">
+    <div class="container">
+      <h2 id="photos-title">Approved photos</h2>
+      <p class="note">Download JPGs below at the size shown. Full-resolution originals are available on request. Please credit as directed.</p>
+      <div class="photos">
+        {photos.map((ph, i) => (
+          <figure>
+            <Image src={ph.src} alt={ph.alt} widths={[400, 800]} sizes="(min-width: 900px) 25vw, 46vw" />
+            <figcaption>
+              <a href={downloads[i].href} download={downloads[i].file} data-track="press_photo_download" data-track-photo={String(i + 1)}>Download JPG</a>
+              <span>{downloads[i].label}</span>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { track } from '../lib/analytics/track';
+  import { onPage } from '../lib/lifecycle';
+
+  onPage(() => {
+    document.querySelectorAll<HTMLButtonElement>('[data-copy-btn]').forEach((b) =>
+      b.addEventListener('click', async () => {
+        const text = b.parentElement?.querySelector('[data-copy]')?.textContent ?? '';
+        try {
+          await navigator.clipboard.writeText(text);
+          b.textContent = 'Copied';
+          setTimeout(() => (b.textContent = 'Copy'), 2000);
+        } catch { /* clipboard blocked */ }
+        track('bio_copy', { length: b.dataset.bio });
+      }),
+    );
+  }, '[data-section="bios"]');
+</script>
+
+<style>
+  .hdr { margin-top: 2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 2rem; }
+  .alt { background: var(--bg-sunk); }
+  .cols { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(2rem, 5vw, 5rem); }
+  h2 { font-size: var(--step-4); }
+  .bios { display: grid; gap: 2.5rem; }
+  .bios h3 { font-family: var(--font-body); font-size: var(--step--1); font-weight: 500; color: var(--text-muted); margin-bottom: 0.6rem; }
+  .bios p { max-width: var(--measure); }
+  .copy { margin-top: 0.75rem; min-height: 40px; padding: 0 1rem; background: none; border: 1px solid var(--line-strong); color: var(--text); font: inherit; font-size: var(--step--1); cursor: pointer; }
+  .copy:hover { border-color: var(--accent); }
+  .credits { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem 2.5rem; }
+  .credits li { display: flex; flex-direction: column; }
+  .credits span { font-family: var(--font-display); font-size: var(--step-2); line-height: 1.15; }
+  .credits small { color: var(--text-muted); font-size: var(--step--1); }
+  .coverage { list-style: none; margin: 0; padding: 0; display: grid; gap: 2.5rem; }
+  blockquote { margin: 0; font-family: var(--font-display); font-size: var(--step-2); line-height: 1.25; }
+  .coverage a { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 44px; color: var(--text-muted); text-decoration: none; font-size: var(--step--1); }
+  .coverage a:hover { color: var(--accent); }
+  .coverage :global(svg) { width: 16px; height: 16px; }
+  .note { color: var(--text-muted); margin: 1rem 0 2rem; }
+  .photos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+  .photos figure { margin: 0; }
+  .photos figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25rem 1rem; margin-top: 0.6rem; font-size: var(--step--1); }
+  .photos figcaption a { display: inline-flex; align-items: center; min-height: 44px; color: var(--text); text-underline-offset: 0.25em; }
+  .photos figcaption a:hover { color: var(--accent); }
+  .photos figcaption span { display: inline-flex; align-items: center; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+  .photos :global(img) { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; }
+  @media (max-width: 899px) {
+    .cols { grid-template-columns: minmax(0, 1fr); }
+    .credits { grid-template-columns: minmax(0, 1fr); }
+    .photos { grid-template-columns: 1fr 1fr; }
+  }
+</style>

@@ -1,0 +1,43 @@
+---
+/**
+ * A quiet, contextual invitation to Scout, placed in the page flow (never a
+ * popup or a bubble that follows you). Optional prompts become one-tap starters.
+ */
+import { PUBLIC_SCOUT_ENABLED } from 'astro:env/client';
+
+interface Props {
+  text: string;
+  /** Analytics source id, e.g. "event_weddings". */
+  source: string;
+  prompts?: string[];
+  variant?: 'bar' | 'inline';
+}
+const { text, source, prompts = [], variant = 'bar' } = Astro.props;
+const enabled = PUBLIC_SCOUT_ENABLED !== 'false';
+---
+
+{enabled && (
+  <div class:list={['invite', variant]} data-section={`scout_invite_${source}`}>
+    <span class="mark" aria-hidden="true">S</span>
+    <p>{text}</p>
+    <div class="acts">
+      {prompts.map((p) => (
+        <button type="button" class="ask" data-scout-open={source} data-scout-prompt={p}>{p}</button>
+      ))}
+      <button type="button" class="open" data-scout-open={source}>Ask Scout</button>
+    </div>
+  </div>
+)}
+
+<style>
+  .invite { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1rem; }
+  .invite.bar { padding: 1rem 1.25rem; border: 1px solid var(--line-strong); background: var(--bg-raised); }
+  .mark { display: grid; place-items: center; width: 32px; height: 32px; flex: none; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-family: var(--font-display); font-weight: 600; font-size: 1.1rem; }
+  p { flex: 1 1 16rem; color: var(--text); font-size: var(--step--1); }
+  .acts { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  button { min-height: 40px; padding: 0.4rem 0.9rem; font: inherit; font-size: var(--step--1); cursor: pointer; }
+  .ask { background: none; border: 1px solid var(--line-strong); color: var(--text); }
+  .ask:hover { border-color: var(--accent); color: var(--accent); }
+  .open { background: var(--accent); border: 1px solid var(--accent); color: var(--accent-ink); }
+  .open:hover { background: var(--text); border-color: var(--text); }
+</style>

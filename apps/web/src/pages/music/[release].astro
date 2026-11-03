@@ -1,0 +1,215 @@
+---
+/**
+ * Release page: the smart link for one album or single. Every campaign, bio
+ * link and press mention points here, so streaming clicks are measured per
+ * platform on our own domain (stream_click) before the visitor leaves.
+ * Upcoming releases (date in the future) lead with the pre-save.
+ */
+import { Image, getImage } from 'astro:assets';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SpotifyFacade from '../../components/media/SpotifyFacade.astro';
+import NotifyForm from '../../components/ui/NotifyForm.astro';
+import FollowLinks from '../../components/ui/FollowLinks.astro';
+import Icon from '../../components/ui/Icon.astro';
+import { site } from '../../config/site';
+import { releaseHref, platformOf } from '../../lib/content';
+import { graph, breadcrumbSchema, albumSchema } from '../../lib/seo/schema';
+
+export async function getStaticPaths() {
+  const all = await getCollection('releases');
+  return all.map((r) => ({ params: { release: r.id }, props: { r, all } }));
+}
+
+interface Props { r: CollectionEntry<'releases'>; all: CollectionEntry<'releases'>[] }
+const { r, all } = Astro.props;
+const d = r.data;
+
+const upcoming = !!d.date && d.date.getTime() > Date.now();
+const kindLabel = { album: 'Album', single: 'Single', ep: 'EP', feature: 'Featured single' }[d.kind];
+const dateLabel = d.date?.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+
+// Pre-save first while upcoming; otherwise Spotify first, then the rest.
+const links = d.links
+  .map((l) => ({ ...l, p: platformOf(l, upcoming) }))
+  .sort((a, b) => Number(b.p.id === 'presave') - Number(a.p.id === 'presave') || Number(b.p.id === 'spotify') - Number(a.p.id === 'spotify'));
+
+const more = all
+  .filter((x) => x.id !== r.id)
+  .sort((a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0))
+  .slice(0, 3);
+
+const og = await getImage({ src: d.cover, width: 1200, height: 1200, fit: 'cover', format: 'jpg', quality: 82 });
+const url = `${site.url}${releaseHref(r.id)}`;
+const description = `${d.title} by ${d.artists}${d.date ? ` (${d.date.getUTCFullYear()})` : ''}. ${d.story ?? d.hook} Listen on Spotify, Bandcamp and more.`;
+const jsonLd = graph(
+  breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Music', path: '/music' }, { name: d.title, path: releaseHref(r.id) }]),
+  albumSchema({ title: d.title, kind: d.kind, date: d.date, url, image: new URL(og.src, site.url).href, description: d.story ?? d.hook, sameAs: d.links.map((l) => l.url) }),
+);
+---
+
+<BaseLayout pageType="release" title={`${d.title} | ${d.artists}`} description={description} image={og.src} imageAlt={`${d.title} cover art`} type="music.album" jsonLd={jsonLd}>
+  <section class="hero" data-section="release_hero" data-release={r.id} data-upcoming={upcoming ? 'true' : undefined}>
+    <div class="container grid">
+      <div class="cover">
+        <Image src={d.cover} alt={`${d.title} cover art`} widths={[480, 720, 960]} sizes="(min-width: 900px) 42vw, 92vw" loading="eager" fetchpriority="high" />
+      </div>
+
+      <div class="body">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="/music">Music</a> <span aria-hidden="true">/</span> <span aria-current="page">{d.title}</span></nav>
+        <h1>{d.title}</h1>
+        <p class="meta">
+          <span>{kindLabel}</span>
+          <span>{d.artists}</span>
+          {dateLabel && <span data-release-date={d.date!.toISOString()}>{upcoming ? `Out ${dateLabel}` : dateLabel}</span>}
+        </p>
+        <p class="story">{d.story ?? d.hook}</p>
+
+        {d.spotify && !upcoming && <div class="player"><SpotifyFacade uri={d.spotify} title={d.title} location="release_page" /></div>}
+
+        {links.length > 0 && (
+          <ul class="listen" aria-label={upcoming ? 'Pre-save and follow' : 'Listen on'}>
+            {links.map((l) => (
+              <li>
+                <a href={l.url} target="_blank" rel="noopener" class:list={{ primary: l.p.id === 'presave' }}
+                  data-track="stream_click" data-track-platform={l.p.id} data-track-release={r.id} data-track-location="release_page">
+                  <span class="pname">{l.p.icon && <Icon name={l.p.icon} />}{l.p.name}</span>
+                  <span class="verb">{l.p.verb} <Icon name="arrow-up-right" /></span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <div class="follow-wrap"><FollowLinks location="release_page" compact /></div>
+
+        <div class="actions">
+          <button type="button" class="share" data-share data-share-title={`${d.title} by ${d.artists}`} data-share-url={url}>Share</button>
+          <span class="share-msg" data-share-msg role="status" aria-live="polite"></span>
+          <a class="link-arrow" href="/music">All music <Icon name="arrow-right" /></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section join" data-section="release_join" aria-labelledby="join-title">
+    <div class="container join-row">
+      <div>
+        <h2 id="join-title">{upcoming ? `Hear ${d.title} the day it lands` : 'Get the next one first'}</h2>
+        <p>One email when new music is out. Sometimes an early listen before anyone else.</p>
+      </div>
+      <NotifyForm topic="news" tone="surface" cta="Join the list" location="release_page" />
+    </div>
+  </section>
+
+  {more.length > 0 && (
+    <section class="section more" data-section="release_more" aria-labelledby="more-title">
+      <div class="container">
+        <h2 id="more-title">More music</h2>
+        <ul>
+          {more.map((m) => (
+            <li>
+              <a href={releaseHref(m.id)} data-track="release_card_click" data-track-release={m.id} data-track-location="release_more">
+                <Image src={m.data.cover} alt="" widths={[320, 560]} sizes="(min-width: 900px) 28vw, 92vw" />
+                <span class="mt">{m.data.title}</span>
+                <span class="mm">{m.data.artists}{m.data.date && `, ${m.data.date.getUTCFullYear()}`}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+</BaseLayout>
+
+<script>
+  import { track } from '../../lib/analytics/track';
+  import { onPage } from '../../lib/lifecycle';
+
+  onPage(() => {
+    const hero = document.querySelector<HTMLElement>('[data-release]');
+    if (hero) {
+      track('release_view', { release: hero.dataset.release, upcoming: hero.dataset.upcoming === 'true' });
+      // The page is static: if the release date passed after the last build, say "out now".
+      const dateEl = hero.querySelector<HTMLElement>('[data-release-date]');
+      if (dateEl && hero.dataset.upcoming && new Date(dateEl.dataset.releaseDate!).getTime() <= Date.now()) {
+        dateEl.textContent = 'Out now';
+      }
+    }
+
+    document.querySelectorAll<HTMLButtonElement>('[data-share]').forEach((b) => {
+      const msg = b.parentElement?.querySelector<HTMLElement>('[data-share-msg]');
+      b.addEventListener('click', async () => {
+        const url = new URL(b.dataset.shareUrl!);
+        url.searchParams.set('utm_source', 'share');
+        url.searchParams.set('utm_medium', 'referral');
+        const data = { title: b.dataset.shareTitle, url: url.href };
+        try {
+          if (navigator.share) {
+            await navigator.share(data);
+            track('share', { method: 'native', content: hero?.dataset.release });
+          } else {
+            await navigator.clipboard.writeText(url.href);
+            if (msg) { msg.textContent = 'Link copied'; setTimeout(() => (msg.textContent = ''), 2500); }
+            track('share', { method: 'copy', content: hero?.dataset.release });
+          }
+        } catch {
+          /* share sheet dismissed or clipboard blocked */
+        }
+      });
+    });
+  }, '[data-release]');
+</script>
+
+<style>
+  .hero { padding-block: clamp(2.5rem, 5vw, 5rem) clamp(4rem, 7vw, 7rem); }
+  .grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(2rem, 6vw, 6rem); align-items: start; }
+  .cover { position: sticky; top: calc(var(--header-h) + 2rem); }
+  .cover :global(img) { width: 100%; height: auto; box-shadow: 0 30px 80px rgb(0 0 0 / 0.5); }
+  .crumbs { font-size: var(--step--1); color: var(--text-muted); }
+  .crumbs a { color: inherit; text-underline-offset: 0.2em; }
+  .crumbs a:hover { color: var(--text); }
+  h1 { font-size: var(--step-5); line-height: 0.95; letter-spacing: -0.02em; margin-top: 1.25rem; text-wrap: balance; }
+  .meta { display: flex; flex-wrap: wrap; gap: 0.25rem 0; margin-top: 1.25rem; color: var(--text-muted); font-size: var(--step--1); }
+  .meta span + span::before { content: ''; display: inline-block; width: 3px; height: 3px; margin: 0 0.75rem; vertical-align: middle; background: var(--text-faint); border-radius: 50%; }
+  .story { margin-top: 1.5rem; font-size: var(--step-1); line-height: 1.5; color: var(--text); max-width: 34ch; }
+  .player { margin-top: 2rem; max-width: 34rem; }
+
+  .listen { list-style: none; margin: 2.25rem 0 0; padding: 0; max-width: 34rem; border-top: 1px solid var(--line); }
+  .listen a { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 64px; padding-inline: 0.25rem; border-bottom: 1px solid var(--line); text-decoration: none; transition: background-color 0.25s var(--ease-out), padding 0.25s var(--ease-out); }
+  .listen a:hover { background: var(--bg-raised); padding-inline: 1rem; }
+  .pname { display: inline-flex; align-items: center; gap: 0.75rem; font-family: var(--font-display); font-size: var(--step-1); }
+  .pname :global(svg) { width: 22px; height: 22px; color: var(--text-muted); }
+  .verb { display: inline-flex; align-items: center; gap: 0.4rem; font-size: var(--step--1); letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
+  .verb :global(svg) { width: 14px; height: 14px; }
+  .listen a:hover .verb { color: var(--accent); }
+  .listen a.primary { background: var(--accent); color: var(--accent-ink); padding-inline: 1rem; border-bottom-color: transparent; }
+  .listen a.primary .verb, .listen a.primary :global(svg) { color: var(--accent-ink); }
+
+  .follow-wrap { margin-top: 1.5rem; max-width: 34rem; }
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.75rem; margin-top: 2rem; }
+  .share { min-height: 44px; padding: 0 1.25rem; background: none; border: 1px solid var(--line-strong); color: var(--text); font: inherit; font-size: var(--step--1); letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; }
+  .share:hover { border-color: var(--text); }
+  .share-msg { font-size: var(--step--1); color: var(--accent); min-width: 6ch; }
+
+  .join { background: var(--bg-sunk); border-block: 1px solid var(--line); padding-block: clamp(3.5rem, 6vw, 6rem); }
+  .join-row { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(2rem, 6vw, 6rem); align-items: center; }
+  .join h2 { font-size: var(--step-3); line-height: 1.05; text-wrap: balance; }
+  .join p { margin-top: 0.75rem; color: var(--text-muted); max-width: 40ch; }
+
+  .more h2 { font-size: var(--step-4); margin-bottom: 2rem; }
+  .more ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem; }
+  .more a { display: grid; gap: 0.35rem; text-decoration: none; }
+  .more :global(img) { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; margin-bottom: 0.75rem; transition: opacity 0.3s var(--ease-out); }
+  .more a:hover :global(img) { opacity: 0.85; }
+  .mt { font-family: var(--font-display); font-size: var(--step-2); line-height: 1.1; }
+  .mm { color: var(--text-muted); font-size: var(--step--1); }
+  .more a:hover .mt { color: var(--accent); }
+
+  @media (max-width: 899px) {
+    .grid, .join-row { grid-template-columns: minmax(0, 1fr); }
+    .cover { position: static; max-width: 30rem; }
+    .more ul { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  }
+  @media (max-width: 560px) { .more ul { grid-template-columns: minmax(0, 1fr); } }
+</style>

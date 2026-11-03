@@ -1,0 +1,117 @@
+---
+/**
+ * Head-level analytics: experiment assignment (inline, pre-paint) plus vendor
+ * loaders. Each vendor is enabled purely by setting its env var.
+ * Third parties load on idle so they never compete with LCP.
+ */
+import {
+  PUBLIC_PLAUSIBLE_DOMAIN,
+  PUBLIC_GA4_ID,
+  PUBLIC_CLARITY_ID,
+  PUBLIC_META_PIXEL_ID,
+} from 'astro:env/client';
+import { bootScript } from '../../lib/analytics/experiments';
+
+const vendors = {
+  ga4: PUBLIC_GA4_ID ?? '',
+  clarity: PUBLIC_CLARITY_ID ?? '',
+  meta: PUBLIC_META_PIXEL_ID ?? '',
+};
+---
+
+<script is:inline set:html={bootScript() /* soc2-ignore: generated at build from static experiment config, no visitor input */} />
+<script is:inline>
+  // Events-zone theme experiment: swap before first paint, no flicker.
+  (function (h) {
+    if (h.getAttribute('data-zone') !== 'events') return;
+    var v = h.getAttribute('data-exp-events-theme');
+    if (v === 'ivory' || v === 'night') h.setAttribute('data-theme', v);
+  })(document.documentElement);
+</script>
+
+{PUBLIC_PLAUSIBLE_DOMAIN && (
+  <>
+    <script is:inline>
+      window.plausible = window.plausible || function () { (window.plausible.q = window.plausible.q || []).push(arguments); };
+    </script>
+    <script is:inline defer data-domain={PUBLIC_PLAUSIBLE_DOMAIN} src="https://plausible.io/js/script.outbound-links.tagged-events.js" />
+  </>
+)}
+
+<script is:inline define:vars={{ vendors }}>
+  (function () {
+    var q = new URLSearchParams(location.search);
+    try {
+      if (q.get('debug_analytics') === '1') localStorage.setItem('sc_debug', '1'); // soc2-ignore: PRIV003 - pre-paint inline script (no imports); sc_ key, evicted by clearSiteData()
+      if (q.get('debug_analytics') === '0') localStorage.removeItem('sc_debug');
+      window.__scDebug = localStorage.getItem('sc_debug') === '1';
+    } catch (e) {}
+    var adsOk = true;
+    try { adsOk = !navigator.globalPrivacyControl && localStorage.getItem('sc_ad_optout') !== '1'; } catch (e) { adsOk = false; }
+    // Consent (GDPR/ePrivacy): GA4, Clarity and Meta load only after the visitor
+    // allows them. Plausible (cookieless, no personal data) runs for everyone.
+    var consent = null;
+    try { consent = localStorage.getItem('sc_consent'); } catch (e) {}
+    var granted = function () { return consent === 'granted'; };
+    var ready = false; // page has loaded; vendor scripts may be injected
+
+    function loadGA() {
+      if (!vendors.ga4 || !granted() || window.gtag) return;
+      var ad = adsOk ? 'granted' : 'denied';
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function () { window.dataLayer.push(arguments); };
+      window.gtag('consent', 'default', { analytics_storage: 'granted', ad_storage: ad, ad_user_data: ad, ad_personalization: ad });
+      window.gtag('js', new Date());
+      window.gtag('config', vendors.ga4, { anonymize_ip: true });
+      var g = document.createElement('script'); g.async = true; g.src = 'https://www.googletagmanager.com/gtag/js?id=' + vendors.ga4; document.head.appendChild(g); // soc2-ignore: PRIV001 - runs only after consent (granted() above)
+    }
+    function loadClarity() {
+      if (!vendors.clarity || !granted() || window.clarity) return;
+      (function (c, l, a, r, i, t, y) { c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); }; t = l.createElement(r); t.async = 1; t.src = 'https://www.clarity.ms/tag/' + i; y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y); })(window, document, 'clarity', 'script', vendors.clarity); // soc2-ignore: PRIV001 - runs only after consent (granted() above)
+      window.clarity('consentv2', { analytics_Storage: 'granted', ad_Storage: 'denied' });
+    }
+    function loadMeta() {
+      if (!vendors.meta || !adsOk || !granted() || window.fbq) return;
+      !function (f, b, e, v, n, t, s) { if (f.fbq) return; n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); }; if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0'; n.queue = []; t = b.createElement(e); t.async = !0; t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s); }(/** @type {any} */ (window), document, 'script', 'https://connect.facebook.net/en_US/fbevents.js'); // soc2-ignore: PRIV001 - runs only after consent and ad opt-in checks above
+      window.fbq('init', vendors.meta); window.fbq('track', 'PageView');
+    }
+    function load() {
+      ready = true;
+      loadGA(); loadClarity(); loadMeta();
+    }
+    // Used by the consent bar and the privacy page.
+    window.__scSetConsent = function (value) {
+      consent = value === 'granted' ? 'granted' : 'denied';
+      try { localStorage.setItem('sc_consent', consent); } catch (e) {} // soc2-ignore: PRIV003 - inline consent store; sc_ key, evicted by clearSiteData()
+      if (consent === 'denied') {
+        // Already-loaded vendors stop storing; a reload removes them entirely.
+        if (window.gtag) window.gtag('consent', 'update', { analytics_storage: 'denied', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
+        if (window.clarity) window.clarity('consentv2', { analytics_Storage: 'denied', ad_Storage: 'denied' });
+      } else if (ready) {
+        load();
+      }
+      (window.dataLayer = window.dataLayer || []).push({ event: 'consent_set', value: consent });
+    };
+    window.__scConsentNeeded = !!(vendors.ga4 || vendors.clarity || vendors.meta) && consent === null;
+
+    if (document.readyState === 'complete') (window.requestIdleCallback || setTimeout)(load);
+    else addEventListener('load', function () { (window.requestIdleCallback || setTimeout)(load); });
+  })();
+</script>
+
+<script>
+  import { captureAttribution } from '../../lib/analytics/attribution';
+  import { startAutotrack } from '../../lib/analytics/autotrack';
+  import { startVisit } from '../../lib/analytics/retention';
+  import { markNewSinceLastVisit } from '../../lib/analytics/new-since';
+  import { track } from '../../lib/analytics/track';
+  import { onPage } from '../../lib/lifecycle';
+  // Visit record first, so every event (including the page's first) carries new/returning.
+  onPage(() => {
+    captureAttribution(); // counts pages per session
+    const visit = startVisit();
+    if (visit?.started) track('session_start', { visit_n: visit.visit_n, days_since_last: visit.days_since_last });
+    markNewSinceLastVisit();
+  });
+  startAutotrack();
+</script>

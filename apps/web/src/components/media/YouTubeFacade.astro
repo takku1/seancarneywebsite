@@ -1,0 +1,141 @@
+---
+/**
+ * Click-to-load YouTube. Ships a thumbnail and a button, no YouTube JS until
+ * the visitor asks for it (saves ~500KB+ per embed and keeps LCP/INP clean).
+ * Uses youtube-nocookie. Playback, docking, "Up next" and watch metrics live
+ * in src/lib/media/player.ts (one session at a time, persists across pages).
+ */
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  id: string;
+  title: string;
+  location: string;
+  /** Use a larger thumbnail for big tiles. */
+  large?: boolean;
+  class?: string;
+}
+const { id, title, location, large = false, class: cls } = Astro.props;
+const thumb = `https://i.ytimg.com/vi/${id}/${large ? 'maxresdefault' : 'hqdefault'}.jpg`;
+---
+
+<div class:list={['yt', cls]} data-yt={id} data-title={title} data-location={location}>
+  <img src={thumb} alt="" loading="lazy" decoding="async" width="1280" height="720" data-fallback={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`} />
+  <button type="button" class="yt-play" aria-label={`Play video: ${title}`}>
+    <span class="yt-icon"><Icon name="play" /></span>
+  </button>
+</div>
+
+<script>
+  import { play } from '../../lib/media/player';
+  import { onPage } from '../../lib/lifecycle';
+
+  // Delegated once for every page the router swaps in: play, and warm the
+  // connection on intent (hover/focus/touch) so the click starts faster.
+  let warmed = false;
+  const warm = () => {
+    if (warmed) return;
+    warmed = true;
+    for (const href of ['https://www.youtube-nocookie.com', 'https://www.youtube.com', 'https://i.ytimg.com']) {
+      const l = document.createElement('link');
+      l.rel = 'preconnect';
+      l.href = href;
+      l.crossOrigin = '';
+      document.head.append(l);
+    }
+  };
+  for (const ev of ['pointerover', 'focusin', 'touchstart']) {
+    document.addEventListener(ev, (e) => { if ((e.target as Element | null)?.closest?.('[data-yt]')) warm(); }, { passive: true });
+  }
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as Element | null)?.closest?.('.yt-play');
+    const tile = btn?.closest<HTMLElement>('[data-yt]');
+    if (tile) play(tile);
+  });
+
+  // Per page: maxresdefault does not exist for every video; YouTube then serves a 120x90 grey placeholder.
+  onPage(() => {
+    for (const img of document.querySelectorAll<HTMLImageElement>('[data-yt] img[data-fallback]')) {
+      const check = () => {
+        if (img.naturalWidth > 0 && img.naturalWidth <= 120 && img.dataset.fallback) {
+          img.src = img.dataset.fallback;
+          delete img.dataset.fallback;
+        }
+      };
+      if (img.complete) check();
+      else img.addEventListener('load', check, { once: true });
+    }
+  });
+</script>
+
+<style>
+  .yt {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: var(--bg-raised);
+    overflow: hidden;
+  }
+  .yt img, .yt :global(iframe) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: 0;
+  }
+  .yt img { filter: saturate(0.85) brightness(0.8); transition: filter 0.5s var(--ease-out), transform 0.8s var(--ease-out); }
+  .yt:hover img { filter: none; transform: scale(1.02); }
+  .yt-play {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    color: var(--on-image);
+  }
+  .yt-icon {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border: 1px solid rgb(236 229 216 / 0.6);
+    background: rgb(13 12 11 / 0.45);
+    backdrop-filter: blur(6px);
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .yt-play:hover .yt-icon, .yt-play:focus-visible .yt-icon { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .yt-icon :global(svg) { width: 26px; height: 26px; }
+
+  /* This video is playing in the mini-player. */
+  .yt.is-docked img { filter: saturate(0.4) brightness(0.45); }
+  .yt.is-docked .yt-play::after {
+    content: 'Playing in the mini player';
+    position: absolute;
+    left: 0.9rem;
+    bottom: 0.75rem;
+    font-size: var(--step--1);
+    color: var(--on-image-muted);
+  }
+
+  /* Up next (built by the script, hence :global). */
+  .yt :global(.yt-next) {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: grid;
+    align-content: end;
+    gap: 0.9rem;
+    padding: clamp(1rem, 3vw, 1.75rem);
+    background: rgb(var(--scrim) / 0.9);
+    backdrop-filter: blur(8px);
+    color: var(--on-image);
+  }
+  .yt :global(.yt-next-title) { font-family: var(--font-display); font-size: var(--step-2); line-height: 1.1; max-width: 26ch; }
+  .yt :global(.yt-next-title span) { display: block; margin-bottom: 0.3rem; font-family: var(--font-body); font-size: var(--step--1); color: var(--on-image-muted); }
+  .yt :global(.yt-next-acts) { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .yt :global(.yt-next-acts button) { min-height: 44px; padding: 0 1.1rem; font: inherit; font-size: var(--step--1); letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; border: 1px solid rgb(241 235 224 / 0.5); background: transparent; color: var(--on-image); font-variant-numeric: tabular-nums; }
+  .yt :global(.yt-next-acts .yt-next-play) { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .yt :global(.yt-next-acts button:hover) { border-color: var(--on-image); }
+</style>

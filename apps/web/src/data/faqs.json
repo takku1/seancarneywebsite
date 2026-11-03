@@ -1,0 +1,146 @@
+[
+  {
+    "id": "formats",
+    "q": "What formats are available?",
+    "a": "Solo acoustic, duo, trio, or Sean Carney and The Hustlers as a full band. Many events combine them, for example solo for a reception and the band once the dancing starts.",
+    "scope": [
+      "scout"
+    ]
+  },
+  {
+    "id": "after-inquiry",
+    "q": "What happens after I inquire?",
+    "a": "Sean replies personally within one business day with availability and questions about the event. Then you receive a tailored proposal, and your date is held once the agreement is signed.",
+    "scope": [
+      "private-events"
+    ]
+  },
+  {
+    "id": "lead-time",
+    "q": "How far ahead should we book?",
+    "a": "Peak Saturdays are often reserved nine to eighteen months out, and corporate and private dates six to twelve months ahead. Shorter notice is sometimes possible, so it is always worth asking.",
+    "scope": [
+      "private-events"
+    ]
+  },
+  {
+    "id": "pricing",
+    "q": "How is pricing set?",
+    "a": "Every proposal reflects the format, date, location and hours of music. Share a few details through the inquiry form and you will receive a tailored quote.",
+    "scope": [
+      "private-events"
+    ]
+  },
+  {
+    "id": "w-ceremony-reception",
+    "q": "Can you play both the ceremony and the reception?",
+    "a": "Yes. A common plan is solo acoustic for the ceremony and cocktail hour, then The Hustlers for the reception. Ceremony sound can run separately so nothing is heard being set up.",
+    "scope": [
+      "weddings"
+    ]
+  },
+  {
+    "id": "w-first-dance",
+    "q": "Can you learn our first dance song?",
+    "a": "Yes. Send the song early and it will be arranged for the moment, whether that is a faithful version or a stripped-back acoustic take.",
+    "scope": [
+      "weddings"
+    ]
+  },
+  {
+    "id": "w-requests",
+    "q": "Do you take requests on the night?",
+    "a": "Yes, within reason. Must-play and do-not-play lists are agreed in advance, and guest requests are welcome during the reception.",
+    "scope": [
+      "weddings"
+    ]
+  },
+  {
+    "id": "w-lead",
+    "q": "How early do couples book?",
+    "a": "Peak Saturdays often go nine to eighteen months out. If your date is sooner, ask anyway.",
+    "scope": [
+      "weddings"
+    ]
+  },
+  {
+    "id": "c-paperwork",
+    "q": "Can you provide a COI, W-9 and tech rider?",
+    "a": "Yes. A certificate of insurance naming your venue, a W-9, a stage plot and a tech rider are available on request.",
+    "scope": [
+      "corporate"
+    ]
+  },
+  {
+    "id": "c-custom",
+    "q": "Can you write or adapt a song for our brand?",
+    "a": "Custom and adapted songs are available for launches and activations. Share the brief and timeline in your inquiry.",
+    "scope": [
+      "corporate"
+    ]
+  },
+  {
+    "id": "c-av",
+    "q": "Do you bring sound, or use the venue's AV?",
+    "a": "Either. Sean can bring a self-contained system for smaller rooms or plug into your production team's setup for larger stages.",
+    "scope": [
+      "corporate"
+    ]
+  },
+  {
+    "id": "e-privacy",
+    "q": "Will our event be posted online?",
+    "a": "Never without your permission. NDAs are welcome.",
+    "scope": [
+      "estate"
+    ]
+  },
+  {
+    "id": "e-volume",
+    "q": "Can the music stay conversational?",
+    "a": "Yes. Sets are planned around the room and the moment, from quiet dinner music to a full dance floor later on.",
+    "scope": [
+      "estate"
+    ]
+  },
+  {
+    "id": "e-footprint",
+    "q": "How much space does a solo setup need?",
+    "a": "Very little. A solo acoustic setup fits in a corner of a living room or beside a garden table, with a single power outlet.",
+    "scope": [
+      "estate"
+    ]
+  },
+  {
+    "id": "g-timing",
+    "q": "Can you fit our program timing exactly?",
+    "a": "Yes. Sets are built around your run-of-show and producer's cues, including a timed featured performance.",
+    "scope": [
+      "galas"
+    ]
+  },
+  {
+    "id": "g-featured",
+    "q": "How long is a featured performance?",
+    "a": "Usually a short, high-impact set, timed to the program. Length is agreed with your producer in advance.",
+    "scope": [
+      "galas"
+    ]
+  },
+  {
+    "id": "d-travel",
+    "q": "How is travel quoted?",
+    "a": "Travel is quoted transparently alongside the performance. Solo performances keep destination costs efficient.",
+    "scope": [
+      "destination"
+    ]
+  },
+  {
+    "id": "d-lead",
+    "q": "How early should we plan a destination date?",
+    "a": "As early as possible, particularly for peak season and international travel, so flights and logistics can be set well ahead.",
+    "scope": [
+      "destination"
+    ]
+  }
+]

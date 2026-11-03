@@ -1,0 +1,84 @@
+---
+import { Image, getImage } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/ui/Icon.astro';
+import { creditsBy } from '../lib/content';
+import { graph, breadcrumbSchema, personSchema } from '../lib/seo/schema';
+import portrait from '../assets/photos/portrait-fringe.jpg';
+import desert from '../assets/photos/hero-desert.jpg';
+
+const groups = [
+  { title: 'Film, television and campaigns', items: [...(await creditsBy('sync')), ...(await creditsBy('broadcast')), ...(await creditsBy('chart'))] },
+  { title: 'Stages', items: await creditsBy('venue') },
+  { title: 'Companies', items: await creditsBy('client') },
+];
+const og = await getImage({ src: desert, width: 1200, height: 630, fit: 'cover', format: 'jpg', quality: 80 });
+const jsonLd = graph(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'About', path: '/about' }]), personSchema(groups[0].items.map((c) => c.data.name)));
+---
+
+<BaseLayout pageType="about" image={og.src} imageAlt="Sean Carney in the desert hills" title="About Sean Carney" description="Sean Carney is a Los Angeles singer, guitarist and producer: Billboard-charting songwriter, NBC Songland alum, Recording Academy voting member." type="profile" jsonLd={jsonLd}>
+  <section class="intro" data-section="about_intro">
+    <div class="container grid">
+      <div>
+        <h1>About</h1>
+        <div class="prose">
+          <p class="first">Sean Carney writes the kind of songs that sound like a film's final scene: dust on the boots, a chorus built for a stadium, a lyric you keep thinking about on the drive home.</p>
+          <p>Before the solo records, there was WOLVES, the band he built with Marc Avery. They took an original song called "Miracle" onto season two of NBC's <em>Songland</em> and pitched it to Martina McBride, and their music found its way into <em>Fast &amp; Furious 9</em> and The CW's <em>All American</em>. On his own, Sean's songs have since run under Olympic coverage, NFL playoff broadcasts and a Netflix holiday film. Today he votes in the Recording Academy.</p>
+          <p>In the studio he does most of it himself: vocals, guitar, bass, banjo and keys, then the production, mixing and mastering.</p>
+          <p>He came up on the stages of the Troubadour, the Roxy, the El Rey and Hotel Cafe, and has played Crypto.com Arena for LA Kings games more than once. Fifteen years and more than a thousand shows later, he has toured in over fifty countries.</p>
+          <p>His latest album, <em>California Cowboy</em>, launched with a sold-in release show at Harvard &amp; Stone, and it is the clearest picture yet: dust, leather and big-screen choruses. Music for outlaws.</p>
+          <p class="aside">And yes, there is another Sean Carney, a blues guitarist from Ohio. Rather than fight over the name, they recorded a song together: <a href="https://www.youtube.com/watch?v=iBLdS53jpa4" target="_blank" rel="noopener" data-track="outbound_story" data-track-label="two_sean_carneys">"The Tale of Two Sean Carneys."</a></p>
+        </div>
+      </div>
+      <div class="photo">
+        <Image src={portrait} alt="Sean Carney in a fringed jacket holding an acoustic guitar" widths={[480, 800, 1200]} sizes="(min-width: 900px) 40vw, 92vw" loading="eager" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section more" data-section="about_more">
+    <div class="container more-row">
+      <p>The full list of credits, approved photos and biographies lives in the press kit.</p>
+      <a class="link-arrow" href="/press#credits-title">Press kit <Icon name="arrow-right" /></a>
+    </div>
+  </section>
+
+  <section class="band" data-section="about_band">
+    <Image src={desert} alt="" widths={[768, 1280, 1920]} sizes="100vw" class="bg" />
+    <div class="container inner">
+      <h2>On stage, he is rarely alone.</h2>
+      <p class="lede">The Hustlers are the band behind Sean's private and festival shows, scaling from a trio to a full ensemble.</p>
+      <a class="link-arrow" href="/private-events">Private events <Icon name="arrow-right" /></a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .intro { padding-block: clamp(3rem, 8vw, 7rem); }
+  .grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(2rem, 6vw, 6rem); align-items: start; }
+  h1 { font-size: var(--step-5); margin-bottom: 2rem; }
+  .prose { font-size: var(--step-0); }
+  .first { font-family: var(--font-display); font-size: var(--step-2); line-height: 1.3; color: var(--text); }
+  .photo :global(img) { width: 100%; height: auto; }
+  .aside { font-style: italic; }
+  .more { border-top: 1px solid var(--line); padding-block: 3rem; }
+  .more-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem 2rem; }
+  .more p { color: var(--text-muted); }
+  .credits { border-top: 1px solid var(--line); }
+  .credits h2 { font-size: var(--step-4); margin-bottom: 2.5rem; }
+  .groups { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 2.5rem 3.5rem; }
+  h3 { font-family: var(--font-body); font-size: var(--step--1); font-weight: 500; color: var(--text-muted); margin-bottom: 1.25rem; }
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
+  li { display: flex; flex-direction: column; }
+  li span { font-family: var(--font-display); font-size: var(--step-1); line-height: 1.2; }
+  li small { color: var(--text-muted); font-size: var(--step--1); }
+  .band { position: relative; isolation: isolate; overflow: hidden; padding-block: clamp(6rem, 12vw, 10rem); }
+  .band :global(.bg) { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: 50% 30%; }
+  .band::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgb(9 8 7 / 0.9), rgb(9 8 7 / 0.35)); }
+  .band h2 { font-size: var(--step-4); max-width: 16ch; }
+  .band .lede { margin-block: 1.25rem 2rem; color: var(--text); opacity: 0.85; }
+  @media (max-width: 899px) {
+    .grid, .groups { grid-template-columns: minmax(0, 1fr); }
+    .photo { max-width: 28rem; }
+  }
+</style>

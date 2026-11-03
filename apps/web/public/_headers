@@ -1,0 +1,17 @@
+# Security headers for every response (Cloudflare static assets + Worker).
+# CSP is enforced. The csp-script-hashes / csp-style-hashes placeholders are replaced
+# at build with every page's SHA-256 hashes (integrations/csp-header-hashes.mjs),
+# so the policy needs no unsafe-inline. Violations report to /api/csp-report.
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+  Reporting-Endpoints: csp="/api/csp-report"
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'csp-script-hashes' https://plausible.io https://www.googletagmanager.com https://*.clarity.ms https://connect.facebook.net https://challenges.cloudflare.com; style-src 'self' 'csp-style-hashes'; img-src 'self' data: https://i.ytimg.com https://i.scdn.co https://*.cdninstagram.com https://*.fbcdn.net https://www.facebook.com https://*.clarity.ms https://www.googletagmanager.com; media-src 'self'; font-src 'self'; connect-src 'self' https://plausible.io https://*.google-analytics.com https://*.clarity.ms https://www.facebook.com; frame-src https://www.youtube-nocookie.com https://open.spotify.com https://challenges.cloudflare.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; report-uri /api/csp-report; report-to csp
+
+# Keep API endpoints out of search indexes.
+/api/*
+  X-Robots-Tag: noindex

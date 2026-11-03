@@ -1,0 +1,57 @@
+---
+import { Image } from 'astro:assets';
+import { featuredRelease, releaseHref } from '../../lib/content';
+import SpotifyFacade from '../media/SpotifyFacade.astro';
+import Icon from '../ui/Icon.astro';
+
+const r = await featuredRelease();
+const kindLabel = { album: 'New album', single: 'New single', ep: 'New EP', feature: 'Featured on' }[r.data.kind];
+---
+
+<section class="section release" data-section="featured_release" aria-labelledby="release-title">
+  <div class="container grid">
+    <div class="cover reveal">
+      <Image src={r.data.cover} alt={`${r.data.title} cover art`} widths={[480, 720, 960]} sizes="(min-width: 900px) 40vw, 92vw" />
+    </div>
+    <div class="body">
+      <p class="kind">{kindLabel}</p>
+      <h2 id="release-title"><a href={releaseHref(r.id)} data-track="release_card_click" data-track-release={r.id} data-track-location="home_featured">{r.data.title}</a></h2>
+      <p class="lede">{r.data.hook}</p>
+      <div class="player">
+        {r.data.spotify && <SpotifyFacade uri={r.data.spotify} title={r.data.title} location="home_featured" />}
+      </div>
+      <ul class="links">
+        {r.data.links.filter((l) => l.label !== 'Spotify').map((l) => (
+          <li>
+            <a class="link-arrow" href={l.url} target="_blank" rel="noopener" data-track="release_link_click" data-track-release={r.id} data-track-label={l.label}>
+              {l.label} <Icon name="arrow-up-right" />
+            </a>
+          </li>
+        ))}
+        <li><a class="link-arrow" href={releaseHref(r.id)} data-track="release_card_click" data-track-release={r.id} data-track-location="home_featured_more">Every way to listen <Icon name="arrow-right" /></a></li>
+        <li><a class="link-arrow" href="/music">All music <Icon name="arrow-right" /></a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: center;
+  }
+  .cover :global(img) { width: 100%; height: auto; box-shadow: 0 30px 80px rgb(0 0 0 / 0.5); }
+  .kind { color: var(--accent); font-size: var(--step--1); letter-spacing: 0.04em; }
+  h2 { font-size: var(--step-5); margin-block: 0.5rem 1.25rem; letter-spacing: -0.02em; }
+  h2 a { text-decoration: none; }
+  h2 a:hover { color: var(--accent); }
+  .player { margin-top: 2rem; max-width: 34rem; }
+  .links { list-style: none; margin: 1.75rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem 2rem; }
+
+  @media (max-width: 899px) {
+    .grid { grid-template-columns: minmax(0, 1fr); }
+    .cover { max-width: 30rem; }
+  }
+</style>

@@ -1,0 +1,46 @@
+---
+/**
+ * Latest Instagram posts (media pipeline). Renders nothing without a token,
+ * so the page never shows an empty "follow us" box. Images are downloaded and
+ * optimized at build; Instagram CDN URLs expire, visitors never see them.
+ */
+import { Image } from 'astro:assets';
+import { loadMedia } from '../../lib/feeds/media';
+import { site } from '../../config/site';
+import rules from '../../data/feed-rules.json';
+import Icon from '../ui/Icon.astro';
+
+const media = await loadMedia();
+const posts = media.instagram.filter((p) => p.likes >= rules.instagram.minLikes).slice(0, rules.instagram.show);
+const ig = site.socials.find((s) => s.id === 'instagram');
+---
+
+{posts.length > 0 && ig && (
+  <section class="section social" data-section="instagram" aria-labelledby="ig-title">
+    <div class="container">
+      <div class="head">
+        <h2 id="ig-title">{ig.handle}</h2>
+        <a class="link-arrow" href={ig.url} target="_blank" rel="me noopener" data-track="social_click" data-track-network="instagram" data-track-location="home_strip">Follow <Icon name="arrow-up-right" /></a>
+      </div>
+      <ul>
+        {posts.map((p) => (
+          <li>
+            <a href={p.url} target="_blank" rel="noopener" data-track="instagram_post_click" data-track-kind={p.kind.toLowerCase()}>
+              <Image src={p.image} alt={p.caption || 'Instagram post by Sean Carney'} inferSize widths={[240, 480]} sizes="(min-width: 900px) 16vw, 46vw" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+)}
+
+<style>
+  .head { display: flex; justify-content: space-between; align-items: end; gap: 1rem; margin-bottom: 2rem; }
+  h2 { font-size: var(--step-3); }
+  ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.75rem; }
+  a { display: block; overflow: hidden; }
+  a :global(img) { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; transition: transform 0.8s var(--ease-out), filter 0.5s; filter: saturate(0.9); }
+  a:hover :global(img) { transform: scale(1.04); filter: none; }
+  @media (max-width: 899px) { ul { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+</style>

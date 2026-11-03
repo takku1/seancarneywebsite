@@ -1,0 +1,39 @@
+---
+import { site } from '../../config/site';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Absolute or root-relative image; defaults to the site OG card. */
+  image?: string;
+  imageAlt?: string;
+  type?: 'website' | 'article' | 'music.album' | 'profile';
+  noindex?: boolean;
+  jsonLd?: object;
+}
+
+const { title, description, image = '/og/default.jpg', imageAlt = 'Sean Carney performing', type = 'website', noindex = false, jsonLd } = Astro.props;
+const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site).href;
+const ogImage = new URL(image, Astro.site).href;
+const fullTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex, follow" />}
+
+<meta property="og:type" content={type} />
+<meta property="og:site_name" content={site.name} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:alt" content={imageAlt} />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+
+{jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd).replace(/</g, '\\u003c') /* soc2-ignore: build-time structured data, "<" escaped */} />}

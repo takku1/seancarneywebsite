@@ -1,0 +1,116 @@
+---
+/**
+ * "As seen on" marquee: monochrome brand marks scrolling slowly, enterprise
+ * logo-bar style. Logos only, no captions. The track is duplicated for a
+ * seamless loop (second copy hidden from assistive tech), pauses on hover or
+ * focus, and falls back to a static row under prefers-reduced-motion.
+ * The only marquee on any page.
+ * CONFIRM logo permissions before launch (logoApproved in credits.json).
+ */
+import { siNetflix, siNbc, siHyundai, siBillboard, siNhl } from 'simple-icons';
+import { getCollection } from 'astro:content';
+import { svgPathBbox } from 'svg-path-bbox';
+
+interface Props {
+  compact?: boolean;
+}
+const { compact = false } = Astro.props;
+
+const marks: Record<string, { path: string }> = {
+  netflix: siNetflix,
+  nbc: siNbc,
+  hyundai: siHyundai,
+  billboard: siBillboard,
+  nhl: siNhl,
+};
+const credits = (await getCollection('credits', (c) => !!c.data.logo && !!marks[c.data.logo!])).sort((a, b) => a.data.order - b.data.order);
+// Enough repeats that one copy is wider than any viewport.
+const loop = Array.from({ length: 3 }, () => credits).flat();
+/** Crop each 24x24 icon to its real bounds so wide wordmarks render at full size. */
+const viewBox = (path: string) => {
+  const [x0, y0, x1, y1] = svgPathBbox(path);
+  return `${x0} ${y0} ${x1 - x0} ${y1 - y0}`;
+};
+---
+
+<section class:list={['credits', { compact }]} data-section="credits" aria-labelledby="credits-title">
+  <h2 id="credits-title" class="title">As seen on</h2>
+  {/* Each mark's path is defined once and referenced by every repeat (the loop shows each logo six times). */}
+  <svg class="defs" aria-hidden="true" focusable="false">
+    {credits.map((c) => (
+      <symbol id={`sc-logo-${c.data.logo}`} viewBox={viewBox(marks[c.data.logo!].path)}><path d={marks[c.data.logo!].path} /></symbol>
+    ))}
+  </svg>
+  <div class="marquee">
+    {[0, 1].map((copy) => (
+      <ul class="track" aria-hidden={copy === 1 ? 'true' : undefined}>
+        {loop.map((c, i) => (
+          <li>
+            <svg viewBox={viewBox(marks[c.data.logo!].path)} role={copy === 0 && i < credits.length ? 'img' : undefined} aria-label={copy === 0 && i < credits.length ? c.data.name : undefined} aria-hidden={copy === 0 && i < credits.length ? undefined : 'true'}>
+              <use href={`#sc-logo-${c.data.logo}`} />
+            </svg>
+          </li>
+        ))}
+      </ul>
+    ))}
+  </div>
+</section>
+
+<style>
+  .credits {
+    border-bottom: 1px solid var(--line);
+    padding-block: clamp(2rem, 4vw, 3rem);
+    overflow: hidden;
+  }
+  .credits.compact { border-top: 1px solid var(--line); }
+  .defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+  .title {
+    max-width: var(--max);
+    margin: 0 auto 1.5rem;
+    padding-inline: var(--gutter);
+    font-family: var(--font-body);
+    font-size: var(--step--1);
+    font-weight: 400;
+    color: var(--text-faint);
+    text-align: center;
+  }
+  .marquee {
+    display: flex;
+    width: max-content;
+    mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  }
+  .credits { --gap: clamp(3rem, 7vw, 6.5rem); }
+  .track {
+    list-style: none;
+    margin: 0;
+    padding: 0 calc(var(--gap) / 2);
+    display: flex;
+    align-items: center;
+    gap: var(--gap);
+    flex: none;
+  }
+  svg {
+    display: block;
+    height: clamp(22px, 2.2vw, 30px);
+    width: auto;
+    fill: var(--text-muted);
+    opacity: 0.75;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .track { animation: scroll 48s linear infinite; }
+    .marquee:hover .track,
+    .marquee:focus-within .track { animation-play-state: paused; }
+  }
+  @keyframes scroll {
+    to { transform: translateX(-100%); }
+  }
+
+  /* Reduced motion: a single static, centered row. */
+  @media (prefers-reduced-motion: reduce) {
+    .marquee { width: auto; mask-image: none; -webkit-mask-image: none; justify-content: center; }
+    .track { flex-wrap: wrap; justify-content: center; row-gap: 1.5rem; }
+    .track li:nth-child(n + 6), .track[aria-hidden] { display: none; }
+  }
+</style>

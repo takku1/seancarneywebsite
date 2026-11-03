@@ -1,0 +1,141 @@
+---
+/**
+ * Engagement-triggered fan-list prompt (artist zone only).
+ *
+ * Asks only after a visitor has shown interest, never on arrival, and never
+ * over a video someone is watching:
+ *  - when a video finishes and they stop (not while "Up next" is counting
+ *    down or the next video plays: a binge is never interrupted),
+ *  - 20s after they start a Spotify player, or
+ *  - once they pass 75% of the page with 40s+ of foreground time.
+ * Rendered on every page in a persisted container (client router), but only
+ * ever shown in the artist zone, never on event pages or the inquiry flow.
+ * Not a modal: it never takes focus or blocks the page. Frequency caps:
+ * once per session, 21 days after a dismissal, never after a signup.
+ * Waits while the consent bar is open so two panels never stack.
+ */
+import NotifyForm from './NotifyForm.astro';
+import Icon from './Icon.astro';
+---
+
+<aside class="fan-prompt" data-fan-prompt aria-labelledby="fan-prompt-title" hidden>
+  <button type="button" class="close" data-fan-close aria-label="Dismiss"><Icon name="x" /></button>
+  <p id="fan-prompt-title" class="title">Get new music first</p>
+  <p class="sub">One email when something new is out. Sometimes an early listen.</p>
+  <NotifyForm topic="news" tone="surface" cta="Join" location="engagement_prompt" />
+</aside>
+
+<script>
+  import { track } from '../../lib/analytics/track';
+  import { getItem, setItem } from '../../lib/storage';
+
+  const el = document.querySelector<HTMLElement>('[data-fan-prompt]');
+  const DISMISS_DAYS = 21;
+
+  function eligible(): boolean {
+    if (getItem('fan_joined', 'local')) return false;
+    if (getItem('fan_prompt_shown')) return false; // once per session
+    const dismissed = Number(getItem('fan_prompt_dismissed', 'local') || 0);
+    if (dismissed && Date.now() - dismissed < DISMISS_DAYS * 864e5) return false;
+    return true;
+  }
+
+  if (el && eligible()) {
+    const start = performance.now();
+    let visibleMs = 0;
+    let lastVisible = document.visibilityState === 'visible' ? start : 0;
+    document.addEventListener('visibilitychange', () => {
+      const now = performance.now();
+      if (document.visibilityState === 'hidden' && lastVisible) { visibleMs += now - lastVisible; lastVisible = 0; }
+      else if (document.visibilityState === 'visible') lastVisible = now;
+    });
+    const engagedSeconds = () => (visibleMs + (lastVisible ? performance.now() - lastVisible : 0)) / 1000;
+
+    let timer = 0;
+    let shown = false;
+    let lastPlay = 0;
+    const playingNow = new Set<string>();
+    addEventListener('sc:video-state', (e) => {
+      const { id, playing } = (e as CustomEvent<{ id: string; playing: boolean }>).detail;
+      if (playing) playingNow.add(id);
+      else playingNow.delete(id);
+    });
+    const show = (trigger: string) => {
+      if (shown || !eligible()) return;
+      if (document.documentElement.dataset.zone !== 'artist') return; // booking pages: never compete with an inquiry
+      // Never over a video in progress or the mini-player: try again shortly.
+      if (playingNow.size || document.querySelector('.yt-next') || document.querySelector('[data-dock]:not([hidden])')) { setTimeout(() => show(trigger), 5000); return; }
+      const consent = document.querySelector<HTMLElement>('[data-consent]');
+      if (consent && !consent.hidden) { setTimeout(() => show(trigger), 4000); return; }
+      shown = true;
+      setItem('fan_prompt_shown', '1');
+      el.hidden = false;
+      requestAnimationFrame(() => el.classList.add('in'));
+      track('fan_prompt_view', { trigger });
+    };
+    const hide = (reason: string) => {
+      el.classList.remove('in');
+      setTimeout(() => (el.hidden = true), 300);
+      if (reason === 'dismiss') {
+        setItem('fan_prompt_dismissed', String(Date.now()), 'local');
+        track('fan_prompt_dismiss', {});
+      }
+    };
+
+    // After a video ends: wait out "Up next"; if another video started, its own ending will ask instead.
+    const afterVideo = (endedAt: number) => {
+      if (document.querySelector('.yt-next')) return void setTimeout(() => afterVideo(endedAt), 1500);
+      if (lastPlay > endedAt) return;
+      show('video_complete');
+    };
+
+    addEventListener('sc:track', (e) => {
+      const { name, props } = (e as CustomEvent<{ name: string; props: Record<string, unknown> }>).detail;
+      if (name === 'video_play') lastPlay = Date.now();
+      else if (name === 'video_complete') { const t = Date.now(); setTimeout(() => afterVideo(t), 2000); }
+      else if (name === 'audio_play' && !timer) timer = window.setTimeout(() => show(name), 20000);
+      else if (name === 'scroll_depth' && Number(props.percent) >= 75) {
+        const wait = Math.max(0, 40 - engagedSeconds());
+        window.setTimeout(() => show('scroll_75'), wait * 1000);
+      }
+    });
+
+    el.querySelector('[data-fan-close]')?.addEventListener('click', () => hide('dismiss'));
+    el.addEventListener('keydown', (e) => { if (e.key === 'Escape') hide('dismiss'); });
+    el.addEventListener('sc:joined', () => setTimeout(() => hide('joined'), 3500));
+    // Moving into the booking zone hides it (it persists across client navigation).
+    document.addEventListener('astro:after-swap', () => {
+      if (shown && !el.hidden && document.documentElement.dataset.zone !== 'artist') hide('zone');
+    });
+  }
+</script>
+
+<style>
+  .fan-prompt {
+    position: fixed;
+    z-index: var(--z-header);
+    left: max(var(--gutter), env(safe-area-inset-left));
+    bottom: max(1.25rem, env(safe-area-inset-bottom));
+    width: min(24rem, calc(100vw - 2 * var(--gutter) - 4.5rem));
+    padding: 1.5rem 1.5rem 1.25rem;
+    background: var(--bg-raised);
+    border: 1px solid var(--line-strong);
+    box-shadow: 0 24px 60px rgb(0 0 0 / 0.45);
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.4s var(--ease-out), transform 0.5s var(--ease-out);
+  }
+  .fan-prompt.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .fan-prompt { transform: none; } }
+  .title { font-family: var(--font-display); font-size: var(--step-2); line-height: 1.05; padding-right: 2rem; }
+  .sub { margin: 0.5rem 0 1rem; color: var(--text-muted); font-size: var(--step--1); }
+  .close {
+    position: absolute; top: 0.5rem; right: 0.5rem;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; background: none; border: 0; color: var(--text-muted); cursor: pointer;
+  }
+  .close:hover { color: var(--text); }
+  .close :global(svg) { width: 20px; height: 20px; }
+  .fan-prompt :global(.notify) { max-width: none; }
+  .fan-prompt :global(.notify .fields .f) { flex: 1 1 9rem; }
+</style>

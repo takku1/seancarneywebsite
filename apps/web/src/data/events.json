@@ -1,0 +1,338 @@
+[
+  {
+    "id": "weddings",
+    "slug": "weddings",
+    "label": "Weddings",
+    "navLabel": "Weddings",
+    "seoTitle": "Live Wedding Music in Los Angeles | Sean Carney",
+    "seoDescription": "Ceremony, cocktail hour and reception music from Sean Carney, solo or with his band The Hustlers. Fifteen years of weddings across Los Angeles and abroad.",
+    "headline": "Ceremony to last dance",
+    "intro": "Fifteen years of weddings in Los Angeles and around the world. Sean performs solo, as a duo or trio, or with his full band, The Hustlers, and shapes every set around the two of you.",
+    "image": "../assets/photos/canyon-suit-portrait.jpg",
+    "imageAlt": "Sean Carney in a black suit and hat, playing acoustic guitar in the canyons",
+    "formType": "wedding",
+    "order": 1,
+    "blocks": [
+      {
+        "type": "timeline",
+        "title": "How the day sounds",
+        "items": [
+          {
+            "title": "Ceremony",
+            "body": "Acoustic arrangements for the processional, the vows and the recessional, including a custom aisle song."
+          },
+          {
+            "title": "Cocktail hour",
+            "body": "Sinatra, Cash and modern standards while guests find their drinks and each other."
+          },
+          {
+            "title": "Dinner",
+            "body": "Warm, conversational sets that let the room breathe."
+          },
+          {
+            "title": "First dance",
+            "body": "Your song, arranged for the moment. Many couples ask for an acoustic version of a track they love."
+          },
+          {
+            "title": "Reception",
+            "body": "The Hustlers take the floor, and keep it full."
+          }
+        ]
+      },
+      {
+        "type": "feature",
+        "image": "../assets/photos/wedding-first-dance.jpg",
+        "alt": "A couple's first dance under string lights while Sean Carney performs",
+        "caption": "A first dance under string lights, live."
+      },
+      {
+        "type": "testimonials",
+        "eventType": "wedding",
+        "strict": true,
+        "limit": 3
+      },
+      {
+        "type": "repertoire",
+        "title": "Most requested",
+        "note": "Frank Sinatra and Johnny Cash for the cocktail hour. Full set lists, and your own requests, on request.",
+        "playlist": "playlist/6rKY5Yzd33JAzxDwVttojd",
+        "solo": [
+          "Can't Help Falling in Love, Elvis Presley",
+          "Perfect, Ed Sheeran",
+          "Tennessee Whiskey, Chris Stapleton",
+          "Stargazing, Myles Smith",
+          "Lose Control, Teddy Swims",
+          "Blinding Lights, The Weeknd"
+        ],
+        "band": [
+          "As It Was, Harry Styles",
+          "Dreams, Fleetwood Mac"
+        ]
+      },
+      {
+        "type": "film",
+        "title": "Hear it before you book",
+        "ids": [
+          "perfect",
+          "dreams-live",
+          "stargazing"
+        ]
+      },
+      {
+        "type": "checklist",
+        "title": "For your planner",
+        "items": [
+          "Ceremony sound can run separately from the reception",
+          "Must-play and do-not-play lists welcome",
+          "Timeline built with your planner and venue",
+          "Certificate of insurance on request"
+        ]
+      },
+      {
+        "type": "faq"
+      }
+    ]
+  },
+  {
+    "id": "corporate",
+    "slug": "corporate",
+    "label": "Corporate and brand",
+    "navLabel": "Corporate and brand",
+    "seoTitle": "Corporate Event and Brand Activation Music | Sean Carney",
+    "seoDescription": "Live music for corporate events, launches and brand activations from an artist heard on the Olympics, the NFL Playoffs and national campaigns.",
+    "headline": "For companies that care how the room feels",
+    "intro": "An artist whose songs have run in national campaigns and on network sports, who arrives briefed, on time and fluent in run-of-show.",
+    "image": "../assets/photos/corporate-stage.jpg",
+    "imageAlt": "Sean Carney playing acoustic guitar on a corporate event stage with LED screens",
+    "formType": "corporate",
+    "order": 2,
+    "blocks": [
+      {
+        "type": "clients",
+        "title": "Booked by",
+        "story": "His music has scored the 2024 Paris Olympics, the 2025 NFL Playoffs and campaigns for Hyundai and WeightWatchers. For a launch or activation, that is a story your audience already knows how to tell."
+      },
+      {
+        "type": "columns",
+        "title": "Where he fits in the program",
+        "items": [
+          {
+            "title": "Conferences and expos",
+            "body": "Arrival sets, keynote walk-ons and an evening program that keeps attendees in the room."
+          },
+          {
+            "title": "Launches and activations",
+            "body": "Original or custom song options on request, with an artist your guests can look up afterward."
+          },
+          {
+            "title": "Holiday parties and incentives",
+            "body": "From a solo acoustic reception to a full band on the dance floor."
+          }
+        ]
+      },
+      {
+        "type": "film",
+        "title": "Live, in rooms like yours",
+        "ids": [
+          "reel-2025",
+          "ritz-shut-up-and-dance",
+          "stronger"
+        ]
+      },
+      {
+        "type": "specs",
+        "title": "Production, handled",
+        "items": [
+          {
+            "k": "Formats",
+            "v": "Solo acoustic to full band"
+          },
+          {
+            "k": "Paperwork",
+            "v": "Stage plot, tech rider and certificate of insurance on request"
+          },
+          {
+            "k": "Teams",
+            "v": "Works directly with agencies, DMCs and AV"
+          },
+          {
+            "k": "Timing",
+            "v": "Built to your run-of-show, to the minute"
+          }
+        ]
+      },
+      {
+        "type": "testimonials",
+        "eventType": "corporate",
+        "strict": true,
+        "limit": 2
+      },
+      {
+        "type": "faq"
+      }
+    ]
+  },
+  {
+    "id": "estate",
+    "slug": "estate",
+    "label": "Private and estate",
+    "navLabel": "Private and estate",
+    "seoTitle": "Private Party and Estate Event Musician | Sean Carney",
+    "seoDescription": "Discreet, volume-aware live music for private estates, milestone celebrations and intimate dinners across Los Angeles, Malibu, Montecito and beyond.",
+    "headline": "Private rooms, handled privately",
+    "intro": "Milestone birthdays, anniversaries and dinners at home. Sean reads a room quickly and keeps the volume where conversation lives.",
+    "image": "../assets/photos/canyon-suit-laugh.jpg",
+    "imageAlt": "Sean Carney laughing in a suit and hat, holding an acoustic guitar outdoors",
+    "formType": "estate",
+    "order": 3,
+    "blocks": [
+      {
+        "type": "statement",
+        "title": "Discretion is the default.",
+        "body": "Nothing is photographed, posted or mentioned without your permission. NDAs are welcome, and house managers and security teams are looped in from the first call."
+      },
+      {
+        "type": "columns",
+        "title": "Evenings he plays",
+        "items": [
+          {
+            "title": "Dinners and salons",
+            "body": "Solo acoustic sets sized for a living room or a garden table."
+          },
+          {
+            "title": "Milestones",
+            "body": "Birthdays and anniversaries with the songs that belong to the people in the room."
+          },
+          {
+            "title": "After dinner",
+            "body": "When the night turns, the band can turn with it."
+          }
+        ]
+      },
+      {
+        "type": "film",
+        "title": "Quiet enough to talk over",
+        "ids": [
+          "tennessee-whiskey",
+          "elevated-live"
+        ]
+      },
+      {
+        "type": "testimonials",
+        "eventType": "estate",
+        "strict": true,
+        "limit": 1
+      },
+      {
+        "type": "faq"
+      }
+    ]
+  },
+  {
+    "id": "galas",
+    "slug": "galas",
+    "label": "Charity galas",
+    "navLabel": "Charity galas",
+    "seoTitle": "Charity Gala Entertainment in Los Angeles | Sean Carney",
+    "seoDescription": "A featured performer for charity galas and fundraisers, from the cocktail reception to the paddle raise and the after-party.",
+    "headline": "A performance worth staying for",
+    "intro": "Gala programs live and die on pacing. Sean builds his sets around your run-of-show so donors stay in their seats through the paddle raise.",
+    "image": "../assets/photos/canyon-suit-wide.jpg",
+    "imageAlt": "Sean Carney in a black suit with an acoustic guitar against the hills",
+    "formType": "gala",
+    "order": 4,
+    "blocks": [
+      {
+        "type": "program",
+        "title": "Built around the program",
+        "items": [
+          {
+            "title": "Reception",
+            "body": "Acoustic sets that make the silent auction feel like a party."
+          },
+          {
+            "title": "Featured performance",
+            "body": "A short, high-impact set timed to the room."
+          },
+          {
+            "title": "Paddle raise",
+            "body": "An anthem cue to lift the moment, if you want one."
+          },
+          {
+            "title": "After-party",
+            "body": "The full band for the guests who stay."
+          }
+        ]
+      },
+      {
+        "type": "film",
+        "title": "Big-room energy",
+        "ids": [
+          "invincible",
+          "blinding-lights"
+        ]
+      },
+      {
+        "type": "stages",
+        "title": "From arenas to ballrooms"
+      },
+      {
+        "type": "faq"
+      }
+    ]
+  },
+  {
+    "id": "destination",
+    "slug": "destination",
+    "label": "Destination",
+    "navLabel": "Destination",
+    "seoTitle": "Destination Wedding and Event Musician | Sean Carney",
+    "seoDescription": "Sean Carney has performed in more than 50 countries and travels for destination weddings, retreats and private events worldwide.",
+    "headline": "Wherever the vows are",
+    "intro": "For destination weddings, retreats and offsites, Sean travels light as a soloist or brings The Hustlers, and works through logistics early with your team.",
+    "image": "../assets/photos/beach-sunset.jpg",
+    "imageAlt": "Sean Carney with a guitar on the beach at sunset",
+    "formType": "destination",
+    "order": 5,
+    "blocks": [
+      {
+        "type": "reach"
+      },
+      {
+        "type": "steps",
+        "title": "How travel works",
+        "items": [
+          {
+            "title": "Share the date and place",
+            "body": "Availability and a travel-inclusive proposal come back together."
+          },
+          {
+            "title": "Plan logistics early",
+            "body": "Flights, backline and timings are set with your planner well ahead."
+          },
+          {
+            "title": "Arrive ready",
+            "body": "Sound check on site, then the same ceremony-to-reception coverage as at home."
+          }
+        ]
+      },
+      {
+        "type": "feature",
+        "image": "../assets/photos/beach-walk.jpg",
+        "alt": "Sean Carney walking along the shoreline with a guitar at golden hour",
+        "caption": "Golden hour travels well."
+      },
+      {
+        "type": "film",
+        "title": "Live by the water",
+        "ids": [
+          "hotel-del-my-girl",
+          "perfect"
+        ]
+      },
+      {
+        "type": "faq"
+      }
+    ]
+  }
+]

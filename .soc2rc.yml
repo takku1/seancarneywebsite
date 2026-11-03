@@ -1,0 +1,13 @@
+# AuditForge (audit_repo.py) config for this repo.
+# Run: python <auditforge>/scripts/audit_repo.py . --baseline docs/security/auditforge-baseline.json --fail-on HIGH
+exclude:
+  - "**/node_modules/**"
+  - "apps/web/dist/**"
+  - "apps/web/.astro/**"
+  - "reference/**"
+  - ".claude/skills/**"
+  - "docs/security/sbom.cdx.json"
+min_severity: LOW
+# Published business contact addresses: intentionally public, not personal data.
+pii_allow:
+  - "*@seancarneymusic.com"
