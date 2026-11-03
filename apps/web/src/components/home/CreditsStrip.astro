@@ -35,11 +35,13 @@ const viewBox = (path: string) => {
 
 <section class:list={['credits', { compact }]} data-section="credits" aria-labelledby="credits-title">
   <h2 id="credits-title" class="title">As seen on</h2>
-  {/* Each mark's path is defined once and referenced by every repeat (the loop shows each logo six times). */}
+  {/* Each mark's path is defined once and referenced by every repeat (the loop shows each logo six times).
+      A plain <path> (not a <symbol>): <use> then draws it in each outer svg's own cropped viewBox.
+      A symbol with its own viewBox gets placed at the outer origin, which offsets and clips the mark. */}
   <svg class="defs" aria-hidden="true" focusable="false">
-    {credits.map((c) => (
-      <symbol id={`sc-logo-${c.data.logo}`} viewBox={viewBox(marks[c.data.logo!].path)}><path d={marks[c.data.logo!].path} /></symbol>
-    ))}
+    <defs>
+      {credits.map((c) => <path id={`sc-logo-${c.data.logo}`} d={marks[c.data.logo!].path} />)}
+    </defs>
   </svg>
   <div class="marquee">
     {[0, 1].map((copy) => (
