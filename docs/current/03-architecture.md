@@ -1,0 +1,58 @@
+# Architecture
+
+## System
+- **Astro 7 static site** in `apps/web`, deployed to **Cloudflare Workers** with `@astrojs/cloudflare`. Pages are prerendered at build (`output: 'static'`, `build.format: 'file'`, so `/weddings` is served directly with no trailing-slash redirect). The Worker runs only the APIs.
+- **Client router** (`ClientRouter` in `BaseLayout.astro`): pages swap in place. Scout, the player dock and the consent bar persist across navigation (`transition:persist`). Bare pages (`/links`, print views) load as plain pages.
+- **Content** lives in typed JSON collections (`src/data/*.json`, schemas in `src/content.config.ts`). `integrations/validate-data.mjs` stops dev, build, check and CI on malformed JSON.
+- **Security:** an enforced header CSP with build-time SHA-256 hashes (`integrations/csp-header-hashes.mjs` writes `public/_headers`; no `unsafe-inline`); API middleware for method, origin, content type, size and rate limits; an OWASP ASVS 5.0 baseline in `docs/security/SECURITY.md`.
+
+```
+Browser ──> Cloudflare (static pages + _headers CSP)
+   │            └─ Worker /api/* ── middleware ──> handlers
+   │                                    ├─ inquire      → score → GoHighLevel → Resend (+ Meta CAPI with consent)
+   │                                    ├─ availability → Google Calendar free/busy
+   │                                    ├─ scout*       → guided mode | Claude adapter
+   │                                    ├─ signal, csp-report
+   │                                    └─ KV SCOUT_KV: anonymous counters, retention cohorts
+   └─ first-party analytics → Plausible · GA4 · Clarity · Meta (consent-gated)
+```
+
+## Modules
+| Area | Where | What it does |
+|---|---|---|
+| Layout | `src/layouts/BaseLayout.astro`, `src/components/layout/*` | head, router, header/footer, persisted Scout, dock and consent bar |
+| Page lifecycle | `src/lib/lifecycle.ts` | `onPage(setup, when)`: per-page binding with cleanup, scoped to its page |
+| Theme | `src/styles/global.css` | Ivory maison tokens, type scale, metric-matched font fallbacks, page transitions |
+| Home | `src/pages/index.astro`, `src/components/home/*` | Hero, Rooms, DayArc, Formats, FilmGrid, Testimonials, EventsBand (private events) |
+| Event pages | `src/pages/[event].astro`, `src/pages/private-events.astro`, `src/components/events/*`, `src/data/events.json` | weddings and each private-event type, composed from typed blocks |
+| Repertoire | `src/pages/repertoire.astro`, `src/data/repertoire.json` | songs by moment and era |
+| Media | `src/lib/media/player.ts`, `yt-player.ts`, `src/components/media/*`, `src/lib/feeds/*` | click-to-load YouTube, the persistent dock, watch metrics, "Up next"; build-time YouTube and Instagram ranking |
+| Inquiry | `src/pages/inquire/*`, `src/lib/inquiry/*`, `src/pages/api/inquire.ts` | five-step form, lead scoring, GoHighLevel, Resend, Turnstile, Meta CAPI |
+| Availability | `src/lib/integrations/google-calendar.ts`, `src/pages/api/availability.ts` | indicative date check from free/busy |
+| Scout | `src/components/scout/*`, `src/lib/scout/*`, `src/pages/api/scout*` | the concierge; `05-scout-concierge.md` |
+| Analytics | `src/lib/analytics/*`, `src/components/analytics/*` | declarative tracking, first/last-touch attribution, A/B tests, retention cohorts, web vitals |
+| SEO | `src/components/seo/Seo.astro`, `src/lib/seo/schema.ts`, `src/pages/llms.txt.ts`, sitemap | Person, Service (weddings, private events) and FAQ JSON-LD; an AI-assistant brief at `/llms.txt` |
+| Integrations | `src/lib/integrations/ghl.ts`, `meta-capi.ts` | GoHighLevel API v2 with webhook fallback; Meta Conversions API |
+| Tooling | `scripts/setup-mac.sh`, `scripts/publish.sh`, `.github/workflows/ci.yml` | Mac setup, publishing to `main`, CI (check, build, audit) |
+
+## Content model
+| Collection | Holds |
+|---|---|
+| `events.json` | weddings and the private-event types, each composed from blocks (timeline, formats, film, testimonials, checklist, FAQ) |
+| `repertoire.json` | songs by moment (ceremony and first dance, cocktail hour and dinner, the dance floor) |
+| `testimonials.json` | couples and planners, with occasion, place and consent |
+| `videos.json` | live-at-event films and covers (`context`: live, cover, session) |
+| `credits.json` | `room` (luxury rooms, typeset on home, About and inquiry), `venue` (stages, for the galas list), `client`, and broadcast/sync credits behind the About credentials line |
+| `faqs.json` | per-page FAQs, shared with Scout |
+| `feed-rules.json` | pinned and excluded videos per placement |
+| `src/config/site.ts` | name, contacts, socials, stats, response time |
+
+## Conventions
+- Every page script binds through `onPage(setup, when)`, scoped to its page.
+- Content is edited in `src/data/`; the build stops on malformed files.
+- Inline scripts and styles only through the CSP hash integration.
+- Browser storage only through `src/lib/storage.ts` (`sc_` keys, cleared by the privacy control).
+- Publishing goes through `scripts/publish.sh` (check, build and secret guard, then push to `main`).
+
+## Performance budget
+Measured on throttled mobile (4× CPU, ~1.6 Mbps): LCP under 2 s, CLS 0, no long tasks; about 12 KB of gzipped JavaScript per page. Fonts are not preloaded (preloads delayed first paint); fallbacks are metric-matched instead.

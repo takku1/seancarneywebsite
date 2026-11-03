@@ -25,12 +25,9 @@ export const SITE_PAGES: Record<string, string> = {
   '/estate': 'Private and estate',
   '/galas': 'Charity galas',
   '/destination': 'Destination events',
-  '/music': 'Music and videos',
-  '/shows': 'Shows and tickets',
-  '/merch': 'Merch (coming soon)',
-  '/press': 'Press kit',
+  '/repertoire': 'Repertoire',
   '/about': 'About Sean',
-  '/contact': 'Management and bookings',
+  '/contact': 'Contact',
 };
 
 export type Card =

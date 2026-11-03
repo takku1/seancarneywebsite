@@ -1,68 +1,46 @@
 ---
 /**
- * /links: the link-in-bio page (replaces Linktree). Instagram and TikTok bios
- * point here, so every tap lands on our domain: first-touch attribution is
- * captured, each link is measured (links_click), and fans can join the list
- * without leaving. Recommended bio URL:
+ * /links: link-in-bio for the wedding Instagram (@seancarneyentertainment).
+ * Every tap lands on our domain, so first-touch attribution is captured and
+ * each link is measured (links_click). Bio URL:
  *   seancarneymusic.com/links?utm_source=instagram&utm_medium=social&utm_campaign=bio
  */
 import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import NotifyForm from '../components/ui/NotifyForm.astro';
 import Icon, { type IconName } from '../components/ui/Icon.astro';
 import { site } from '../config/site';
-import { featuredRelease, releaseHref } from '../lib/content';
 import portrait from '../assets/photos/canyon-suit-portrait.jpg';
 
-const r = await featuredRelease();
-const kind = { album: 'New album', single: 'New single', ep: 'New EP', feature: 'New feature' }[r.data.kind];
-const yt = site.socials.find((s) => s.id === 'youtube');
-const sp = site.socials.find((s) => s.id === 'spotify');
-
 const links = [
-  { id: 'book', href: '/private-events', title: 'Book Sean for your event', sub: 'Weddings, galas, brands and private estates' },
-  ...(sp ? [{ id: 'spotify', href: site.follow.spotify, title: 'Follow on Spotify', sub: 'New releases land in your Release Radar', icon: 'spotify' as IconName, external: true }] : []),
-  ...(yt ? [{ id: 'youtube', href: site.follow.youtube, title: 'Subscribe on YouTube', sub: 'Live sessions, originals and covers', icon: 'youtube' as IconName, external: true }] : []),
-  { id: 'shows', href: '/shows', title: 'Shows', sub: 'Public dates and where to hear him next' },
-  { id: 'merch', href: '/merch', title: 'Merch', sub: 'The official store' },
-  { id: 'press', href: '/press', title: 'Press kit', sub: 'Bios, credits and photos' },
+  { id: 'inquire', href: '/inquire', title: 'Check your date', sub: 'A short inquiry; Sean replies personally', primary: true },
+  { id: 'weddings', href: '/weddings', title: 'Weddings', sub: 'Ceremony to last dance, solo through full band' },
+  { id: 'repertoire', href: '/repertoire', title: 'Repertoire', sub: 'The songs couples ask for most' },
+  { id: 'private_events', href: '/private-events', title: 'Private events', sub: 'Company evenings, galas and estates' },
+  { id: 'about', href: '/about', title: 'About Sean', sub: 'The house, the band and the rooms' },
 ];
 ---
 
-<BaseLayout bare pageType="links" title="Sean Carney | Links" description="Sean Carney's latest music, videos, shows, merch and event bookings in one place." noindex>
+<BaseLayout bare pageType="links" title="Sean Carney | Links" description="Live music for weddings and private events: check your date, see the formats and the repertoire." noindex>
   <div class="wrap">
     <header class="top">
-      <Image src={portrait} alt="Sean Carney in a dark suit with an acoustic guitar in a canyon" widths={[480, 800]} sizes="(min-width: 560px) 34rem, 100vw" loading="eager" fetchpriority="high" class="photo" />
+      <Image src={portrait} alt="Sean Carney in a dark suit with an acoustic guitar" widths={[480, 800]} sizes="(min-width: 560px) 34rem, 100vw" loading="eager" fetchpriority="high" class="photo" />
       <div class="id">
         <h1>Sean Carney</h1>
-        <p>{site.role}. Heard on the Paris Olympics, the NFL Playoffs and Netflix.</p>
+        <p>{site.tagline} Solo, trio and full band.</p>
       </div>
     </header>
 
     <nav aria-label="Links" class="list">
-      <a class="release" href={releaseHref(r.id)} data-track="links_click" data-track-link="featured_release" data-track-release={r.id}>
-        <Image src={r.data.cover} alt="" width={160} height={160} />
-        <span class="txt">
-          <span class="t">{r.data.title}</span>
-          <span class="s">{kind}. Every way to listen</span>
-        </span>
-        <Icon name="arrow-right" />
-      </a>
       {links.map((l) => (
-        <a href={l.href} target={l.external ? '_blank' : undefined} rel={l.external ? 'noopener' : undefined} data-track="links_click" data-track-link={l.id}>
+        <a href={l.href} class:list={{ primary: l.primary }} data-track="links_click" data-track-link={l.id}>
           <span class="txt">
-            <span class="t">{l.icon && <Icon name={l.icon} />}{l.title}</span>
+            <span class="t">{l.title}</span>
             <span class="s">{l.sub}</span>
           </span>
-          <Icon name={l.external ? 'arrow-up-right' : 'arrow-right'} />
+          <Icon name="arrow-right" />
         </a>
       ))}
     </nav>
-
-    <section class="join" aria-labelledby="links-join">
-      <h2 id="links-join">Get new music first</h2>
-      <NotifyForm topic="news" tone="surface" cta="Join" location="links" />
-    </section>
 
     <footer class="foot">
       <ul class="socials" aria-label="Social">
@@ -79,7 +57,7 @@ const links = [
   .wrap { width: min(34rem, 100%); margin-inline: auto; padding-bottom: 3rem; }
   .top { position: relative; }
   .top :global(.photo) { display: block; width: 100%; height: min(62svh, 34rem); object-fit: cover; object-position: center 25%; }
-  .top::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--bg) 2%, rgb(var(--scrim) / 0.35) 45%, transparent 75%); pointer-events: none; }
+  .top::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgb(var(--scrim) / 0.88) 0%, rgb(var(--scrim) / 0.35) 45%, transparent 75%); pointer-events: none; }
   .id { position: absolute; z-index: 1; left: var(--gutter); right: var(--gutter); bottom: 1.25rem; color: var(--on-image); }
   h1 { font-size: var(--step-4); line-height: 0.95; letter-spacing: -0.02em; }
   .id p { margin-top: 0.6rem; color: var(--on-image-muted); font-size: var(--step--1); max-width: 34ch; }
@@ -98,11 +76,9 @@ const links = [
   .t { display: inline-flex; align-items: center; gap: 0.6rem; font-family: var(--font-display); font-size: var(--step-1); line-height: 1.15; }
   .t :global(svg) { width: 20px; height: 20px; color: var(--text-muted); }
   .s { color: var(--text-muted); font-size: var(--step--1); }
-  .release { border-color: var(--accent) !important; padding: 0.6rem !important; }
-  .release :global(img) { width: 72px; height: 72px; object-fit: cover; flex: none; }
+  .primary { border-color: var(--accent) !important; background: var(--accent) !important; color: var(--accent-ink); }
+  .primary .s, .primary > :global(svg) { color: var(--accent-ink) !important; }
 
-  .join { margin: 2.5rem var(--gutter) 0; padding-top: 2rem; border-top: 1px solid var(--line); }
-  .join h2 { font-size: var(--step-2); margin-bottom: 1rem; }
 
   .foot { display: grid; justify-items: center; gap: 1rem; margin-top: 2.5rem; padding-inline: var(--gutter); }
   .socials { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; }

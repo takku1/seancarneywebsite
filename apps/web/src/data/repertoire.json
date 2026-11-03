@@ -1,0 +1,66 @@
+[
+  {
+    "id": "ceremony",
+    "moment": "Ceremony and first dance",
+    "order": 1,
+    "note": "Acoustic arrangements for the aisle, the vows and the first dance. Your own song, arranged for the moment, is always welcome.",
+    "songs": [
+      {
+        "title": "Can't Help Falling in Love",
+        "artist": "Elvis Presley"
+      },
+      {
+        "title": "Perfect",
+        "artist": "Ed Sheeran"
+      },
+      {
+        "title": "Stargazing",
+        "artist": "Myles Smith"
+      },
+      {
+        "title": "Tennessee Whiskey",
+        "artist": "Chris Stapleton"
+      }
+    ]
+  },
+  {
+    "id": "cocktails",
+    "moment": "Cocktail hour and dinner",
+    "order": 2,
+    "note": "Standards and modern favorites, played to be heard and talked over.",
+    "songs": [
+      {
+        "title": "Lose Control",
+        "artist": "Teddy Swims"
+      },
+      {
+        "title": "Blinding Lights",
+        "artist": "The Weeknd"
+      },
+      {
+        "title": "My Girl",
+        "artist": "The Temptations"
+      }
+    ]
+  },
+  {
+    "id": "reception",
+    "moment": "The dance floor",
+    "order": 3,
+    "note": "With The Hustlers, the full band, once the dancing starts.",
+    "songs": [
+      {
+        "title": "As It Was",
+        "artist": "Harry Styles"
+      },
+      {
+        "title": "Dreams",
+        "artist": "Fleetwood Mac"
+      },
+      {
+        "title": "Shut Up and Dance",
+        "artist": "Walk the Moon"
+      }
+    ]
+  }
+]

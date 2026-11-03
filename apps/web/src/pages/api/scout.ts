@@ -49,7 +49,7 @@ export const POST: APIRoute = async ({ request }) => {
   const ip = request.headers.get('cf-connecting-ip') ?? 'local';
   if (limited(ip)) return json(429, { ok: false, error: 'rate_limited', reply: "I'm getting a lot of questions at once. Give it a minute, or send the details through the inquiry form." });
 
-  let body: { text?: unknown; transcript?: unknown; page?: unknown; attribution?: unknown; experiments?: unknown; newContext?: unknown; twang?: unknown };
+  let body: { text?: unknown; transcript?: unknown; page?: unknown; attribution?: unknown; experiments?: unknown; newContext?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -80,8 +80,7 @@ export const POST: APIRoute = async ({ request }) => {
   const page = typeof body.page === 'string' && /^\/[a-z0-9/_-]{0,119}$/i.test(body.page) ? body.page : undefined;
   const asRecord = (v: unknown) => (v && typeof v === 'object' ? Object.fromEntries(Object.entries(v as Record<string, unknown>).slice(0, 40).map(([k, val]) => [k, String(val).slice(0, 200)])) : {});
   const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
-  const twang = [0, 1, 2].includes(Number(body.twang)) ? Number(body.twang) : 1;
-  const contextTag = transcript.length === 0 || body.newContext ? `<context today="${today}" page="${page ?? '/'}" twang="${twang}" />` : '';
+  const contextTag = transcript.length === 0 || body.newContext ? `<context today="${today}" page="${page ?? '/'}" />` : '';
 
   // Unbounded consumption (OWASP LLM10): daily cap on AI turns, then guided mode.
   if (!(await consumeDailyBudget(Number(SCOUT_DAILY_LIMIT || 1500)))) {

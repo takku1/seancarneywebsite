@@ -32,7 +32,6 @@ interface RouteRule {
 const JSON_ONLY = ['application/json'];
 const RULES: [RegExp, RouteRule][] = [
   [/^\/api\/inquire$/, { methods: ['POST'], types: JSON_ONLY, tier: 'strict', limit: { max: 5, windowSec: 600 } }],
-  [/^\/api\/notify$/, { methods: ['POST'], types: JSON_ONLY, tier: 'strict', maxBodySize: 4096, limit: { max: 5, windowSec: 600 } }],
   [/^\/api\/scout$/, { methods: ['GET', 'POST'], types: JSON_ONLY, maxBodySize: 65536, limit: { max: 60, windowSec: 600 } }],
   [/^\/api\/scout\/trending$/, { methods: ['GET'], limit: { max: 60, windowSec: 600 } }],
   [/^\/api\/scout\/insights$/, { methods: ['GET'], tier: 'strict', admin: true, limit: { max: 10, windowSec: 600 } }],

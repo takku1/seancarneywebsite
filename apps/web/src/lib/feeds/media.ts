@@ -1,11 +1,12 @@
 /**
- * Media pipeline: one memoized build-time load that merges curated data
- * (src/data/videos.json, releases.json) with live platform data, then ranks it.
+ * Media pipeline: one memoized build-time load that merges curated films
+ * (src/data/videos.json) with live platform data, then ranks it.
  *
- *   curated  -> clean titles, context (live / cover / original), notes, pins
- *   YouTube  -> every public upload with views, likes, duration, date
- *   Spotify  -> newest releases, most-played tracks
- *   Instagram-> latest posts
+ *   curated  -> clean titles, context (live / cover / session), notes, pins
+ *   YouTube  -> public uploads with views, likes, duration, date; only uploads
+ *               that read as live performances or covers are included, so the
+ *               channel's original-music videos never reach the site
+ *   Instagram-> latest posts from the wedding account
  *
  * Every source is optional. Missing keys or API errors fall back to curated
  * data and log a warning, so a build never fails because a platform is down.
@@ -13,13 +14,12 @@
  * A daily scheduled rebuild keeps "newest" and view counts fresh.
  */
 import { getCollection } from 'astro:content';
-import { YOUTUBE_API_KEY, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, INSTAGRAM_ACCESS_TOKEN } from 'astro:env/server';
+import { YOUTUBE_API_KEY, INSTAGRAM_ACCESS_TOKEN } from 'astro:env/server';
 import { fetchChannelVideos, type YtVideo } from './youtube';
-import { fetchSpotify, type SpRelease, type SpTrack } from './spotify';
 import { fetchInstagram, type IgPost } from './instagram';
 import rules from '../../data/feed-rules.json';
 
-export type VideoContext = 'original' | 'cover' | 'live' | 'session';
+export type VideoContext = 'cover' | 'live' | 'session';
 
 export interface Video {
   id: string;
@@ -38,20 +38,19 @@ export interface Video {
 
 export interface Media {
   videos: Video[];
-  releases: SpRelease[];
-  topTracks: SpTrack[];
   instagram: IgPost[];
-  sources: { youtube: boolean; spotify: boolean; instagram: boolean };
+  sources: { youtube: boolean; instagram: boolean };
 }
 
 const LIVE_RE = /\b(live|reel|promo|performance|entertainment)\b|@/i;
 const COVER_RE = /\bcover\b|#acousticcover/i;
 const EVENT_BOOST_RE = new RegExp(rules.eventKeywords.join('|'), 'i');
 
-function classify(title: string): VideoContext {
+/** Live performance or cover; anything else (e.g. an original-music video) is left out. */
+function classify(title: string): VideoContext | null {
   if (LIVE_RE.test(title)) return 'live';
   if (COVER_RE.test(title)) return 'cover';
-  return 'original';
+  return null;
 }
 
 /** "Sean Carney - "Stronger" Official Music Video #stronger" -> { title: Stronger, note: Official music video } */
@@ -81,7 +80,7 @@ function score(videos: Video[]): void {
     const pop = Math.log10(v.views + 1) / Math.log10(maxViews + 1);
     const ageDays = v.published ? (now - v.published.getTime()) / 86_400_000 : 365;
     const recency = Math.pow(0.5, ageDays / rules.recencyHalfLifeDays);
-    const relevance = (v.context === 'live' ? 1 : v.context === 'cover' ? 0.7 : 0.45) + (EVENT_BOOST_RE.test(`${v.title} ${v.note ?? ''}`) ? 0.3 : 0);
+    const relevance = (v.context === 'live' ? 1 : v.context === 'cover' ? 0.7 : 0.6) + (EVENT_BOOST_RE.test(`${v.title} ${v.note ?? ''}`) ? 0.3 : 0);
     const curatedBoost = v.curated ? 0.05 : 0;
     v.scores = {
       best: 0.45 * pop + 0.25 * recency + 0.3 * Math.min(relevance, 1) + curatedBoost,
@@ -105,10 +104,6 @@ export function loadMedia(): Promise<Media> {
   return (cache ??= (async () => {
     const curated = await getCollection('videos');
     const [yt, ytOk] = YOUTUBE_API_KEY ? await safe('YouTube', () => fetchChannelVideos(YOUTUBE_API_KEY!, rules.youtubeChannelId), [] as YtVideo[]) : [[] as YtVideo[], false];
-    const [sp, spOk] =
-      SPOTIFY_CLIENT_ID && SPOTIFY_CLIENT_SECRET
-        ? await safe('Spotify', () => fetchSpotify(SPOTIFY_CLIENT_ID!, SPOTIFY_CLIENT_SECRET!, rules.spotifyArtistId), { releases: [], topTracks: [] })
-        : [{ releases: [], topTracks: [] }, false];
     const [ig, igOk] = INSTAGRAM_ACCESS_TOKEN ? await safe('Instagram', () => fetchInstagram(INSTAGRAM_ACCESS_TOKEN!), [] as IgPost[]) : [[] as IgPost[], false];
 
     const exclude = new Set<string>(rules.excludeYoutubeIds as string[]);
@@ -141,13 +136,15 @@ export function loadMedia(): Promise<Media> {
     for (const v of byYt.values()) {
       if (exclude.has(v.youtubeId) || !v.embeddable) continue;
       if (v.durationSec < rules.minDurationSec || /#shorts/i.test(v.title)) continue;
+      const context = classify(v.title);
+      if (!context) continue;
       const { title, note } = cleanTitle(v.title);
       videos.push({
         id: v.youtubeId,
         youtubeId: v.youtubeId,
         title,
         note,
-        context: classify(v.title),
+        context,
         published: v.published,
         views: v.views,
         likes: v.likes,
@@ -159,7 +156,7 @@ export function loadMedia(): Promise<Media> {
     }
 
     score(videos);
-    return { videos, releases: sp.releases, topTracks: sp.topTracks, instagram: ig, sources: { youtube: ytOk, spotify: spOk, instagram: igOk } };
+    return { videos, instagram: ig, sources: { youtube: ytOk, instagram: igOk } };
   })());
 }
 

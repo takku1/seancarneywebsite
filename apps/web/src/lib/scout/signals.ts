@@ -66,12 +66,6 @@ export async function consumeDailyBudget(limit: number): Promise<boolean> {
 }
 
 /** Anonymous demand: which cities want shows, how many want merch. */
-export async function recordNotify(topic: string, city: string): Promise<void> {
-  const store = await kv();
-  if (!store) return;
-  await bump(store, `notify:${topic}`, city ? city.toLowerCase().slice(0, 60) : '(no city)');
-}
-
 const COHORT = /^20\d{2}-W(0[1-9]|[1-4]\d|5[0-3])$/;
 const RETENTION_TTL = 60 * 60 * 24 * 400; // a cohort's 12-week curve stays readable for over a year
 
@@ -167,11 +161,6 @@ export async function insights(days = 30) {
     connected: true,
     topQuestions: (await trending(days)).slice(0, 15),
     gaps: gaps.slice(-100).reverse(),
-    notify: {
-      shows: JSON.parse((await store.get('notify:shows')) ?? '{}') as Record<string, number>,
-      merch: JSON.parse((await store.get('notify:merch')) ?? '{}') as Record<string, number>,
-      news: JSON.parse((await store.get('notify:news')) ?? '{}') as Record<string, number>,
-    },
     // Week-N retention by first-visit week. size = new visitors that week; rate.wN = share seen again N weeks later.
     retention: await retention(store),
     hotDates: Object.entries(dateDemand).sort((a, b) => b[1] - a[1]).slice(0, 25).map(([date, checks]) => ({ date, checks })),

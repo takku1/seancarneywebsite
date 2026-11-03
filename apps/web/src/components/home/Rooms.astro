@@ -1,0 +1,39 @@
+---
+/**
+ * The rooms Sean has played, typeset by name: the luxury-correct proof.
+ * Names set in the display face read as provenance, not advertising, and
+ * need no logo permissions. Source: credits.json, category "room".
+ */
+import { rooms } from '../../lib/content';
+
+const list = await rooms();
+---
+
+{list.length > 0 && (
+  <section class="rooms" data-section="rooms" aria-label="Rooms Sean has played">
+    <div class="container">
+      <ul>
+        {list.map((r) => <li>{r.data.name}</li>)}
+      </ul>
+    </div>
+  </section>
+)}
+
+<style>
+  .rooms { border-bottom: 1px solid var(--line); padding-block: clamp(2rem, 4vw, 3rem); }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem 0;
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    color: var(--text-muted);
+    text-align: center;
+  }
+  li { white-space: nowrap; }
+  li + li::before { content: '·'; margin-inline: 1rem; color: var(--line-strong); }
+</style>

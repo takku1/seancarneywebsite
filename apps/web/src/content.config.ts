@@ -1,5 +1,4 @@
 import { defineCollection } from 'astro:content';
-import appearanceRows from './data/appearances.json';
 import { z } from 'astro/zod';
 import { file } from 'astro/loaders';
 
@@ -9,30 +8,12 @@ import { file } from 'astro/loaders';
  * Local JSON lives in src/data/.
  */
 
-const releases = defineCollection({
-  loader: file('src/data/releases.json'),
-  schema: ({ image }) =>
-    z.object({
-      title: z.string(),
-      kind: z.enum(['album', 'single', 'ep', 'feature']),
-      artists: z.string(),
-      date: z.coerce.date().optional(),
-      cover: image(),
-      hook: z.string(),
-      /** Longer description for the music page (falls back to hook). */
-      story: z.string().optional(),
-      featured: z.boolean().default(false),
-      spotify: z.string().optional(), // e.g. "album/3y85..."
-      links: z.array(z.object({ label: z.string(), url: z.url() })).default([]),
-    }),
-});
-
 const credits = defineCollection({
   loader: file('src/data/credits.json'),
   schema: z.object({
     name: z.string(),
     detail: z.string().optional(),
-    category: z.enum(['sync', 'broadcast', 'chart', 'venue', 'client', 'endorsement']),
+    category: z.enum(['sync', 'broadcast', 'chart', 'room', 'venue', 'client', 'endorsement']),
     year: z.number().optional(),
     date: z.coerce.date().optional(),
     /** simple-icons slug for the monochrome mark, when one exists. */
@@ -41,32 +22,6 @@ const credits = defineCollection({
     logoApproved: z.boolean().default(false),
     headline: z.boolean().default(false),
     order: z.number().default(100),
-  }),
-});
-
-const press = defineCollection({
-  loader: file('src/data/press.json'),
-  schema: z.object({
-    outlet: z.string(),
-    headline: z.string(),
-    quote: z.string(),
-    url: z.url(),
-    date: z.coerce.date().optional(),
-  }),
-});
-
-const appearances = defineCollection({
-  // Empty until shows are announced; an inline empty loader avoids the file-loader warning.
-  loader: appearanceRows.length ? file('src/data/appearances.json') : async () => [],
-  schema: z.object({
-    title: z.string(),
-    date: z.coerce.date(),
-    venue: z.string(),
-    city: z.string(),
-    kind: z.enum(['public', 'broadcast', 'private']),
-    /** private events are never shown unless consented or anonymized */
-    visibility: z.enum(['public', 'anonymized', 'hidden']).default('public'),
-    url: z.url().optional(),
   }),
 });
 
@@ -88,7 +43,7 @@ const videos = defineCollection({
   schema: z.object({
     title: z.string(),
     youtubeId: z.string(),
-    context: z.enum(['original', 'cover', 'live', 'session']),
+    context: z.enum(['cover', 'live', 'session']),
     note: z.string().optional(),
     order: z.number().default(100),
   }),
@@ -111,7 +66,7 @@ const events = defineCollection({
       /** Page sections, in order. Each event type composes its own page. */
       blocks: z.array(
         z.object({
-          type: z.enum(['timeline', 'columns', 'program', 'steps', 'feature', 'film', 'repertoire', 'clients', 'specs', 'checklist', 'statement', 'testimonials', 'quote', 'stages', 'reach', 'faq']),
+          type: z.enum(['timeline', 'columns', 'program', 'steps', 'feature', 'film', 'repertoire', 'clients', 'specs', 'checklist', 'statement', 'testimonials', 'stages', 'reach', 'faq']),
           title: z.string().optional(),
           body: z.string().optional(),
           note: z.string().optional(),
@@ -127,11 +82,21 @@ const events = defineCollection({
           playlist: z.string().optional(),
           solo: z.array(z.string()).optional(),
           band: z.array(z.string()).optional(),
-          pressId: z.string().optional(),
         }),
       ),
       order: z.number(),
     }),
+});
+
+/** Songs by moment of the day. A sample: full lists and requests come with the proposal. */
+const repertoire = defineCollection({
+  loader: file('src/data/repertoire.json'),
+  schema: z.object({
+    moment: z.string(),
+    note: z.string(),
+    order: z.number(),
+    songs: z.array(z.object({ title: z.string(), artist: z.string() })),
+  }),
 });
 
 const faqs = defineCollection({
@@ -143,4 +108,4 @@ const faqs = defineCollection({
   }),
 });
 
-export const collections = { releases, credits, press, appearances, testimonials, videos, events, faqs };
+export const collections = { credits, testimonials, videos, events, repertoire, faqs };

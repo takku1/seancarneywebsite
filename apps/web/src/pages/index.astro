@@ -1,41 +1,34 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/home/Hero.astro';
-import CreditsStrip from '../components/home/CreditsStrip.astro';
-import FeaturedRelease from '../components/home/FeaturedRelease.astro';
-import LatestFeed from '../components/home/LatestFeed.astro';
-import EventsBand from '../components/home/EventsBand.astro';
-import Testimonials from '../components/home/Testimonials.astro';
+import Rooms from '../components/home/Rooms.astro';
+import DayArc from '../components/home/DayArc.astro';
+import Formats from '../components/home/Formats.astro';
 import FilmGrid from '../components/home/FilmGrid.astro';
-import Stages from '../components/home/Stages.astro';
-import SocialStrip from '../components/home/SocialStrip.astro';
+import Testimonials from '../components/home/Testimonials.astro';
+import EventsBand from '../components/home/EventsBand.astro';
 import ScoutInvite from '../components/scout/ScoutInvite.astro';
 import { graph, personSchema, websiteSchema, serviceSchema } from '../lib/seo/schema';
-import { headlineCredits } from '../lib/content';
-
-const credits = (await headlineCredits()).map((c) => c.data.name);
-const jsonLd = graph(personSchema(credits), websiteSchema(), serviceSchema());
+const jsonLd = graph(personSchema(), websiteSchema(), serviceSchema());
 ---
 
 <BaseLayout
   pageType="home"
   overlayHeader
-  title="Sean Carney | Singer, Guitarist and Producer, Los Angeles"
-  description="Official site of Sean Carney: Billboard-charting songwriter heard on the Paris Olympics, NFL Playoffs and Netflix. Booking weddings, galas and private events."
+  title="Live Wedding Music in Los Angeles | Sean Carney"
+  description="Live music for luxury weddings and private events in Los Angeles and beyond: solo guitar for the ceremony, a trio for cocktails, the full band for the reception."
   jsonLd={jsonLd}
 >
   <Hero />
-  <CreditsStrip />
-  <FeaturedRelease />
-  <LatestFeed />
+  <Rooms />
+  <DayArc />
+  <Formats />
+  <FilmGrid placement="home" heading="A wedding, live" />
+  <Testimonials ids={['jordan-isabela', 'timea-kris', 'olivia-john']} />
+  <div class="container scout-row"><ScoutInvite source="home" text="Have a date in mind? Scout, Sean's AI assistant, can check it and answer questions in a minute." prompts={['Check a date', 'Which format suits our day?']} /></div>
   <EventsBand />
-  <div class="container scout-row"><ScoutInvite source="home" text="Have a date in mind? Scout, Sean's AI assistant, can check it and answer questions in a minute." prompts={['Check a date', 'What does a wedding set include?']} /></div>
-  <Testimonials ids={['sugarman', 'gina', 'morison']} />
-  <FilmGrid placement="home" heading="Originals" mix={['best', 'newest', 'most_watched']} />
-  <SocialStrip />
-  <Stages />
 </BaseLayout>
 
 <style>
-  .scout-row { padding-block: 2rem 0; }
+  .scout-row { padding-block: 0 var(--space-section); }
 </style>

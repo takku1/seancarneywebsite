@@ -8,15 +8,15 @@ interface Props {
 }
 const { overlay = false } = Astro.props;
 
-const events = (await getCollection('events')).sort((a, b) => a.data.order - b.data.order);
+// Weddings lead the navigation; the other event types sit under "Private events".
+const events = (await getCollection('events')).sort((a, b) => a.data.order - b.data.order).filter((e) => e.data.slug !== 'weddings');
 const path = Astro.url.pathname;
 const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
 
+// Weddings, [Private events menu], Repertoire, About.
 const primary = [
-  { href: '/music', label: 'Music' },
-  { href: '/shows', label: 'Shows' },
-  { href: '/merch', label: 'Merch' },
-  { href: '/press', label: 'Press' },
+  { href: '/weddings', label: 'Weddings' },
+  { href: '/repertoire', label: 'Repertoire' },
   { href: '/about', label: 'About' },
 ];
 const norm = path.replace(/\/$/, '') || '/';
@@ -31,11 +31,11 @@ const eventsCurrent = norm === '/private-events' ? 'page' : events.some((e) => o
 
     <nav class="nav" aria-label="Primary">
       <ul>
-        {primary.slice(0, 2).map((l) => (
+        {primary.slice(0, 1).map((l) => (
           <li><a href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a></li>
         ))}
         <li class="has-menu">
-          <a href="/private-events" aria-current={eventsCurrent}>Private Events</a>
+          <a href="/private-events" aria-current={eventsCurrent}>Private events</a>
           <div class="menu">
             <ul>
               {events.map((e) => (
@@ -44,7 +44,7 @@ const eventsCurrent = norm === '/private-events' ? 'page' : events.some((e) => o
             </ul>
           </div>
         </li>
-        {primary.slice(2).map((l) => (
+        {primary.slice(1).map((l) => (
           <li><a href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a></li>
         ))}
       </ul>
@@ -63,9 +63,9 @@ const eventsCurrent = norm === '/private-events' ? 'page' : events.some((e) => o
     <nav class="container" aria-label="Mobile">
       <ul class="mm-primary">
         <li><a href="/" aria-current={norm === '/' ? 'page' : undefined}>Home</a></li>
-        {primary.slice(0, 2).map((l) => <li><a href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a></li>)}
-        <li><a href="/private-events" aria-current={eventsCurrent}>Private Events</a></li>
-        {primary.slice(2).map((l) => <li><a href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a></li>)}
+        {primary.slice(0, 1).map((l) => <li><a href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a></li>)}
+        <li><a href="/private-events" aria-current={eventsCurrent}>Private events</a></li>
+        {primary.slice(1).map((l) => <li><a href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a></li>)}
       </ul>
       <ul class="mm-events">
         {events.map((e) => <li><a href={`/${e.data.slug}`} aria-current={onEvent(e.data.slug) ? 'page' : undefined}>{e.data.navLabel}</a></li>)}
@@ -133,6 +133,14 @@ const eventsCurrent = norm === '/private-events' ? 'page' : events.some((e) => o
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     border-color: transparent;
+  }
+  /* Over the hero film the header reads light; once solid it returns to ink. */
+  .site-header.overlay:not(.scrolled):not(.menu-open) {
+    --text: var(--on-image);
+    --text-muted: var(--on-image-muted);
+    --line: rgb(241 235 224 / 0.25);
+    --line-strong: rgb(241 235 224 / 0.45);
+    color: var(--text);
   }
   .site-header.overlay.scrolled,
   .site-header.menu-open {

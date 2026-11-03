@@ -36,18 +36,16 @@ import InquireLabel from '../ui/InquireLabel.astro';
   </div>
 
   <div class="container content">
-    <p class="label tag">Music for Outlaws</p>
-    <h1 id="hero-title">Sean Carney</h1>
+    <h1 id="hero-title">Live music for your wedding</h1>
     <p class="sub">
-      <span class="exp" data-exp="hero_sub" data-variant="status">Singer, guitarist and producer. Heard on the Paris Olympics, the NFL Playoffs and Netflix.</span>
-      <span class="exp" data-exp="hero_sub" data-variant="service">Solo, trio or full band for weddings, galas and private estates in Los Angeles and beyond.</span>
+      <span class="exp" data-exp="hero_sub" data-variant="arc">From the first note of the ceremony to the last song of the night.</span>
+      <span class="exp" data-exp="hero_sub" data-variant="rooms">Fifteen years of weddings, from Hotel del Coronado to The Beverly Hills Hotel.</span>
     </p>
+    <p class="formats" aria-label="Formats">Solo <span aria-hidden="true">·</span> Trio <span aria-hidden="true">·</span> Full band</p>
     <div class="ctas">
       <a href="/inquire" class="btn" data-track="cta_click" data-track-location="hero"><InquireLabel /></a>
-      {reel ? (
-        <button type="button" class="btn btn--ghost" data-reel-open data-track="watch_live_click" data-track-location="hero"><Icon name="play" /> Watch live</button>
-      ) : (
-        <a href="/music" class="btn btn--ghost" data-track="listen_click" data-track-location="hero"><Icon name="play" /> Listen</a>
+      {reel && (
+        <button type="button" class="watch" data-reel-open data-track="watch_live_click" data-track-location="hero"><Icon name="play" /> Watch a wedding</button>
       )}
     </div>
   </div>
@@ -167,30 +165,61 @@ import InquireLabel from '../ui/InquireLabel.astro';
       linear-gradient(to right, rgb(9 8 7 / 0.55), transparent 55%);
   }
 
-  .content { padding-block: 0 clamp(3rem, 8vh, 6rem); }
-  .tag { color: var(--accent); margin-bottom: 1rem; }
+  /* Text over the film stays light, whatever the page palette. */
+  .content {
+    --text: var(--on-image);
+    --text-muted: var(--on-image-muted);
+    --line-strong: rgb(241 235 224 / 0.45);
+    color: var(--text);
+    padding-block: 0 clamp(3rem, 8vh, 6rem);
+  }
   h1 {
     font-size: var(--step-5);
     font-weight: 500;
-    line-height: 0.95;
-    letter-spacing: -0.025em;
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+    max-width: 12ch;
+    text-wrap: balance;
   }
   .sub {
-    margin-top: 1.25rem;
-    max-width: 34ch;
+    margin-top: 1.5rem;
+    max-width: 36ch;
     font-size: var(--step-1);
     line-height: 1.45;
-    color: var(--text);
   }
-  .ctas { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
+  .formats {
+    margin-top: 1.25rem;
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+  }
+  .formats span { margin-inline: 0.5em; }
+  .watch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 48px;
+    padding: 0 0.25rem;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid var(--line-strong);
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+    transition: border-color 0.3s var(--ease-out);
+  }
+  .watch:hover { border-color: var(--text); }
+  .watch :global(svg) { width: 1em; height: 1em; }
+  .ctas { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 2rem; margin-top: 2.25rem; }
 
-  /* Cinematic entrance: the eyebrow arrives first, then the name, the line, the buttons. */
+  /* Entrance: the promise first, then the line, the formats, the actions. */
   @media (prefers-reduced-motion: no-preference) {
-    .tag, h1, .sub, .ctas { animation: enter 0.8s var(--ease-out) both; }
-    .tag { animation-delay: 0.15s; }
-    h1 { animation-delay: 0.3s; animation-duration: 1s; }
-    .sub { animation-delay: 0.55s; }
-    .ctas { animation-delay: 0.7s; }
+    h1, .sub, .formats, .ctas { animation: enter 0.9s var(--ease-out) both; }
+    h1 { animation-delay: 0.2s; animation-duration: 1.1s; }
+    .sub { animation-delay: 0.45s; }
+    .formats { animation-delay: 0.6s; }
+    .ctas { animation-delay: 0.75s; }
     .scrim { animation: dim 1.2s ease both; }
   }
   /* A focus pull from an already-visible start: text paints on the first frame (so it counts

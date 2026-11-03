@@ -1,0 +1,215 @@
+{
+  "url": "https://www.therow.com/",
+  "status": 200,
+  "title": "The Row | Clothing & Accessories",
+  "description": "The Row est. in 2005 by Ashley Olsen and Mary-Kate Olsen. Timeless ready-to-wear, handbags, clothes and accessories. Shop on the official online store.",
+  "og": {
+    "og:type": "website",
+    "og:title": "The Row | Clothing & Accessories ",
+    "og:description": "The Row est. in 2005 by Ashley Olsen and Mary-Kate Olsen. Timeless ready-to-wear, handbags, clothes and accessories. Shop on the official online store.",
+    "og:url": "https://www.therow.com/",
+    "og:site_name": "The Row",
+    "og:image": "https://cdn.shopify.com/s/files/1/0552/0313/5593/files/logo_therow_e6543ef8-863b-462b-a9f9-e076ceff0052.png?height=628&pad_color=ffffff&v=1677024616&width=1200",
+    "og:image:secure_url": "https://cdn.shopify.com/s/files/1/0552/0313/5593/files/logo_therow_e6543ef8-863b-462b-a9f9-e076ceff0052.png?height=628&pad_color=ffffff&v=1677024616&width=1200",
+    "og:image:width": "1200",
+    "og:image:height": "628"
+  },
+  "outline": [
+    "H2: Menu",
+    "H2: Subscribe to our Newsletter",
+    "H2: Footer - Desktop Menu",
+    "H2: Do Not Sell or Share My Personal Data",
+    "H3: Manage Consent Preferences",
+    "H3: Cookie List",
+    "H2: Do Not Sell or Share My Personal Data",
+    "H3: Manage Consent Preferences",
+    "H3: Performance Cookies"
+  ],
+  "nav": [
+    "Winter 2026 - New Arrivals -> /collections/women-new-arrivals",
+    "Outerwear -> /collections/women-coats-outerwear",
+    "Leather & Shearling -> /collections/women-outerwear-leather-shearling",
+    "Jackets -> /collections/women-jackets-blazers",
+    "Sweaters -> /collections/women-sweaters-sweatshirts",
+    "Shirts & Tops -> /collections/women-shirts-tops",
+    "T-Shirts & Tank Tops -> /collections/women-t-shirts-tank-tops",
+    "Dresses -> /collections/women-dresses",
+    "Skirts -> /collections/women-skirts",
+    "Denim -> /collections/women-denim-jeans-shirts",
+    "Pants & Shorts -> /collections/women-pants-shorts",
+    "Sweatshirts -> /collections/women-sweatshirts",
+    "Underpinnings -> /collections/women-underpinnings",
+    "New Arrivals -> /collections/shoes-new-arrivals",
+    "View All -> /collections/women-shoes",
+    "Boots -> /collections/women-boots",
+    "Flats & Loafers -> /collections/women-flats-loafers",
+    "Heels -> /collections/women-heels",
+    "Sneakers -> /collections/women-sneakers",
+    "Sandals -> /collections/women-sandals",
+    "New Arrivals -> /collections/handbags-new-arrivals",
+    "View All -> /collections/women-handbags",
+    "Top Handle -> /collections/women-top-handle-bags",
+    "Totes & Backpacks -> /collections/women-tote-bags-backpacks",
+    "Shoulder Bags -> /collections/women-shoulder-bags",
+    "Cross Body Bags -> /collections/women-crossbody-bags",
+    "Small Bags -> /collections/women-small-bags-clutches",
+    "Small Accessories -> /collections/bags-small-accessories",
+    "Travel -> /collections/bags-travel",
+    "Eyewear -> /collections/women-sunglasses",
+    "Scarves & Gloves -> /collections/women-scarves-gloves",
+    "Hats -> /collections/women-hats-beanies",
+    "Belts -> /collections/women-belts",
+    "Shop by Look -> /collections/women-shop-by-look",
+    "Winter 2026 - New Arrivals -> /collections/men-new-arrivals",
+    "Outerwear -> /collections/men-coats-outerwear",
+    "Jackets -> /collections/men-jackets-blazers",
+    "Sweaters -> /collections/men-sweaters-sweatshirts",
+    "T-Shirts & Knits -> /collections/men-t-shirts",
+    "Shirts & Polos -> /collections/men-shirts"
+  ],
+  "ctas": [
+    "Contact Us -> /pages/contact-us",
+    "Proceed to checkout -> (button)"
+  ],
+  "forms": [
+    [
+      "form_type",
+      "utf8",
+      "_method",
+      "return_to",
+      "country_code",
+      "language_code"
+    ],
+    [],
+    [
+      "q",
+      "type"
+    ],
+    [
+      "form_type",
+      "utf8",
+      "contact[tags]",
+      "contact[email]",
+      "footerPolicy"
+    ],
+    [
+      "form_type",
+      "utf8",
+      "contact[tags]",
+      "contact[email]",
+      "footerPolicy"
+    ],
+    [
+      "form_type",
+      "utf8",
+      "_method",
+      "return_to",
+      "country_code",
+      "currency_code",
+      "locale_code"
+    ],
+    [
+      "form_type",
+      "utf8",
+      "contact[tags]",
+      "contact[email]",
+      "footerPolicy"
+    ],
+    [
+      "form_type",
+      "utf8",
+      "_method",
+      "return_to",
+      "country_code",
+      "Country",
+      "language_code"
+    ]
+  ],
+  "type": {
+    "h1": null,
+    "h2": {
+      "font": "\"Basic Commercial\", Arial, sans-serif",
+      "size": "13px",
+      "weight": "400",
+      "color": "rgb(0, 0, 0)",
+      "transform": "none",
+      "spacing": "normal"
+    },
+    "body": {
+      "font": "\"Basic Commercial\", Arial, sans-serif",
+      "size": "14px",
+      "weight": "400",
+      "color": "rgb(0, 0, 0)",
+      "transform": "none",
+      "spacing": "normal"
+    },
+    "button": {
+      "font": "\"Basic Commercial\", Arial, sans-serif",
+      "size": "14px",
+      "weight": "400",
+      "color": "rgb(0, 0, 0)",
+      "transform": "none",
+      "spacing": "normal"
+    }
+  },
+  "topColors": [
+    [
+      "rgb(0, 0, 0)",
+      1446
+    ],
+    [
+      "rgb(28, 27, 27)",
+      346
+    ],
+    [
+      "rgb(255, 255, 255)",
+      77
+    ],
+    [
+      "rgb(106, 106, 106)",
+      68
+    ],
+    [
+      "rgb(105, 105, 105)",
+      66
+    ],
+    [
+      "rgb(33, 33, 33)",
+      36
+    ],
+    [
+      "rgb(85, 85, 85)",
+      27
+    ],
+    [
+      "rgb(200, 35, 44)",
+      9
+    ],
+    [
+      "rgba(255, 255, 255, 0)",
+      8
+    ],
+    [
+      "rgb(39, 69, 92)",
+      8
+    ],
+    [
+      "rgb(56, 96, 190)",
+      4
+    ],
+    [
+      "rgb(248, 248, 248)",
+      4
+    ]
+  ],
+  "jsonld": [
+    "\n      {\n        \"@context\": \"https://schema.org\",\n        \"@type\": \"OnlineStore\",\n        \"name\": \"The Row\",\n        \"url\": \"https://www.therow.com\",\n        \"description\": \"The Row est. in 2005 by Ashley Olsen and Mary-Kate Olsen. Timeless ready-to-wear, handbags, clothes and accessories. Shop on the official online store.\",\n        \"image\": \"//www.therow.com/cdn/shop/t/587/assets/logo.svg?v=37983361621263247601793193479\",\n        \"logo\": \"//www.therow.com/cdn/shop/t/587/assets/logo.svg?v=37983361621263247601793193479\",\n        \"parentOrganization\": {\n          \"@type\": \"OnlineBusiness\",\n          \"name\": \"The Row\",\n          \"url\": \"https://www.therow.com\"\n        },\n        \"address\": {\n          \"@type\": \"PostalAddress\",\n          \"addressCountry\": \"USA\",\n          \"addressLocality\": \"New York\"\n        }\n      }\n    ",
+    "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"BreadcrumbList\",\n  \"itemListElement\": [{\n      \"@type\": \"ListItem\",\n      \"position\": 1,\n      \"name\": \"Home\",\n      \"item\": \"https://www.therow.com\"\n    }]\n  }\n  "
+  ],
+  "videos": [
+    "https://www.therow.com/web-pixels@02d13049w588a3a08pb529f9b2m27ddd415/custom/web-pixel-28508265@2/sandbox/modern/",
+    "https://www.therow.com/web-pixels@02d13049w588a3a08pb529f9b2m27ddd415/custom/web-pixel-196346228@4/sandbox/modern/",
+    "https://www.therow.com/web-pixels@02d13049w588a3a08pb529f9b2m27ddd415/custom/web-pixel-shopify-custom-pixel@0530/sandbox/modern/"
+  ],
+  "words": 281
+}

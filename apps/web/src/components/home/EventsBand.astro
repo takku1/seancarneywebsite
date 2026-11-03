@@ -1,13 +1,13 @@
 ---
-/** The conversion band: status above, booking below. */
+/** Private events, quietly: the one band on the home page for non-wedding occasions. */
 import { Image } from 'astro:assets';
 import bg from '../../assets/photos/event-acoustic-garden.jpg';
-import { eventTypes } from '../../lib/content';
+import { privateEventTypes } from '../../lib/content';
 import { site } from '../../config/site';
 import Icon from '../ui/Icon.astro';
 import InquireLabel from '../ui/InquireLabel.astro';
 
-const events = await eventTypes();
+const events = await privateEventTypes();
 ---
 
 <section class="band" data-section="events_band" aria-labelledby="band-title">
@@ -15,9 +15,8 @@ const events = await eventTypes();
   <div class="shade"></div>
   <div class="container inner">
     <div class="copy">
-      <p class="label">Private events</p>
-      <h2 id="band-title">{site.bookingSeason}</h2>
-      <p class="lede">Weddings, galas, company evenings and private estates. Solo, trio, or with his band, The Hustlers.</p>
+      <h2 id="band-title">Private events</h2>
+      <p class="lede">{site.bookingSeason} Company evenings, charity galas, private estates and destination celebrations, solo through full band.</p>
       <a href="/inquire" class="btn" data-track="cta_click" data-track-location="events_band"><InquireLabel /> <Icon name="arrow-right" /></a>
     </div>
     <ul class="types">
@@ -35,6 +34,11 @@ const events = await eventTypes();
 
 <style>
   .band {
+    /* Text over the photograph stays light. */
+    --text: var(--on-image);
+    --text-muted: var(--on-image-muted);
+    --line-strong: rgb(241 235 224 / 0.35);
+    color: var(--text);
     position: relative;
     isolation: isolate;
     overflow: hidden;

@@ -1,0 +1,119 @@
+{
+  "url": "https://web.archive.org/web/20230609220054if_/https://moseslinmusic.com/contact/weddings",
+  "status": 200,
+  "title": "Weddings - Moses Lin Music",
+  "description": "For California and destination weddings, please contact Moses Lin for availability and pricing for live music.",
+  "og": {
+    "og:locale": "en_US",
+    "og:type": "article",
+    "og:title": "Weddings - Moses Lin Music",
+    "og:description": "For California and destination weddings, please contact Moses Lin for availability and pricing for live music.",
+    "og:url": "https://moseslinmusic.com/contact/weddings",
+    "og:site_name": "Moses Lin Music",
+    "og:image": "https://moseslinmusic.com/wp-content/uploads/2022/06/Moses-BTS-SWP7-scaled.jpg",
+    "og:image:width": "2560",
+    "og:image:height": "1707",
+    "og:image:type": "image/jpeg"
+  },
+  "outline": [
+    "H1: Contact Forms:",
+    "H1: -Weddings",
+    "H2: Hello there!",
+    "H2: TOP DESTINATIONS",
+    "H2: TOP CITIES",
+    "H2: TOP SOCAL REGIONS"
+  ],
+  "nav": [
+    "Bookings -> https://moseslinmusic.com/weddings",
+    "WEDDINGS -> https://moseslinmusic.com/weddings",
+    "EVENTS -> https://moseslinmusic.com/events",
+    "Videos -> https://moseslinmusic.com/videos",
+    "Store -> https://moseslinmusic.com/store",
+    "ALBUMS -> https://moseslinmusic.com/product-category/albums",
+    "TABS -> https://moseslinmusic.com/product-category/tabs",
+    "@media (min-width:768px) and (max-width:1024px){.flo-header--61 .flo-header__logo{max-width:8.125rem}}@media (min-width:1025px){.flo-header--61 .flo-header__logo{max-width:15.625rem}} -> https://moseslinmusic.com/",
+    "About -> https://moseslinmusic.com/about",
+    "Contact -> https://moseslinmusic.com/contact/weddings",
+    "WEDDINGS -> https://moseslinmusic.com/contact/weddings",
+    "EVENTS AND CORPORATE -> https://moseslinmusic.com/contact/events",
+    "GENERAL INQUIRIES -> https://moseslinmusic.com/contact",
+    "BUSINESS COACHING -> https://moseslinmusic.com/contact/coaching",
+    " -> https://moseslinmusic.com/"
+  ],
+  "ctas": [
+    "Bookings -> https://moseslinmusic.com/weddings",
+    "Contact -> https://moseslinmusic.com/contact/weddings",
+    "GENERAL INQUIRIES -> https://moseslinmusic.com/contact",
+    "General Inquiries -> https://moseslinmusic.com/contact",
+    "General Inquires -> https://moseslinmusic.com/contact"
+  ],
+  "forms": [],
+  "type": {
+    "h1": {
+      "font": "operetta-52-normal-400",
+      "size": "33.75px",
+      "weight": "400",
+      "color": "rgb(0, 0, 0)",
+      "transform": "none",
+      "spacing": "-2.7px"
+    },
+    "h2": {
+      "font": "operetta-52-normal-400",
+      "size": "90px",
+      "weight": "400",
+      "color": "rgb(0, 0, 0)",
+      "transform": "none",
+      "spacing": "-7.2px"
+    },
+    "body": {
+      "font": "Montserrat-Regular",
+      "size": "16.875px",
+      "weight": "400",
+      "color": "rgb(0, 0, 0)",
+      "transform": "none",
+      "spacing": "normal"
+    },
+    "button": null
+  },
+  "topColors": [
+    [
+      "rgb(0, 0, 0)",
+      224
+    ],
+    [
+      "rgb(67, 68, 66)",
+      149
+    ],
+    [
+      "rgb(10, 10, 10)",
+      41
+    ],
+    [
+      "rgb(255, 255, 255)",
+      8
+    ],
+    [
+      "rgb(127, 142, 162)",
+      3
+    ],
+    [
+      "rgb(252, 225, 214)",
+      3
+    ],
+    [
+      "rgb(220, 212, 206)",
+      3
+    ],
+    [
+      "rgba(252, 225, 214, 0)",
+      1
+    ]
+  ],
+  "jsonld": [
+    "{\"@context\":\"https://web.archive.org/web/20221208232248/https://schema.org\",\"@graph\":[{\"@type\":\"WebPage\",\"@id\":\"https://web.archive.org/web/20221208232248/https://moseslinmusic.com/contact/weddings\",\"url\":\"https://web.archive.org/web/20221208232248/https://moseslinmusic.com/contact/weddings\",\"name\":\"Weddings - Moses Lin Music\",\"isPartOf\":{\"@id\":\"https://web.archive.org/web/20221208232248/https://moseslinmusic.com/#website\"},\"datePublished\":\"2020-11-19T06:25:19+00:00\",\"dateModified\":\"2021-04-07T00:43:02+00:00\",\"description\":\"For California and destination weddings, please contact Moses Lin for availability and pricing for live music.\",\"breadcrumb\":{\"@id\":\"https://web.archive.org/web/20221208232248/https://moseslinmusic.com/contact/weddings#breadcrumb\"},\"inLanguage\":\"en-US\",\"potentialAction\":[{\"@type\":\"ReadAction\",\"target\":[\"https://web.archive.org/web/20221208232248/https://moseslinmusic.com/contact/weddings\"]}]},{\"@type\":\"BreadcrumbList\",\"@id\":\"https://web.archive.org/web/20221208232248/https://moseslinmusic.com/contact/weddings#breadcrumb\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://web.archive.org/web/20221208232248/https://moseslinmusic.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"General Inquiries\",\"item\":\"https://web.archive.org/web/20221208232248/https://moseslinmusic.com/contact\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Weddings\"}]},{\"@type\":\"WebSite\",\"@id\":\"https://web.archive.org/web/20221208232248/https://moseslinmusic.com/#website\",\"url\":\"https://web.archive.org/web/20221208232248/https://moseslinmusic.com/\",\"name\":\"Moses Lin Music\",\"description\":\"Wedding and Event Guitarist\",\"publisher\":{\"@id\":\"https://web.archive.org/web/20221208232248/https://moseslinmusic.com/#organization\"},\"potentialAction\":[{\"@type\":\"SearchAction\",\"target\":{\"@type\":\"EntryPoint\",\"urlTemplate\":\"https://web.archive.org/web/20221208232248/https://moseslinmusic.com/?s={search_term_string}\"},\"query-input\":\"required name=search_term_string\"}],\"inL"
+  ],
+  "videos": [
+    "https://hello.dubsado.com:443/public/form/view/5d5c9917d1052c279dfbcf1e"
+  ],
+  "words": 164
+}

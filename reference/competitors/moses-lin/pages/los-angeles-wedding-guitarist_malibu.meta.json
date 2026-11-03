@@ -1,0 +1,111 @@
+{
+  "url": "https://web.archive.org/web/20240720094143if_/https://moseslinmusic.com/los-angeles-wedding-guitarist/malibu",
+  "status": 200,
+  "title": "Malibu Wedding Guitarist | Moses Lin Music",
+  "description": "Moses Lin is an award-winning Malibu wedding guitarist who specializes in live music for ceremony, cocktail hour and reception. Moses has performed in Malibu at venues like Calamigos Ranch and Saddlerock Ranch",
+  "og": {
+    "og:locale": "en_US",
+    "og:type": "article",
+    "og:title": "Malibu Wedding Guitarist",
+    "og:description": "Moses Lin is an award-winning Malibu wedding guitarist who specializes in live music for ceremony, cocktail hour and reception. Moses has performed in Malibu at venues like Calamigos Ranch and Saddlerock Ranch",
+    "og:url": "https://moseslinmusic.com/los-angeles-wedding-guitarist/malibu",
+    "og:site_name": "Moses Lin Music",
+    "og:image": "https://moseslinmusic.com/wp-content/uploads/2023/03/Ingleside-Inn-Planners-Retreat-2023-93-169-1200x630.jpg",
+    "og:image:width": "1200",
+    "og:image:height": "630",
+    "og:image:type": "image/jpeg"
+  },
+  "outline": [
+    "H3: This will be",
+    "H3: the best damn night of your life",
+    "H1: MALIBU WEDDING GUITARIST",
+    "H2: RECENT DESTINATIONS"
+  ],
+  "nav": [
+    "@media (min-width:768px) and (max-width:1024px){.flo-header--293 .flo-header__logo{max-width:17.5rem}}@media (min-width:1025px){.flo-header--293 .flo-header__logo{max-width:17.5rem}} -> https://moseslinmusic.com/",
+    "ABOUT -> https://moseslinmusic.com/about",
+    "MEET MOSES -> https://moseslinmusic.com/about",
+    "PRESS -> https://moseslinmusic.com/press",
+    "FAQ -> https://moseslinmusic.com/faq",
+    "REPERTOIRE -> https://moseslinmusic.com/repertoire",
+    "WEDDINGS -> https://moseslinmusic.com/weddings",
+    "PRIVATE EVENTS -> https://moseslinmusic.com/events",
+    "FOR MUSICIANS -> https://moseslinmusic.com/coaching",
+    "CONTACT -> https://moseslinmusic.com/contact",
+    " -> https://moseslinmusic.com/"
+  ],
+  "ctas": [
+    "CONTACT -> https://moseslinmusic.com/contact",
+    "Contact -> https://moseslinmusic.com/contact"
+  ],
+  "forms": [],
+  "type": {
+    "h1": {
+      "font": "Montserrat-Regular",
+      "size": "11.25px",
+      "weight": "400",
+      "color": "rgb(0, 0, 0)",
+      "transform": "uppercase",
+      "spacing": "1.125px"
+    },
+    "h2": {
+      "font": "Montserrat-Regular",
+      "size": "11.25px",
+      "weight": "400",
+      "color": "rgb(0, 0, 0)",
+      "transform": "uppercase",
+      "spacing": "1.125px"
+    },
+    "body": {
+      "font": "Montserrat-Regular",
+      "size": "13.5px",
+      "weight": "400",
+      "color": "rgb(0, 0, 0)",
+      "transform": "none",
+      "spacing": "normal"
+    },
+    "button": {
+      "font": "\"Helvetica Neue\", Helvetica, Roboto, Arial, sans-serif",
+      "size": "18px",
+      "weight": "400",
+      "color": "rgb(127, 142, 162)",
+      "transform": "none",
+      "spacing": "normal"
+    }
+  },
+  "topColors": [
+    [
+      "rgb(57, 64, 71)",
+      169
+    ],
+    [
+      "rgb(0, 0, 0)",
+      108
+    ],
+    [
+      "rgb(127, 142, 162)",
+      20
+    ],
+    [
+      "rgb(250, 250, 250)",
+      11
+    ],
+    [
+      "rgb(242, 243, 245)",
+      3
+    ],
+    [
+      "rgba(0, 0, 0, 0.05)",
+      1
+    ],
+    [
+      "rgb(255, 255, 255)",
+      1
+    ]
+  ],
+  "jsonld": [
+    "{\"@context\":\"https://web.archive.org/web/20240720094143/https://schema.org\",\"@graph\":[{\"@type\":\"WebPage\",\"@id\":\"https://web.archive.org/web/20240720094143/https://moseslinmusic.com/los-angeles-wedding-guitarist/malibu\",\"url\":\"https://web.archive.org/web/20240720094143/https://moseslinmusic.com/los-angeles-wedding-guitarist/malibu\",\"name\":\"Malibu Wedding Guitarist | Moses Lin Music\",\"isPartOf\":{\"@id\":\"https://web.archive.org/web/20240720094143/https://moseslinmusic.com/#website\"},\"datePublished\":\"2021-03-13T04:28:40+00:00\",\"dateModified\":\"2023-02-14T03:27:59+00:00\",\"description\":\"Moses Lin is an award-winning Malibu wedding guitarist who specializes in live music for ceremony, cocktail hour and reception. Moses has performed in Malibu at venues like Calamigos Ranch and Saddlerock Ranch\",\"breadcrumb\":{\"@id\":\"https://web.archive.org/web/20240720094143/https://moseslinmusic.com/los-angeles-wedding-guitarist/malibu#breadcrumb\"},\"inLanguage\":\"en-US\",\"potentialAction\":[{\"@type\":\"ReadAction\",\"target\":[\"https://web.archive.org/web/20240720094143/https://moseslinmusic.com/los-angeles-wedding-guitarist/malibu\"]}]},{\"@type\":\"BreadcrumbList\",\"@id\":\"https://web.archive.org/web/20240720094143/https://moseslinmusic.com/los-angeles-wedding-guitarist/malibu#breadcrumb\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://web.archive.org/web/20240720094143/https://moseslinmusic.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Los Angeles Wedding Guitarist\",\"item\":\"https://web.archive.org/web/20240720094143/https://moseslinmusic.com/los-angeles-wedding-guitarist\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Malibu Wedding Guitarist\"}]},{\"@type\":\"WebSite\",\"@id\":\"https://web.archive.org/web/20240720094143/https://moseslinmusic.com/#website\",\"url\":\"https://web.archive.org/web/20240720094143/https://moseslinmusic.com/\",\"name\":\"Moses Lin Music\",\"description\":\"Wedding and Event Guitarist\",\"publisher\":{\"@id\":\"https://web.archive.org/web/20240720094143/https://moseslin"
+  ],
+  "videos": [],
+  "words": 132
+}

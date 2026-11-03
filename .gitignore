@@ -19,3 +19,11 @@ apps/web/.claude-flow/
 .tunic/
 graphify-out/
 *.log
+
+# Third-party reference captures: keep screenshots, raw HTML and media local
+reference/competitors/*/media/
+reference/competitors/*/shots/
+reference/competitors/*/pages/*.html
+reference/inspiration/*/shots/
+reference/inspiration/*/media/
+reference/inspiration/*/pages/*.html

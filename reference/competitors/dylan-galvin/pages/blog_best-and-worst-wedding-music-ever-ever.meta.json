@@ -1,0 +1,142 @@
+{
+  "url": "https://www.dylangalvin.com/blog/best-and-worst-wedding-music-ever-ever",
+  "status": 200,
+  "title": "Best Acoustic Guitar Songs for a Wedding | Dylan Galvin",
+  "description": "The ultimate top 10 acoustic guitar versions of songs perfect for weddings — each with a link so you can hear it and gather ideas for your day.",
+  "og": {
+    "og:title": "Best Acoustic Guitar Songs for a Wedding | Dylan Galvin",
+    "og:description": "The ultimate top 10 acoustic guitar versions of songs perfect for weddings — each with a link so you can hear it and gather ideas for your day.",
+    "og:type": "website",
+    "og:image": "https://cdn.prod.website-files.com/66732b917cb61a30b9dc062e/6674495ad61eac2bce20d89f_blog_15.webp"
+  },
+  "outline": [
+    "H3: Home",
+    "H3: blog",
+    "H3: The Best Acoustic Guitar Songs to Play at a Wedding",
+    "H1: The Best Acoustic Guitar Songs to Play at a Wedding",
+    "H3: Blog Categories",
+    "H2: Birthday Party Entertainment",
+    "H2: Corporate Events",
+    "H2: Private Events",
+    "H2: Wedding Events",
+    "H3: Latest Blogs",
+    "H3: Wedding Dinner Music: How Loud, How Long and What Happens During the Toasts",
+    "H3: Wedding Ceremony Sound Systems Compared: Battery, Plugged-In, Venue and Unplugged",
+    "H3: Wedding Prelude Songs: The Half Hour Before the Ceremony and the One Song That Closes It",
+    "H3: Wedding Song Requests With Live Music: Who Decides What Gets Played",
+    "H3: Live Music Sound, Power and AV: What Your Venue Needs to Provide",
+    "H3: Birthday Party Entertainment, Revisited: New Requests and Fresh Stories",
+    "H3: Engagement Party Songs: How the Set Actually Gets Built"
+  ],
+  "nav": [
+    "ABOUT -> /about",
+    "PRIVATE & CORPORATE EVENTS -> /private-corporate-events",
+    "WEDDING MUSIC -> /wedding-music",
+    "CONTACT -> /contact",
+    "INQUIRE -> /contact"
+  ],
+  "ctas": [
+    "CONTACT -> /contact",
+    "INQUIRE -> /contact",
+    "Hire a live wedding guitarist -> https://www.dylangalvin.com/wedding-music",
+    "Facebook -> https://www.facebook.com/dylangalvinentertainment",
+    "Wedding Song Requests With Live Music: Who Decides What Gets Played -> /blog/wedding-song-requests-live-musician",
+    "Birthday Party Entertainment, Revisited: New Requests and Fresh Stories -> /blog/birthday-party-entertainment-ideas"
+  ],
+  "forms": [
+    [
+      "query*",
+      "submit"
+    ]
+  ],
+  "type": {
+    "h1": {
+      "font": "Salvager, sans-serif",
+      "size": "50px",
+      "weight": "700",
+      "color": "rgb(51, 51, 51)",
+      "transform": "none",
+      "spacing": "2px"
+    },
+    "h2": {
+      "font": "Salvager, sans-serif",
+      "size": "16px",
+      "weight": "700",
+      "color": "rgb(0, 0, 0)",
+      "transform": "none",
+      "spacing": "2px"
+    },
+    "body": {
+      "font": "\"Bitter Local\", Bitter, serif",
+      "size": "14px",
+      "weight": "400",
+      "color": "rgb(51, 51, 51)",
+      "transform": "none",
+      "spacing": "normal"
+    },
+    "button": {
+      "font": "Salvager, sans-serif",
+      "size": "13.5px",
+      "weight": "400",
+      "color": "rgb(255, 255, 255)",
+      "transform": "uppercase",
+      "spacing": "2px"
+    }
+  },
+  "topColors": [
+    [
+      "rgb(51, 51, 51)",
+      264
+    ],
+    [
+      "rgb(0, 0, 0)",
+      68
+    ],
+    [
+      "rgba(18, 18, 18, 0.82)",
+      48
+    ],
+    [
+      "rgb(0, 0, 238)",
+      14
+    ],
+    [
+      "rgb(255, 255, 255)",
+      13
+    ],
+    [
+      "rgb(99, 99, 102)",
+      12
+    ],
+    [
+      "rgb(26, 27, 31)",
+      8
+    ],
+    [
+      "rgb(242, 242, 247)",
+      5
+    ],
+    [
+      "rgb(33, 33, 33)",
+      3
+    ],
+    [
+      "rgb(244, 244, 244)",
+      2
+    ],
+    [
+      "rgba(255, 255, 255, 0)",
+      2
+    ],
+    [
+      "rgb(58, 58, 60)",
+      2
+    ]
+  ],
+  "jsonld": [
+    "\n{\n  \"@context\": \"https://schema.org\",\n  \"@graph\": [\n    {\n      \"@type\": [\"LocalBusiness\", \"EntertainmentBusiness\"],\n      \"@id\": \"https://www.dylangalvin.com/#business\",\n      \"name\": \"Dylan Galvin Entertainment\",\n      \"image\": \"https://cdn.prod.website-files.com/660593ada12bb1b42498d823/6607db63b743df512506a05a_logo.svg\",\n      \"email\": \"dylangalvinmusic@gmail.com\",\n      \"description\": \"Luxury live entertainment for weddings, corporate events, and private parties across Washington DC, Maryland, and Virginia. Services include solo acoustic guitar, vocals, live looping, DJ, wireless roaming performance, and full sound system. Performing across the United States since 2009, now based in the DMV (Washington DC, Maryland, and Virginia).\",\n      \"url\": \"https://www.dylangalvin.com\",\n      \"telephone\": \"+12025739654\",\n      \"priceRange\": \"$$$\",\n      \"founder\": {\"@id\": \"https://www.dylangalvin.com/#person\"},\n      \"areaServed\": [\n        {\"@type\": \"City\", \"name\": \"Washington\", \"addressRegion\": \"DC\", \"addressCountry\": \"US\"},\n        {\"@type\": \"AdministrativeArea\", \"name\": \"Maryland\", \"addressCountry\": \"US\"},\n        {\"@type\": \"AdministrativeArea\", \"name\": \"Virginia\", \"addressCountry\": \"US\"}\n      ],\n      \"sameAs\": [\n        \"https://www.instagram.com/dylangalvinevents\",\n        \"https://www.facebook.com/dylangalvinentertainment\"\n      ]\n    },\n    {\n      \"@type\": \"Person\",\n      \"@id\": \"https://www.dylangalvin.com/#person\",\n      \"name\": \"Dylan Galvin\",\n      \"jobTitle\": \"Professional Musician, Guitarist, and Live Entertainer\",\n      \"description\": \"Dylan Galvin is a professional guitarist, vocalist, and live entertainer based in the Washington DC area. A graduate of Berklee College of Music, he has performed at over 1,500 events since 2009, including luxury weddings, corporate galas, and private celebrations across Washington DC, Maryland, and Virginia. His mentors include John Mayer, Paul Simon, and Livingston Taylor.\",\n      \"url\": \"https://www.dylangalvin.com/abo",
+    "\n  {\n    \"@context\": \"https://schema.org\",\n    \"@type\": \"BlogPosting\",\n    \"headline\": \"The Best Acoustic Guitar Songs to Play at a Wedding\",\n    \"description\": \"The ultimate top 10 acoustic guitar versions of songs perfect for weddings — each with a link so you can hear it and gather ideas for your day.\",\n    \"image\": \"https://cdn.prod.website-files.com/66732b917cb61a30b9dc062e/6674495ad61eac2bce20d89f_blog_15.webp\",\n    \"author\": {\"@type\": \"Person\", \"name\": \"Dylan Galvin\"},\n    \"publisher\": {\"@type\": \"Organization\", \"name\": \"Dylan Galvin Entertainment\"},\n    \"datePublished\": \"Aug 29, 2026\",\n    \"dateModified\": \"Aug 29, 2026\"\n      }\n"
+  ],
+  "videos": [],
+  "words": 857
+}

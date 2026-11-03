@@ -1,0 +1,171 @@
+{
+  "url": "https://www.dylangalvin.com/blog/backyard-parties-to-luxury-events-when-live-acoustic-music-works-best",
+  "status": 200,
+  "title": "When Live Acoustic Music Works Best | Dylan Galvin",
+  "description": "Discover when live acoustic music makes events unforgettable, from backyard parties to weddings and corporate gatherings. Read the guide and plan yours.",
+  "og": {
+    "og:title": "When Live Acoustic Music Works Best | Dylan Galvin",
+    "og:description": "Discover when live acoustic music makes events unforgettable, from backyard parties to weddings and corporate gatherings. Read the guide and plan yours.",
+    "og:type": "website",
+    "og:image": "https://cdn.prod.website-files.com/66732b917cb61a30b9dc062e/6ae9e0b78403fdd4d2ce7bff_6a2b8e0941ccee79f62d26cf_editor-1780484656346-557311914.png"
+  },
+  "outline": [
+    "H3: Home",
+    "H3: blog",
+    "H3: Backyard Parties to Luxury Events: When Live Acoustic Music Works Best",
+    "H1: Backyard Parties to Luxury Events: When Live Acoustic Music Works Best",
+    "H2: What Live Acoustic Music Brings to an Event",
+    "H3: The Difference Between a Playlist and a Live Performer",
+    "H3: Why Acoustic Works Where Other Formats Do Not",
+    "H2: House Parties and Backyard Gatherings",
+    "H3: A Personal Gathering Deserves More Than Background Audio",
+    "H3: Practical Considerations for a Home Setting",
+    "H2: Outdoor Events and Garden Celebrations",
+    "H3: Why Open Air Settings and Acoustic Sound Work Together",
+    "H3: Milestone Celebrations Outdoors",
+    "H2: Cocktail Hours and Pre-Dinner Receptions",
+    "H3: Why the Arrival Moment Sets the Tone",
+    "H3: Managing the Transition Between Segments",
+    "H2: Corporate Events and Professional Gatherings",
+    "H3: Why Live Acoustic Music Works in a Professional Setting",
+    "H3: What the Choice Communicates",
+    "H2: Weddings and Luxury Private Events",
+    "H3: Where Acoustic Performance Fits Into a Wedding Day",
+    "H3: Custom Arrangements and Personalized Repertoire",
+    "H2: The One Thing Most Guides on This Topic Miss",
+    "H2: How to Decide If Acoustic Music Is Right for Your Event",
+    "H3: Questions to Ask Before Booking",
+    "H3: What a Professional Acoustic Musician Offers",
+    "H2: About Dylan Galvin Entertainment",
+    "H2: Conclusion",
+    "H2: Frequently Asked Questions",
+    "H3: Is live acoustic music suitable for small events and house parties?",
+    "H3: Can a live musician perform with guests who also play instruments?",
+    "H3: What does an outdoor acoustic music setup require?",
+    "H3: Can an acoustic musician perform different styles in one evening?",
+    "H3: How far in advance should I book a live acoustic musician?",
+    "H3: What is the difference between hiring a solo acoustic musician and a full band?",
+    "H3: Blog Categories",
+    "H2: Birthday Party Entertainment",
+    "H2: Corporate Events",
+    "H2: Private Events",
+    "H2: Wedding Events",
+    "H3: Latest Blogs",
+    "H3: Wedding Dinner Music: How Loud, How Long and What Happens During the Toasts",
+    "H3: Wedding Ceremony Sound Systems Compared: Battery, Plugged-In, Venue and Unplugged",
+    "H3: Wedding Prelude Songs: The Half Hour Before the Ceremony and the One Song That Closes It",
+    "H3: Wedding Song Requests With Live Music: Who Decides What Gets Played",
+    "H3: Live Music Sound, Power and AV: What Your Venue Needs to Provide",
+    "H3: Birthday Party Entertainment, Revisited: New Requests and Fresh Stories",
+    "H3: Engagement Party Songs: How the Set Actually Gets Built"
+  ],
+  "nav": [
+    "ABOUT -> /about",
+    "PRIVATE & CORPORATE EVENTS -> /private-corporate-events",
+    "WEDDING MUSIC -> /wedding-music",
+    "CONTACT -> /contact",
+    "INQUIRE -> /contact"
+  ],
+  "ctas": [
+    "CONTACT -> /contact",
+    "INQUIRE -> /contact",
+    "Wedding Song Requests With Live Music: Who Decides What Gets Played -> /blog/wedding-song-requests-live-musician",
+    "Birthday Party Entertainment, Revisited: New Requests and Fresh Stories -> /blog/birthday-party-entertainment-ideas"
+  ],
+  "forms": [
+    [
+      "query*",
+      "submit"
+    ]
+  ],
+  "type": {
+    "h1": {
+      "font": "Salvager, sans-serif",
+      "size": "50px",
+      "weight": "700",
+      "color": "rgb(51, 51, 51)",
+      "transform": "none",
+      "spacing": "2px"
+    },
+    "h2": {
+      "font": "\"Bitter Local\", Bitter, serif",
+      "size": "40px",
+      "weight": "700",
+      "color": "rgb(51, 51, 51)",
+      "transform": "none",
+      "spacing": "normal"
+    },
+    "body": {
+      "font": "\"Bitter Local\", Bitter, serif",
+      "size": "14px",
+      "weight": "400",
+      "color": "rgb(51, 51, 51)",
+      "transform": "none",
+      "spacing": "normal"
+    },
+    "button": {
+      "font": "Salvager, sans-serif",
+      "size": "13.5px",
+      "weight": "400",
+      "color": "rgb(255, 255, 255)",
+      "transform": "uppercase",
+      "spacing": "2px"
+    }
+  },
+  "topColors": [
+    [
+      "rgb(51, 51, 51)",
+      166
+    ],
+    [
+      "rgb(0, 0, 0)",
+      20
+    ],
+    [
+      "rgb(0, 0, 238)",
+      14
+    ],
+    [
+      "rgb(255, 255, 255)",
+      13
+    ],
+    [
+      "rgb(99, 99, 102)",
+      12
+    ],
+    [
+      "rgb(26, 27, 31)",
+      8
+    ],
+    [
+      "rgb(242, 242, 247)",
+      5
+    ],
+    [
+      "rgb(33, 33, 33)",
+      3
+    ],
+    [
+      "rgb(244, 244, 244)",
+      2
+    ],
+    [
+      "rgba(255, 255, 255, 0)",
+      2
+    ],
+    [
+      "rgb(58, 58, 60)",
+      2
+    ],
+    [
+      "rgb(255, 233, 230)",
+      1
+    ]
+  ],
+  "jsonld": [
+    "\n{\n  \"@context\": \"https://schema.org\",\n  \"@graph\": [\n    {\n      \"@type\": [\"LocalBusiness\", \"EntertainmentBusiness\"],\n      \"@id\": \"https://www.dylangalvin.com/#business\",\n      \"name\": \"Dylan Galvin Entertainment\",\n      \"image\": \"https://cdn.prod.website-files.com/660593ada12bb1b42498d823/6607db63b743df512506a05a_logo.svg\",\n      \"email\": \"dylangalvinmusic@gmail.com\",\n      \"description\": \"Luxury live entertainment for weddings, corporate events, and private parties across Washington DC, Maryland, and Virginia. Services include solo acoustic guitar, vocals, live looping, DJ, wireless roaming performance, and full sound system. Performing across the United States since 2009, now based in the DMV (Washington DC, Maryland, and Virginia).\",\n      \"url\": \"https://www.dylangalvin.com\",\n      \"telephone\": \"+12025739654\",\n      \"priceRange\": \"$$$\",\n      \"founder\": {\"@id\": \"https://www.dylangalvin.com/#person\"},\n      \"areaServed\": [\n        {\"@type\": \"City\", \"name\": \"Washington\", \"addressRegion\": \"DC\", \"addressCountry\": \"US\"},\n        {\"@type\": \"AdministrativeArea\", \"name\": \"Maryland\", \"addressCountry\": \"US\"},\n        {\"@type\": \"AdministrativeArea\", \"name\": \"Virginia\", \"addressCountry\": \"US\"}\n      ],\n      \"sameAs\": [\n        \"https://www.instagram.com/dylangalvinevents\",\n        \"https://www.facebook.com/dylangalvinentertainment\"\n      ]\n    },\n    {\n      \"@type\": \"Person\",\n      \"@id\": \"https://www.dylangalvin.com/#person\",\n      \"name\": \"Dylan Galvin\",\n      \"jobTitle\": \"Professional Musician, Guitarist, and Live Entertainer\",\n      \"description\": \"Dylan Galvin is a professional guitarist, vocalist, and live entertainer based in the Washington DC area. A graduate of Berklee College of Music, he has performed at over 1,500 events since 2009, including luxury weddings, corporate galas, and private celebrations across Washington DC, Maryland, and Virginia. His mentors include John Mayer, Paul Simon, and Livingston Taylor.\",\n      \"url\": \"https://www.dylangalvin.com/abo",
+    "\n  {\n    \"@context\": \"https://schema.org\",\n    \"@type\": \"BlogPosting\",\n    \"headline\": \"Backyard Parties to Luxury Events: When Live Acoustic Music Works Best\",\n    \"description\": \"Discover when live acoustic music makes events unforgettable, from backyard parties to weddings and corporate gatherings. Read the guide and plan yours.\",\n    \"image\": \"https://cdn.prod.website-files.com/66732b917cb61a30b9dc062e/6ae9e0b78403fdd4d2ce7bff_6a2b8e0941ccee79f62d26cf_editor-1780484656346-557311914.png\",\n    \"author\": {\"@type\": \"Person\", \"name\": \"Dylan Galvin\"},\n    \"publisher\": {\"@type\": \"Organization\", \"name\": \"Dylan Galvin Entertainment\"},\n    \"datePublished\": \"Nov 03, 2026\",\n    \"dateModified\": \"Nov 03, 2026\"\n      }\n"
+  ],
+  "videos": [],
+  "words": 2619
+}

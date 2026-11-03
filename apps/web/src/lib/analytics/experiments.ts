@@ -18,15 +18,10 @@ export interface Experiment {
 }
 
 export const EXPERIMENTS: Experiment[] = [
-  // Status-led vs service-led hero line. Primary metric: inquiry_start rate.
-  { id: 'hero_sub', variants: ['status', 'service'], active: true },
-  // Inquiry CTA label. Primary metric: cta_click to inquiry_submit.
-  { id: 'cta_label', variants: ['inquire', 'check_date'], active: true },
-  // Events-zone theme. Hypothesis (research report: bone/ivory service zone,
-  // NN/g plain task areas): ivory lifts inquiry_start per event-page view vs
-  // the cinematic night theme. Applied only on data-zone="events" pages.
-  // Secondary: inquiry_submit, scroll_depth, engaged_time.
-  { id: 'events_theme', variants: ['ivory', 'night'], active: true },
+  // Hero supporting line: the arc of the day vs the rooms. Primary metric: inquiry_start rate.
+  { id: 'hero_sub', variants: ['arc', 'rooms'], active: true },
+  // Primary action label (first variant is the no-JS fallback). Primary metric: cta_click to inquiry_submit.
+  { id: 'cta_label', variants: ['check_date', 'inquire'], active: true },
 ];
 
 const KEY = 'sc_exp_v1';

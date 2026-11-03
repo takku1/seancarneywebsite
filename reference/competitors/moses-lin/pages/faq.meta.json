@@ -1,0 +1,92 @@
+{
+  "url": "https://web.archive.org/web/20250420144808if_/https://moseslinmusic.com/faq",
+  "status": 200,
+  "title": "FAQ | Moses Lin Music",
+  "description": "Moses Lin is an award-winning destination wedding guitarist based in Southern California. He was named the best live musician in Los Angeles by California Wedding Day.",
+  "og": {
+    "og:locale": "en_US",
+    "og:type": "article",
+    "og:title": "FAQ",
+    "og:description": "Moses Lin is an award-winning destination wedding guitarist based in Southern California. He was named the best live musician in Los Angeles by California Wedding Day.",
+    "og:url": "https://moseslinmusic.com/faq",
+    "og:site_name": "Moses Lin Music",
+    "og:image": "https://moseslinmusic.com/wp-content/uploads/2023/03/Ingleside-Inn-Planners-Retreat-2023-93-169-1200x630.jpg",
+    "og:image:width": "1200",
+    "og:image:height": "630",
+    "og:image:type": "image/jpeg"
+  },
+  "outline": [],
+  "nav": [
+    "@media (min-width:768px) and (max-width:1024px){.flo-header--799 .flo-header__logo{max-width:17.5rem}}@media (min-width:1025px){.flo-header--799 .flo-header__logo{max-width:17.5rem}} -> https://moseslinmusic.com/",
+    "ABOUT -> https://moseslinmusic.com/about",
+    "MEET MOSES -> https://moseslinmusic.com/about",
+    "PRESS -> https://moseslinmusic.com/press",
+    "FAQ -> https://moseslinmusic.com/faq",
+    "REPERTOIRE -> https://moseslinmusic.com/repertoire",
+    "WEDDINGS -> https://moseslinmusic.com/weddings",
+    "PRIVATE EVENTS -> https://moseslinmusic.com/events",
+    "FOR MUSICIANS -> https://moseslinmusic.com/coaching",
+    "CONTACT -> https://moseslinmusic.com/contact",
+    " -> https://moseslinmusic.com/"
+  ],
+  "ctas": [
+    "CONTACT -> https://moseslinmusic.com/contact",
+    "Contact -> https://moseslinmusic.com/contact"
+  ],
+  "forms": [],
+  "type": {
+    "h1": null,
+    "h2": null,
+    "body": {
+      "font": "operetta-52-normal-400",
+      "size": "90px",
+      "weight": "400",
+      "color": "rgb(0, 0, 0)",
+      "transform": "none",
+      "spacing": "-7.2px"
+    },
+    "button": {
+      "font": "Montserrat-Regular",
+      "size": "11.25px",
+      "weight": "400",
+      "color": "rgb(127, 142, 162)",
+      "transform": "none",
+      "spacing": "1.125px"
+    }
+  },
+  "topColors": [
+    [
+      "rgb(57, 64, 71)",
+      175
+    ],
+    [
+      "rgb(127, 142, 162)",
+      55
+    ],
+    [
+      "rgb(0, 0, 0)",
+      30
+    ],
+    [
+      "rgb(250, 250, 250)",
+      8
+    ],
+    [
+      "rgb(242, 243, 245)",
+      8
+    ],
+    [
+      "rgb(255, 255, 255)",
+      4
+    ],
+    [
+      "rgb(58, 58, 58)",
+      4
+    ]
+  ],
+  "jsonld": [
+    "{\"@context\":\"https://web.archive.org/web/20250420144808/https://schema.org\",\"@graph\":[{\"@type\":\"WebPage\",\"@id\":\"https://web.archive.org/web/20250420144808/https://moseslinmusic.com/faq\",\"url\":\"https://web.archive.org/web/20250420144808/https://moseslinmusic.com/faq\",\"name\":\"FAQ | Moses Lin Music\",\"isPartOf\":{\"@id\":\"https://web.archive.org/web/20250420144808/https://moseslinmusic.com/#website\"},\"datePublished\":\"2022-12-27T03:20:45+00:00\",\"dateModified\":\"2024-09-30T19:43:27+00:00\",\"description\":\"Moses Lin is an award-winning destination wedding guitarist based in Southern California. He was named the best live musician in Los Angeles by California Wedding Day.\",\"breadcrumb\":{\"@id\":\"https://web.archive.org/web/20250420144808/https://moseslinmusic.com/faq#breadcrumb\"},\"inLanguage\":\"en-US\",\"potentialAction\":[{\"@type\":\"ReadAction\",\"target\":[\"https://web.archive.org/web/20250420144808/https://moseslinmusic.com/faq\"]}]},{\"@type\":\"BreadcrumbList\",\"@id\":\"https://web.archive.org/web/20250420144808/https://moseslinmusic.com/faq#breadcrumb\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://web.archive.org/web/20250420144808/https://moseslinmusic.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"FAQ\"}]},{\"@type\":\"WebSite\",\"@id\":\"https://web.archive.org/web/20250420144808/https://moseslinmusic.com/#website\",\"url\":\"https://web.archive.org/web/20250420144808/https://moseslinmusic.com/\",\"name\":\"Moses Lin Music\",\"description\":\"Wedding and Event Guitarist\",\"publisher\":{\"@id\":\"https://web.archive.org/web/20250420144808/https://moseslinmusic.com/#organization\"},\"potentialAction\":[{\"@type\":\"SearchAction\",\"target\":{\"@type\":\"EntryPoint\",\"urlTemplate\":\"https://web.archive.org/web/20250420144808/https://moseslinmusic.com/?s={search_term_string}\"},\"query-input\":{\"@type\":\"PropertyValueSpecification\",\"valueRequired\":true,\"valueName\":\"search_term_string\"}}],\"inLanguage\":\"en-US\"},{\"@type\":\"Organization\",\"@id\":\"https://web.archive.org/web/20250420144808/https://mosesli"
+  ],
+  "videos": [],
+  "words": 471
+}

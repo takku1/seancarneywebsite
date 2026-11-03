@@ -1,6 +1,6 @@
 /**
- * Meta Conversions API (server-side events), deduplicated with the browser
- * pixel through a shared event_id generated in the browser.
+ * Meta Conversions API (server-side Lead events from inquiries), deduplicated
+ * with the browser pixel through a shared event_id generated in the browser.
  *
  * Sends only when ALL of these hold, mirroring when the pixel itself may load:
  *  - PUBLIC_META_PIXEL_ID and META_CAPI_ACCESS_TOKEN are configured;
@@ -23,7 +23,7 @@ async function sha256(v: string): Promise<string> {
 const cookie = (header: string | null, name: string) => header?.split(/;\s*/).find((c) => c.startsWith(`${name}=`))?.slice(name.length + 1);
 
 export interface MetaEvent {
-  name: 'Lead' | 'CompleteRegistration';
+  name: 'Lead';
   eventId?: string;
   adsOk?: boolean;
   email?: string;

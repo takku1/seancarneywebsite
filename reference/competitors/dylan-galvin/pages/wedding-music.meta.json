@@ -1,0 +1,134 @@
+{
+  "url": "https://www.dylangalvin.com/wedding-music",
+  "status": 200,
+  "title": "Wedding Guitarist & Ceremony Singer | DC, VA & MD",
+  "description": "Acoustic wedding guitarist & ceremony singer for DC, Virginia & Maryland weddings. Berklee-trained, 5.0-rated. Ceremonies, cocktail hours & receptions.",
+  "og": {
+    "og:title": "Wedding Guitarist & Ceremony Singer | DC, VA & MD",
+    "og:description": "Acoustic wedding guitarist & ceremony singer for DC, Virginia & Maryland weddings. Berklee-trained, 5.0-rated. Ceremonies, cocktail hours & receptions.",
+    "og:type": "website"
+  },
+  "outline": [
+    "H1: Wedding Music by Dylan Galvin",
+    "H3: Samantha and Sundar",
+    "H3: Melissa and Devin",
+    "H3: Lianne and Marco",
+    "H2: Live Music at the DMV's Finest Venues",
+    "H2: Wedding Music Questions, Answered",
+    "H2: Inquire Now"
+  ],
+  "nav": [
+    "ABOUT -> /about",
+    "PRIVATE & CORPORATE EVENTS -> /private-corporate-events",
+    "WEDDING MUSIC -> /wedding-music",
+    "CONTACT -> /contact",
+    "INQUIRE -> /contact"
+  ],
+  "ctas": [
+    "CONTACT -> /contact",
+    "INQUIRE -> /contact"
+  ],
+  "forms": [
+    [
+      "Name",
+      "Fiance-s-Name*",
+      "Email*",
+      "Phone*",
+      "Wedding-Venue*",
+      "Wedding-Date*",
+      "additional-details-2",
+      "submit",
+      "cf-turnstile-response"
+    ]
+  ],
+  "type": {
+    "h1": {
+      "font": "Salvager, sans-serif",
+      "size": "80px",
+      "weight": "700",
+      "color": "rgb(255, 255, 255)",
+      "transform": "none",
+      "spacing": "normal"
+    },
+    "h2": {
+      "font": "Salvager, sans-serif",
+      "size": "38px",
+      "weight": "400",
+      "color": "rgb(51, 51, 51)",
+      "transform": "none",
+      "spacing": "normal"
+    },
+    "body": {
+      "font": "\"Bitter Local\", Bitter",
+      "size": "12px",
+      "weight": "400",
+      "color": "rgb(138, 106, 59)",
+      "transform": "uppercase",
+      "spacing": "3.12px"
+    },
+    "button": {
+      "font": "Salvager, sans-serif",
+      "size": "13.5px",
+      "weight": "400",
+      "color": "rgb(255, 255, 255)",
+      "transform": "uppercase",
+      "spacing": "2px"
+    }
+  },
+  "topColors": [
+    [
+      "rgb(51, 51, 51)",
+      250
+    ],
+    [
+      "rgb(255, 255, 255)",
+      17
+    ],
+    [
+      "rgb(85, 85, 85)",
+      12
+    ],
+    [
+      "rgb(99, 99, 102)",
+      12
+    ],
+    [
+      "rgb(250, 250, 250)",
+      11
+    ],
+    [
+      "rgba(255, 255, 255, 0)",
+      9
+    ],
+    [
+      "rgb(138, 106, 59)",
+      6
+    ],
+    [
+      "rgb(26, 27, 31)",
+      5
+    ],
+    [
+      "rgb(242, 242, 247)",
+      5
+    ],
+    [
+      "rgb(0, 0, 238)",
+      4
+    ],
+    [
+      "rgb(17, 17, 17)",
+      3
+    ],
+    [
+      "rgba(0, 0, 0, 0.75)",
+      3
+    ]
+  ],
+  "jsonld": [
+    "\n{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"FAQPage\",\n  \"mainEntity\": [\n    {\n      \"@type\": \"Question\",\n      \"name\": \"How much does a wedding guitarist cost in Washington DC?\",\n      \"acceptedAnswer\": {\n        \"@type\": \"Answer\",\n        \"text\": \"Professional live wedding music in the DC, Virginia, and Maryland area typically runs $2,500–$6,000 depending on coverage. Dylan Galvin Entertainment offers flexible wedding music hire packages spanning ceremony through reception, so whether you want to hire a guitarist for a single set or hire wedding musicians for the entire day, pricing scales with what you book — all packages include a full sound system, wireless microphones, and roaming wireless performance with no separate AV rental needed.\"\n      }\n    },\n    {\n      \"@type\": \"Question\",\n      \"name\": \"Can Dylan sing for the wedding ceremony as well as play guitar?\",\n      \"acceptedAnswer\": {\n        \"@type\": \"Answer\",\n        \"text\": \"Yes. Dylan performs as both an acoustic guitarist and a singer for wedding ceremonies — instrumental processionals, sung first-dance renditions, or a full acoustic singer set for cocktail hour. Couples choose the blend of instrumental guitar and vocals for each part of the day.\"\n      }\n    },\n    {\n      \"@type\": \"Question\",\n      \"name\": \"Live music or a DJ — which is better for a wedding?\",\n      \"acceptedAnswer\": {\n        \"@type\": \"Answer\",\n        \"text\": \"Many couples choose both. Live acoustic guitar carries the ceremony and cocktail hour, then a hybrid live-plus-DJ set keeps the reception dance floor full. Dylan offers this hybrid format in one package, so there is one vendor, one sound system, and no handoff gaps.\"\n      }\n    },\n    {\n      \"@type\": \"Question\",\n      \"name\": \"How far in advance should you book wedding entertainment?\",\n      \"acceptedAnswer\": {\n        \"@type\": \"Answer\",\n        \"text\": \"Six to twelve months ahead for peak-season dates (May–June and September–October) in the DC area. Off-season and w",
+    "\n{\n  \"@context\": \"https://schema.org\",\n  \"@graph\": [\n    {\n      \"@type\": [\"LocalBusiness\", \"EntertainmentBusiness\"],\n      \"@id\": \"https://www.dylangalvin.com/#business\",\n      \"name\": \"Dylan Galvin Entertainment\",\n      \"image\": \"https://cdn.prod.website-files.com/660593ada12bb1b42498d823/6607db63b743df512506a05a_logo.svg\",\n      \"email\": \"dylangalvinmusic@gmail.com\",\n      \"description\": \"Luxury live entertainment for weddings, corporate events, and private parties across Washington DC, Maryland, and Virginia. Services include solo acoustic guitar, vocals, live looping, DJ, wireless roaming performance, and full sound system. Performing across the United States since 2009, now based in the DMV (Washington DC, Maryland, and Virginia).\",\n      \"url\": \"https://www.dylangalvin.com\",\n      \"telephone\": \"+12025739654\",\n      \"priceRange\": \"$$$\",\n      \"founder\": {\"@id\": \"https://www.dylangalvin.com/#person\"},\n      \"areaServed\": [\n        {\"@type\": \"City\", \"name\": \"Washington\", \"addressRegion\": \"DC\", \"addressCountry\": \"US\"},\n        {\"@type\": \"AdministrativeArea\", \"name\": \"Maryland\", \"addressCountry\": \"US\"},\n        {\"@type\": \"AdministrativeArea\", \"name\": \"Virginia\", \"addressCountry\": \"US\"}\n      ],\n      \"sameAs\": [\n        \"https://www.instagram.com/dylangalvinevents\",\n        \"https://www.facebook.com/dylangalvinentertainment\"\n      ]\n    },\n    {\n      \"@type\": \"Person\",\n      \"@id\": \"https://www.dylangalvin.com/#person\",\n      \"name\": \"Dylan Galvin\",\n      \"jobTitle\": \"Professional Musician, Guitarist, and Live Entertainer\",\n      \"description\": \"Dylan Galvin is a professional guitarist, vocalist, and live entertainer based in the Washington DC area. A graduate of Berklee College of Music, he has performed at over 1,500 events since 2009, including luxury weddings, corporate galas, and private celebrations across Washington DC, Maryland, and Virginia. His mentors include John Mayer, Paul Simon, and Livingston Taylor.\",\n      \"url\": \"https://www.dylangalvin.com/abo"
+  ],
+  "videos": [],
+  "words": 756
+}

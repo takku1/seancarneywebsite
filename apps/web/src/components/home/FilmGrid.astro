@@ -5,7 +5,6 @@
  * most watched). Exactly as many cells as clips (3 = big + 2, 2 = pair).
  */
 import YouTubeFacade from '../media/YouTubeFacade.astro';
-import Icon from '../ui/Icon.astro';
 import { loadMedia, pick, viewsLabel, type Slot } from '../../lib/feeds/media';
 
 interface Props {
@@ -34,7 +33,6 @@ const meta = (s: Slot) => [s.video.note, viewsLabel(s.video), s.reason === 'newe
     <div class="container">
       <div class="head">
         <h2 id={`film-title-${placement}`}>{heading}</h2>
-        <a class="link-arrow" href="/music#film">All videos <Icon name="arrow-right" /></a>
       </div>
       <div class:list={['grid', { pair: slots.length === 2, solo: slots.length === 1 }]}>
         <figure class="big reveal" data-pick={big.reason} data-published={big.video.published?.toISOString()}>

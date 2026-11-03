@@ -1,0 +1,134 @@
+{
+  "url": "https://www.dylangalvin.com",
+  "status": 200,
+  "title": "Dylan Galvin | Wedding, Corporate & Private Event Musician | DC, VA & MD",
+  "description": "Luxury live entertainment for weddings, corporate events, and private celebrations across DC, Virginia & Maryland. Berklee-trained, mentored by music legends.",
+  "og": {
+    "og:title": "Dylan Galvin | Wedding, Corporate & Private Event Musician | DC, VA & MD",
+    "og:description": "Luxury live entertainment for weddings, corporate events, and private celebrations across DC, Virginia & Maryland. Berklee-trained, mentored by music legends.",
+    "og:type": "website"
+  },
+  "outline": [
+    "H1: Your event deserves more than a playlist",
+    "H2: Credentials",
+    "H2: THE EXPERIENCE",
+    "H2: TESTIMONIALS",
+    "H3: “Profoundly Captivating”",
+    "H3: “Read the Crowd”",
+    "H3: “Engaged the Audience”",
+    "H3: “The Perfect Performer”",
+    "H3: “Enhanced Our Event”",
+    "H3: “Accommodated Every Request”",
+    "H3: “The Evening's Ambiance”",
+    "H3: “Elegance and Entertainment”",
+    "H3: “Professional and Punctual”",
+    "H2: A Seamless Booking Experience",
+    "H2: \"NOTHING SHORT OF SPECTACULAR\" - THE VIBE AGENCY -",
+    "H2: Frequently Asked Questions"
+  ],
+  "nav": [
+    "ABOUT -> /about",
+    "PRIVATE & CORPORATE EVENTS -> /private-corporate-events",
+    "WEDDING MUSIC -> /wedding-music",
+    "CONTACT -> /contact",
+    "INQUIRE -> /contact"
+  ],
+  "ctas": [
+    "CONTACT -> /contact",
+    "INQUIRE -> /contact",
+    "Inquire -> /contact"
+  ],
+  "forms": [],
+  "type": {
+    "h1": {
+      "font": "Salvager, sans-serif",
+      "size": "80px",
+      "weight": "400",
+      "color": "rgb(51, 51, 51)",
+      "transform": "none",
+      "spacing": "normal"
+    },
+    "h2": {
+      "font": "Salvager, sans-serif",
+      "size": "55px",
+      "weight": "400",
+      "color": "rgb(51, 51, 51)",
+      "transform": "uppercase",
+      "spacing": "normal"
+    },
+    "body": {
+      "font": "Salvager, sans-serif",
+      "size": "30px",
+      "weight": "400",
+      "color": "rgb(51, 51, 51)",
+      "transform": "capitalize",
+      "spacing": "normal"
+    },
+    "button": {
+      "font": "Salvager, sans-serif",
+      "size": "13.5px",
+      "weight": "400",
+      "color": "rgb(255, 255, 255)",
+      "transform": "uppercase",
+      "spacing": "2px"
+    }
+  },
+  "topColors": [
+    [
+      "rgb(51, 51, 51)",
+      283
+    ],
+    [
+      "rgb(255, 255, 255)",
+      55
+    ],
+    [
+      "rgb(85, 85, 85)",
+      12
+    ],
+    [
+      "rgb(99, 99, 102)",
+      12
+    ],
+    [
+      "rgba(51, 51, 51, 0.3)",
+      8
+    ],
+    [
+      "rgb(0, 0, 238)",
+      7
+    ],
+    [
+      "rgb(26, 27, 31)",
+      5
+    ],
+    [
+      "rgb(242, 242, 247)",
+      5
+    ],
+    [
+      "rgba(255, 255, 255, 0)",
+      4
+    ],
+    [
+      "rgb(250, 250, 250)",
+      3
+    ],
+    [
+      "rgba(245, 247, 250, 0)",
+      2
+    ],
+    [
+      "rgb(0, 0, 0)",
+      2
+    ]
+  ],
+  "jsonld": [
+    "\n{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"FAQPage\",\n  \"mainEntity\": [\n    {\n      \"@type\": \"Question\",\n      \"name\": \"Can you perform different music styles at one event?\",\n      \"acceptedAnswer\": {\n        \"@type\": \"Answer\",\n        \"text\": \"Yes, Dylan can cover a wide range of styles, from classic hits to modern favorites. The setlist can be adjusted throughout the event to match the changing mood and audience.\"\n      }\n    },\n    {\n      \"@type\": \"Question\",\n      \"name\": \"Do you bring backup equipment in case of technical issues?\",\n      \"acceptedAnswer\": {\n        \"@type\": \"Answer\",\n        \"text\": \"Yes, Dylan comes prepared with backup gear to ensure everything runs smoothly. This helps avoid interruptions and keeps the performance seamless.\"\n      }\n    },\n    {\n      \"@type\": \"Question\",\n      \"name\": \"Can you perform indoors and outdoors?\",\n      \"acceptedAnswer\": {\n        \"@type\": \"Answer\",\n        \"text\": \"Yes, Dylan is fully equipped to perform in both indoor and outdoor settings. The setup is adaptable to different environments and venue requirements.\"\n      }\n    },\n    {\n      \"@type\": \"Question\",\n      \"name\": \"Do you offer custom song arrangements?\",\n      \"acceptedAnswer\": {\n        \"@type\": \"Answer\",\n        \"text\": \"Yes, Dylan can create unique acoustic versions of songs to suit your event. This adds a personal and memorable touch to special moments.\"\n      }\n    },\n    {\n      \"@type\": \"Question\",\n      \"name\": \"What makes a solo performer a good choice for events?\",\n      \"acceptedAnswer\": {\n        \"@type\": \"Answer\",\n        \"text\": \"A solo performer offers flexibility, easier setup, and a more intimate experience. It also allows for a smooth flow without the complexity of managing a full band.\"\n      }\n    },\n    {\n      \"@type\": \"Question\",\n      \"name\": \"Can you coordinate timing with other vendors?\",\n      \"acceptedAnswer\": {\n        \"@type\": \"Answer\",\n        \"text\": \"Yes, Dylan works alongside planners, coordinators, and other ",
+    "\n{\n  \"@context\": \"https://schema.org\",\n  \"@graph\": [\n    {\n      \"@type\": [\"LocalBusiness\", \"EntertainmentBusiness\"],\n      \"@id\": \"https://www.dylangalvin.com/#business\",\n      \"name\": \"Dylan Galvin Entertainment\",\n      \"image\": \"https://cdn.prod.website-files.com/660593ada12bb1b42498d823/6607db63b743df512506a05a_logo.svg\",\n      \"email\": \"dylangalvinmusic@gmail.com\",\n      \"description\": \"Luxury live entertainment for weddings, corporate events, and private parties across Washington DC, Maryland, and Virginia. Services include solo acoustic guitar, vocals, live looping, DJ, wireless roaming performance, and full sound system. Performing across the United States since 2009, now based in the DMV (Washington DC, Maryland, and Virginia).\",\n      \"url\": \"https://www.dylangalvin.com\",\n      \"telephone\": \"+12025739654\",\n      \"priceRange\": \"$$$\",\n      \"founder\": {\"@id\": \"https://www.dylangalvin.com/#person\"},\n      \"areaServed\": [\n        {\"@type\": \"City\", \"name\": \"Washington\", \"addressRegion\": \"DC\", \"addressCountry\": \"US\"},\n        {\"@type\": \"AdministrativeArea\", \"name\": \"Maryland\", \"addressCountry\": \"US\"},\n        {\"@type\": \"AdministrativeArea\", \"name\": \"Virginia\", \"addressCountry\": \"US\"}\n      ],\n      \"sameAs\": [\n        \"https://www.instagram.com/dylangalvinevents\",\n        \"https://www.facebook.com/dylangalvinentertainment\"\n      ]\n    },\n    {\n      \"@type\": \"Person\",\n      \"@id\": \"https://www.dylangalvin.com/#person\",\n      \"name\": \"Dylan Galvin\",\n      \"jobTitle\": \"Professional Musician, Guitarist, and Live Entertainer\",\n      \"description\": \"Dylan Galvin is a professional guitarist, vocalist, and live entertainer based in the Washington DC area. A graduate of Berklee College of Music, he has performed at over 1,500 events since 2009, including luxury weddings, corporate galas, and private celebrations across Washington DC, Maryland, and Virginia. His mentors include John Mayer, Paul Simon, and Livingston Taylor.\",\n      \"url\": \"https://www.dylangalvin.com/abo"
+  ],
+  "videos": [
+    "https://cdn.prod.website-files.com/660593ada12bb1b42498d823%2F6aa426fb7f43439dd6617bac_Home%20Hero%20-%20Compressed%20%281.3MB%20was%203.5MB%29_mp4.mp4"
+  ],
+  "words": 1350
+}

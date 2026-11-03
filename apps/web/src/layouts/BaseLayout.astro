@@ -14,7 +14,6 @@ import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
 import Scout from '../components/scout/Scout.astro';
 import ConsentBar from '../components/analytics/ConsentBar.astro';
-import FanPrompt from '../components/ui/FanPrompt.astro';
 import PlayerDock from '../components/media/PlayerDock.astro';
 import { ClientRouter } from 'astro:transitions';
 
@@ -30,27 +29,19 @@ interface Props {
   pageType: string;
   /** Header sits over a full-bleed hero. */
   overlayHeader?: boolean;
-  /**
-   * artist = cinematic night theme. events = booking zone; its theme is the
-   * events_theme A/B test (ivory default, night challenger).
-   */
-  zone?: 'artist' | 'events';
   /** No header/footer/Scout: link-in-bio and print pages. */
   bare?: boolean;
-  /** Engagement-triggered fan-list prompt (it only ever shows in the artist zone). */
-  fanPrompt?: boolean;
 }
 
-const { pageType, overlayHeader = false, zone = 'artist', bare = false, fanPrompt = !bare, ...seo } = Astro.props;
-const theme = zone === 'events' ? 'ivory' : 'night';
+const { pageType, overlayHeader = false, bare = false, ...seo } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en" data-page-type={pageType} data-zone={zone} data-theme={theme}>
+<html lang="en" data-page-type={pageType}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content={theme === 'ivory' ? '#f3efe7' : '#0d0c0b'} />
+    <meta name="theme-color" content="#f3efe7" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -74,22 +65,16 @@ const theme = zone === 'events' ? 'ivory' : 'night';
     {!bare && <Footer />}
     {!bare && <div transition:persist="scout"><Scout /></div>}
     {!bare && <div transition:persist="player"><PlayerDock /></div>}
-    {fanPrompt && <div transition:persist="fan-prompt"><FanPrompt /></div>}
     <div transition:persist="consent"><ConsentBar /></div>
   </body>
 </html>
 
 <script>
   // Router bridge: the router replaces <html> attributes on every swap, so carry
-  // the A/B assignments over and re-apply the events-zone theme arm (the pre-paint
-  // boot script only runs on full loads).
+  // the A/B assignments over (the pre-paint boot script only runs on full loads).
   document.addEventListener('astro:before-swap', (e) => {
     const next = e.newDocument.documentElement;
     for (const a of [...document.documentElement.attributes]) if (a.name.startsWith('data-exp-')) next.setAttribute(a.name, a.value);
-    if (next.getAttribute('data-zone') === 'events') {
-      const v = next.getAttribute('data-exp-events-theme');
-      if (v === 'ivory' || v === 'night') next.setAttribute('data-theme', v);
-    }
   });
 </script>
 

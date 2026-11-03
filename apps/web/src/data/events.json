@@ -23,7 +23,7 @@
           },
           {
             "title": "Cocktail hour",
-            "body": "Sinatra, Cash and modern standards while guests find their drinks and each other."
+            "body": "Sinatra and modern standards while guests find their drinks and each other."
           },
           {
             "title": "Dinner",
@@ -54,7 +54,7 @@
       {
         "type": "repertoire",
         "title": "Most requested",
-        "note": "Frank Sinatra and Johnny Cash for the cocktail hour. Full set lists, and your own requests, on request.",
+        "note": "Frank Sinatra and modern standards for the cocktail hour. Full set lists, and your own requests, on request.",
         "playlist": "playlist/6rKY5Yzd33JAzxDwVttojd",
         "solo": [
           "Can't Help Falling in Love, Elvis Presley",
@@ -136,7 +136,7 @@
         "ids": [
           "reel-2025",
           "ritz-shut-up-and-dance",
-          "stronger"
+          "elevated-live"
         ]
       },
       {
@@ -268,7 +268,7 @@
         "type": "film",
         "title": "Big-room energy",
         "ids": [
-          "invincible",
+          "hotel-del-my-girl",
           "blinding-lights"
         ]
       },

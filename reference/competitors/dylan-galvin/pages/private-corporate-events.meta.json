@@ -1,0 +1,124 @@
+{
+  "url": "https://www.dylangalvin.com/private-corporate-events",
+  "status": 200,
+  "title": "Corporate & Private Event Entertainment | DC, VA & MD",
+  "description": "Corporate event live music and private event entertainment in Washington DC, Northern Virginia & Maryland. Berklee-trained solo guitarist, wireless roaming performance, hybrid DJ sets. Trusted by Fortune 500 brands and luxury venues.",
+  "og": {
+    "og:title": "Corporate & Private Event Entertainment | DC, VA & MD",
+    "og:description": "Corporate event live music and private event entertainment in Washington DC, Northern Virginia & Maryland. Berklee-trained solo guitarist, wireless roaming performance, hybrid DJ sets. Trusted by Fortune 500 brands and luxury venues.",
+    "og:type": "website"
+  },
+  "outline": [
+    "H2: Your Event, Your Vibe",
+    "H1: You will get a 3-in-1 musician",
+    "H2: Inquire Now"
+  ],
+  "nav": [
+    "ABOUT -> /about",
+    "PRIVATE & CORPORATE EVENTS -> /private-corporate-events",
+    "WEDDING MUSIC -> /wedding-music",
+    "CONTACT -> /contact",
+    "INQUIRE -> /contact"
+  ],
+  "ctas": [
+    "CONTACT -> /contact",
+    "INQUIRE -> /contact",
+    "Inquire -> /contact"
+  ],
+  "forms": [
+    [
+      "Name",
+      "Email*",
+      "Phone*",
+      "Event-date*",
+      "Venue-Name*",
+      "additional-details-2",
+      "submit",
+      "cf-turnstile-response"
+    ]
+  ],
+  "type": {
+    "h1": {
+      "font": "Salvager, sans-serif",
+      "size": "65px",
+      "weight": "400",
+      "color": "rgb(51, 51, 51)",
+      "transform": "uppercase",
+      "spacing": "normal"
+    },
+    "h2": {
+      "font": "Salvager, sans-serif",
+      "size": "65px",
+      "weight": "400",
+      "color": "rgb(51, 51, 51)",
+      "transform": "uppercase",
+      "spacing": "normal"
+    },
+    "body": null,
+    "button": {
+      "font": "Salvager, sans-serif",
+      "size": "13.5px",
+      "weight": "400",
+      "color": "rgb(255, 255, 255)",
+      "transform": "uppercase",
+      "spacing": "2px"
+    }
+  },
+  "topColors": [
+    [
+      "rgb(51, 51, 51)",
+      199
+    ],
+    [
+      "rgb(255, 255, 255)",
+      33
+    ],
+    [
+      "rgb(99, 99, 102)",
+      12
+    ],
+    [
+      "rgba(255, 255, 255, 0)",
+      8
+    ],
+    [
+      "rgb(26, 27, 31)",
+      5
+    ],
+    [
+      "rgb(242, 242, 247)",
+      5
+    ],
+    [
+      "rgb(0, 0, 238)",
+      4
+    ],
+    [
+      "rgb(0, 0, 0)",
+      3
+    ],
+    [
+      "rgba(18, 18, 18, 0.82)",
+      3
+    ],
+    [
+      "rgba(228, 228, 228, 0)",
+      2
+    ],
+    [
+      "rgb(250, 250, 250)",
+      2
+    ],
+    [
+      "rgb(58, 58, 60)",
+      2
+    ]
+  ],
+  "jsonld": [
+    "\n{\n  \"@context\": \"https://schema.org\",\n  \"@graph\": [\n    {\n      \"@type\": [\"LocalBusiness\", \"EntertainmentBusiness\"],\n      \"@id\": \"https://www.dylangalvin.com/#business\",\n      \"name\": \"Dylan Galvin Entertainment\",\n      \"image\": \"https://cdn.prod.website-files.com/660593ada12bb1b42498d823/6607db63b743df512506a05a_logo.svg\",\n      \"email\": \"dylangalvinmusic@gmail.com\",\n      \"description\": \"Luxury live entertainment for weddings, corporate events, and private parties across Washington DC, Maryland, and Virginia. Services include solo acoustic guitar, vocals, live looping, DJ, wireless roaming performance, and full sound system. Performing across the United States since 2009, now based in the DMV (Washington DC, Maryland, and Virginia).\",\n      \"url\": \"https://www.dylangalvin.com\",\n      \"telephone\": \"+12025739654\",\n      \"priceRange\": \"$$$\",\n      \"founder\": {\"@id\": \"https://www.dylangalvin.com/#person\"},\n      \"areaServed\": [\n        {\"@type\": \"City\", \"name\": \"Washington\", \"addressRegion\": \"DC\", \"addressCountry\": \"US\"},\n        {\"@type\": \"AdministrativeArea\", \"name\": \"Maryland\", \"addressCountry\": \"US\"},\n        {\"@type\": \"AdministrativeArea\", \"name\": \"Virginia\", \"addressCountry\": \"US\"}\n      ],\n      \"sameAs\": [\n        \"https://www.instagram.com/dylangalvinevents\",\n        \"https://www.facebook.com/dylangalvinentertainment\"\n      ]\n    },\n    {\n      \"@type\": \"Person\",\n      \"@id\": \"https://www.dylangalvin.com/#person\",\n      \"name\": \"Dylan Galvin\",\n      \"jobTitle\": \"Professional Musician, Guitarist, and Live Entertainer\",\n      \"description\": \"Dylan Galvin is a professional guitarist, vocalist, and live entertainer based in the Washington DC area. A graduate of Berklee College of Music, he has performed at over 1,500 events since 2009, including luxury weddings, corporate galas, and private celebrations across Washington DC, Maryland, and Virginia. His mentors include John Mayer, Paul Simon, and Livingston Taylor.\",\n      \"url\": \"https://www.dylangalvin.com/abo"
+  ],
+  "videos": [
+    "https://cdn.prod.website-files.com/660593ada12bb1b42498d823%2F6aa42a6f6eecbacff44c0b20_Corp%20Hero%20-%20Compressed%20v2_mp4.mp4"
+  ],
+  "words": 211
+}

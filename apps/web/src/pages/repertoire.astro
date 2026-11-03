@@ -1,0 +1,78 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/ui/PageHeader.astro';
+import SpotifyFacade from '../components/media/SpotifyFacade.astro';
+import InquireLabel from '../components/ui/InquireLabel.astro';
+import { repertoire } from '../lib/content';
+import { graph, breadcrumbSchema } from '../lib/seo/schema';
+
+const moments = await repertoire();
+const jsonLd = graph(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Repertoire', path: '/repertoire' }]));
+---
+
+<BaseLayout
+  pageType="repertoire"
+  title="Wedding Repertoire | Sean Carney"
+  description="The songs couples ask for most, from the ceremony and first dance to the dance floor, arranged live by Sean Carney solo, as a trio or with the full band."
+  jsonLd={jsonLd}
+>
+  <PageHeader title="Repertoire" intro="The songs couples ask for most, arranged for the moment they're played. A sample: full lists, and your own requests, come with the proposal." />
+
+  <section class="section" data-section="repertoire" aria-label="Songs by moment">
+    <div class="container">
+      {moments.map((m) => (
+        <article class="moment">
+          <div class="lead">
+            <h2>{m.data.moment}</h2>
+            <p>{m.data.note}</p>
+          </div>
+          <ul>
+            {m.data.songs.map((s) => (
+              <li><span class="t">{s.title}</span><span class="a">{s.artist}</span></li>
+            ))}
+          </ul>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="section listen" data-section="repertoire_listen" aria-labelledby="listen-title">
+    <div class="container cols">
+      <div>
+        <h2 id="listen-title">Hear the acoustic arrangements</h2>
+        <p>A playlist of the covers Sean plays for ceremonies and cocktail hours.</p>
+      </div>
+      <SpotifyFacade uri="playlist/6rKY5Yzd33JAzxDwVttojd" title="Sean Carney, Acoustic Covers" location="repertoire" />
+    </div>
+  </section>
+
+  <section class="section request" data-section="repertoire_request" aria-labelledby="request-title">
+    <div class="container request-row">
+      <div>
+        <h2 id="request-title">Your song, arranged for you</h2>
+        <p>An aisle song, a first dance, a family favorite: Sean arranges requests as part of the proposal.</p>
+      </div>
+      <a href="/inquire" class="btn" data-track="cta_click" data-track-location="repertoire"><InquireLabel /></a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .moment { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 1.5rem clamp(2rem, 6vw, 6rem); padding-block: clamp(2.5rem, 5vw, 4rem); border-top: 1px solid var(--line); }
+  .moment:first-child { border-top: 0; padding-top: 0; }
+  .lead h2 { font-size: var(--step-3); line-height: 1.05; }
+  .lead p { margin-top: 0.9rem; color: var(--text-muted); max-width: 38ch; }
+  ul { list-style: none; margin: 0; padding: 0; }
+  li { display: flex; justify-content: space-between; align-items: baseline; gap: 1.5rem; padding-block: 0.9rem; border-bottom: 1px solid var(--line); }
+  li:first-child { border-top: 1px solid var(--line); }
+  .t { font-family: var(--font-display); font-size: var(--step-2); line-height: 1.15; }
+  .a { color: var(--text-muted); font-size: var(--step--1); text-align: right; }
+
+  .listen { background: var(--bg-raised); border-block: 1px solid var(--line); }
+  .cols { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(2rem, 6vw, 6rem); align-items: center; }
+  .listen h2, .request h2 { font-size: var(--step-3); line-height: 1.05; }
+  .listen p, .request p { margin-top: 0.75rem; color: var(--text-muted); max-width: 40ch; }
+  .request-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem 3rem; }
+
+  @media (max-width: 899px) { .moment, .cols { grid-template-columns: minmax(0, 1fr); } }
+</style>

@@ -41,7 +41,7 @@ const jsonLd = graph(
 );
 ---
 
-<BaseLayout zone="events" pageType={`event_${e.slug}`} title={e.seoTitle} description={e.seoDescription} image={og.src} imageAlt={e.imageAlt} jsonLd={jsonLd}>
+<BaseLayout pageType={`event_${e.slug}`} title={e.seoTitle} description={e.seoDescription} image={og.src} imageAlt={e.imageAlt} jsonLd={jsonLd}>
   <section class="intro" data-section="event_intro">
     <div class="container grid">
       <div class="copy">

@@ -10,16 +10,14 @@ import { site } from '../config/site';
     <div class="container prose body">
       <h2>What we collect</h2>
       <p>When you send an inquiry, we receive the details you provide (name, email, phone, event details) and how you found the site, such as the referring website or campaign. We use this only to respond to you and to understand which channels bring inquiries.</p>
-      <h2>Email lists</h2>
-      <p>If you join a list (new music, shows or merch), we keep your email (and the city you share, if any) to tell you about new dates or merch, and we count cities anonymously to plan where Sean plays. Every email includes an unsubscribe link.</p>
       <h2>Analytics</h2>
       <p>We use privacy-friendly analytics that do not use advertising cookies, plus session analytics that mask form inputs. These help us understand which pages are useful and where the site can be clearer.</p>
-      <p>Your browser keeps a small visit record for this site: the date of your first visit, when you last visited and how many visits. It holds no name, email or identifier. We use it to tell new from returning visitors, to mark what is new since your last visit, and to send an anonymous weekly count (for example "a visitor first seen in week 45 came back") that contains nothing that identifies you. It also remembers whether you dismissed or answered the email signup prompt, so we don't ask again.</p>
+      <p>Your browser keeps a small visit record for this site: the date of your first visit, when you last visited and how many visits. It holds no name, email or identifier. We use it to tell new from returning visitors, to mark what is new since your last visit, and to send an anonymous weekly count (for example "a visitor first seen in week 45 came back") that contains nothing that identifies you.</p>
       <h2>Advertising</h2>
       <p>If advertising pixels are enabled, they load only when your browser does not send a Global Privacy Control signal and you have not opted out below.</p>
-      <p>Under the same conditions (you allowed cookies, have not opted out and send no Global Privacy Control signal), when you send an inquiry or join an email list our server also tells Meta that the conversion happened, so ad results are measured accurately. That message contains your email (and phone, for inquiries) only in hashed form, which Meta uses to match it to its own records, plus your browser's IP address and user agent. Nothing is sent when any of those conditions is not met.</p>
+      <p>Under the same conditions (you allowed cookies, have not opted out and send no Global Privacy Control signal), when you send an inquiry our server also tells Meta that the conversion happened, so ad results are measured accurately. That message contains your email and phone only in hashed form, which Meta uses to match it to its own records, plus your browser's IP address and user agent. Nothing is sent when any of those conditions is not met.</p>
       <h2 id="scout">Scout, the AI assistant</h2>
-      <p>Scout is an automated AI assistant, not Sean or a member of his team. It can check whether a date looks open, show music, answer questions about Sean's performances, and send an inquiry when you ask it to.</p>
+      <p>Scout is an automated AI assistant, not Sean or a member of his team. It can check whether a date looks open, suggest formats for your day, show wedding films, answer questions about Sean's performances, and send an inquiry when you ask it to.</p>
       <p>When AI replies are on, your messages and the page you are on are sent to our AI provider (Anthropic) to generate replies. The conversation is kept only in your browser tab and is cleared when you close the tab or choose "Clear chat". We do not store chat transcripts on our servers.</p>
       <p>To improve the site we keep anonymous counts of the topics people ask about and the event dates they check. Unrecognized questions may be kept for up to 120 days with email addresses, phone numbers and street addresses removed. None of this is linked to you.</p>
       <p>If you choose to send an inquiry through Scout, the details you typed (such as your name, email and event details) go to Sean's booking system, exactly as with the inquiry form. Scout never signs you up for text messages; that consent is only collected on the inquiry form.</p>
@@ -32,7 +30,7 @@ import { site } from '../config/site';
       <label class="toggle"><input type="checkbox" data-analytics-consent /> Allow optional analytics cookies</label>
       <p class="status" data-optout-status aria-live="polite"></p>
       <p><button type="button" class="btn btn--ghost" data-clear-site-data>Clear data saved in this browser</button></p>
-      <p class="status">Removes your consent choice, A/B test assignment, visit attribution, visit record, signup-prompt choice, Scout conversation and any saved inquiry draft from this browser. Data you already sent to Sean is handled through the contact below.</p>
+      <p class="status">Removes your consent choice, A/B test assignment, visit attribution, visit record, Scout conversation and any saved inquiry draft from this browser. Data you already sent to Sean is handled through the contact below.</p>
       <h2>Contact</h2>
       <p>Questions or deletion requests: <a href={`mailto:${site.email.management}`}>{site.email.management}</a>.</p>
     </div>

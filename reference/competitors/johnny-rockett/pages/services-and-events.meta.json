@@ -1,0 +1,126 @@
+{
+  "url": "https://johnnyrockettmusic.com/services-and-events",
+  "status": 200,
+  "title": "Services | Book Live Music Now! — Johnny Rockett Music",
+  "description": "Offering live acoustic performances for weddings, corporate events, and private parties, creating memorable, personalized musical experiences for any occasion.",
+  "og": {
+    "og:site_name": "Johnny Rockett Music",
+    "og:title": "Services | Book Live Music Now! — Johnny Rockett Music",
+    "og:url": "https://johnnyrockettmusic.com/services-and-events",
+    "og:type": "website",
+    "og:description": "Offering live acoustic performances for weddings, corporate events, and private parties, creating memorable, personalized musical experiences for any occasion."
+  },
+  "outline": [
+    "H1: Transform Your Event With Live Entertainment",
+    "H2: WEDDINGS",
+    "H3: Unique Experiences",
+    "H2: CORPORATE",
+    "H3: Versatile Entertainment"
+  ],
+  "nav": [
+    "Skip to Content -> #page",
+    " -> /",
+    "Home -> /",
+    "About -> /about",
+    "Live Event Clips -> /photos-and-videos-1",
+    "Services -> /services-and-events",
+    "Media -> /photos-and-videos",
+    "FAQs -> /frequently-asked-questions",
+    "Contact -> /contact",
+    " -> https://www.instagram.com/johnnyrockettmusic1/",
+    " -> https://www.facebook.com/johnnyrockettmusician",
+    " -> https://www.youtube.com/@JohnnyRockett"
+  ],
+  "ctas": [
+    "Contact -> /contact"
+  ],
+  "forms": [
+    [
+      "fname",
+      "lname",
+      "text",
+      "email",
+      "text",
+      "text",
+      "text",
+      "message-yui_c4e8deaf-a553-440c-b520-207e9b3ae2fb-field"
+    ]
+  ],
+  "type": {
+    "h1": {
+      "font": "\"Libre Baskerville\"",
+      "size": "34.1px",
+      "weight": "400",
+      "color": "rgb(28, 28, 28)",
+      "transform": "none",
+      "spacing": "-0.682px"
+    },
+    "h2": {
+      "font": "\"Libre Baskerville\"",
+      "size": "42.3px",
+      "weight": "400",
+      "color": "rgb(28, 28, 28)",
+      "transform": "none",
+      "spacing": "-0.846px"
+    },
+    "body": {
+      "font": "Montserrat",
+      "size": "22.72px",
+      "weight": "400",
+      "color": "rgb(0, 0, 0)",
+      "transform": "none",
+      "spacing": "normal"
+    },
+    "button": {
+      "font": "Almarai",
+      "size": "16px",
+      "weight": "400",
+      "color": "rgb(250, 250, 250)",
+      "transform": "none",
+      "spacing": "normal"
+    }
+  },
+  "topColors": [
+    [
+      "rgb(0, 0, 0)",
+      533
+    ],
+    [
+      "rgb(28, 28, 28)",
+      369
+    ],
+    [
+      "rgb(250, 250, 250)",
+      29
+    ],
+    [
+      "rgb(255, 255, 255)",
+      11
+    ],
+    [
+      "rgba(0, 0, 0, 0.5)",
+      7
+    ],
+    [
+      "rgba(255, 255, 255, 0)",
+      7
+    ],
+    [
+      "rgb(231, 237, 246)",
+      6
+    ],
+    [
+      "rgba(255, 255, 255, 0.65)",
+      1
+    ]
+  ],
+  "jsonld": [
+    "{\"url\":\"https://johnnyrockettmusic.com\",\"name\":\"Johnny Rockett Music\",\"image\":\"//images.squarespace-cdn.com/content/v1/67a22e587f45ea7c1acb3172/1f25f9fc-1d77-4ab4-806a-bbef6bb0101b/dark_logo_transparent_background.png\",\"@context\":\"http://schema.org\",\"@type\":\"WebSite\"}",
+    "{\"address\":\"\",\"image\":\"https://static1.squarespace.com/static/67a22e587f45ea7c1acb3172/t/68334aca5ec5751eb59c4a36/1791141550109/\",\"openingHours\":\"\",\"@context\":\"http://schema.org\",\"@type\":\"LocalBusiness\"}"
+  ],
+  "videos": [
+    "blob:https://johnnyrockettmusic.com/74ba2a30-0f03-473f-a644-1b7726b3f375",
+    "https://www.google.com/recaptcha/enterprise/anchor?ar=1&k=6LdDFQwjAAAAAPigEvvPgEVbb7QBm-TkVJdDTlAv&co=aHR0cHM6Ly9qb2hubnlyb2NrZXR0bXVzaWMuY29tOjQ0Mw..&hl=en&v=bSuJ2xBC8cFy7pM4Z3Hu9boH&size=invisible&anchor-ms=20000&execute-ms=30000&cb=96kyxjljmoii"
+  ],
+  "words": 190
+}

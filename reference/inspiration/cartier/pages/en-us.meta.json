@@ -1,0 +1,177 @@
+{
+  "url": "https://www.cartier.com/en-us/",
+  "status": 200,
+  "title": "Cartier® Official Website - Jeweler and Watchmaker since 1847",
+  "description": "Cartier",
+  "og": {},
+  "outline": [
+    "H1: homepage",
+    "H2: MARVELOUS DREAMS",
+    "H2: SANTOS DE CARTIER",
+    "H2: BAIGNOIRE",
+    "H2: BALLON BLEU DE CARTIER",
+    "H2: CARTIER SOIR",
+    "H2: AN ODE TO GEMSTONES",
+    "H2: OUR LEATHER GOODS SERVICES",
+    "H2: OUR WATCHMAKING SERVICES",
+    "H2: MAKE AN APPOINTMENT",
+    "H2: CUSTOMER CARE",
+    "H2: OUR COMPANY",
+    "H2: LEGAL AREA",
+    "H2: FOLLOW US",
+    "H2: COOKIE POLICY"
+  ],
+  "nav": [
+    "Learn More -> https://www.cartier.com/en-us/fragrance-sampling.html",
+    "UNITED STATES -> /en-us/change-country",
+    "CONTACT US -> /en-us/contact-customer-care",
+    "SERVICES -> /en-us/services.html",
+    " -> /en-us/home",
+    "Wish List -> https://www.cartier.com/en-us/wishlist",
+    "My Cartier -> https://auth.cartier.com/oauth2/auth?client_id=c47549d1-5864-41f4-96ca-f1c1a8bcac28&redirect_uri=https://www.cartier.com/on/demandware.store/Sites-CartierUS-Site/en_US/Login-LoginCallback&response_type=code&scope=offline%20openid%20profile&state=1040748018",
+    "Find a Boutique -> https://stores.cartier.com/en_us/search?category=storeLocatorSearch",
+    "0 -> https://www.cartier.com/en-us/cart",
+    "PANTHER -> /en-us/high-jewelry/all-creations/panther/",
+    "Faune et Flore de Cartier -> /en-us/high-jewelry/all-creations/faune-et-flore-de-cartier/",
+    "Architecture and purity -> /en-us/high-jewelry/all-creations/architecture-and-purity/",
+    "Geometry and Contrasts -> /en-us/high-jewelry/all-creations/geometry-and-contrasts/",
+    "View all -> /en-us/high-jewelry/all-creations/",
+    "Le Choeur des Pierres -> https://www.cartier.com/en-us/lechoeurdespierres.html",
+    "En Équilibre -> /en-us/high-jewelry/latest-collections/en-equilibre/",
+    "View all -> /en-us/high-jewelry/latest-collections/",
+    "Architecture and Purity -> /en-us/high-jewelry/markers-of-style/architecture-and-purity/",
+    "Geometry and Contrasts -> /en-us/high-jewelry/markers-of-style/geometry-and-contrasts/",
+    "Flora and Fauna -> /en-us/high-jewelry/markers-of-style/flora-and-fauna/",
+    "Cultural Dialogues -> /en-us/high-jewelry/markers-of-style/cultural-dialogues/",
+    "View all -> /en-us/high-jewelry/markers-of-style/",
+    "Iconic panther -> https://www.cartier.com/en-us/high-jewelry/iconic-panthere/",
+    "View all -> /en-us/high-jewelry/iconic-panthere/",
+    "Living Legacy -> https://www.cartier.com/en-us/high-jewelry/living-legacy/",
+    "View all -> /en-us/high-jewelry/living-legacy/",
+    "Exceptional Stones -> https://www.cartier.com/en-us/high-jewelry/exceptional-stones/",
+    "View all -> /en-us/high-jewelry/exceptional-stones/",
+    "Know-how -> https://www.cartier.com/en-us/high-jewelry/know-how/",
+    "View all -> /en-us/high-jewelry/know-how/",
+    "Cartier Virtual try-on -> https://www.cartier.com/en-us/virtual-try-on.html",
+    "Engrave Your Creation -> https://www.cartier.com/en-us/personalization-services.html",
+    "Latest creation -> https://www.cartier.com/en-us/be-inspired/latest-creation/",
+    "Wishlist jewelry for him -> https://www.cartier.com/en-us/be-inspired/wishlist-jewelry-for-him/",
+    "LOVE -> /en-us/jewelry/all-collections/love/",
+    "Juste un Clou -> /en-us/jewelry/all-collections/juste-un-clou/",
+    "Clash de Cartier -> /en-us/jewelry/all-collections/clash-de-cartier/",
+    "Trinity -> /en-us/jewelry/all-collections/trinity/",
+    "Panthère de Cartier -> /en-us/jewelry/all-collections/panthere-de-cartier/",
+    "Grain de Café -> /en-us/jewelry/all-collections/grain-de-cafe/"
+  ],
+  "ctas": [
+    "CONTACT US -> /en-us/contact-customer-care",
+    "Notebooks & Stationery -> /en-us/home-%26-stationery/pens-%26-stationery/notebooks-%26-stationery/",
+    "Contact Us -> /en-us/contact-customer-care",
+    "OUR LEATHER GOODS SERVICES Cartier leather goods are made to last, and the Maison offers specific services to preserve their beauty. Discover -> https://www.cartier.com/en-us/services/bags-and-accessories/leather-goods/",
+    "CALL NOW: 800 227 8437 -> tel: +1 800 227 8437",
+    "BOOK AN APPOINTMENT -> /en-us/rdv-bookings"
+  ],
+  "forms": [
+    [],
+    [
+      "q",
+      "lang"
+    ],
+    [
+      "subscriptionBannerEmail*"
+    ]
+  ],
+  "type": {
+    "h1": {
+      "font": "\"Brilliant Cut\", Almarai, Helvetica, Arial, sans-serif",
+      "size": "32px",
+      "weight": "700",
+      "color": "rgb(29, 28, 28)",
+      "transform": "none",
+      "spacing": "0.5px"
+    },
+    "h2": {
+      "font": "\"Brilliant Cut\", Almarai, Helvetica, Arial, sans-serif",
+      "size": "22px",
+      "weight": "600",
+      "color": "rgb(255, 255, 255)",
+      "transform": "uppercase",
+      "spacing": "0.4px"
+    },
+    "body": {
+      "font": "\"Brilliant Cut\", Almarai, Helvetica, Arial, sans-serif",
+      "size": "14px",
+      "weight": "400",
+      "color": "rgb(29, 28, 28)",
+      "transform": "none",
+      "spacing": "0.5px"
+    },
+    "button": {
+      "font": "Arial",
+      "size": "13.3333px",
+      "weight": "400",
+      "color": "rgb(0, 0, 0)",
+      "transform": "none",
+      "spacing": "normal"
+    }
+  },
+  "topColors": [
+    [
+      "rgb(29, 28, 28)",
+      3735
+    ],
+    [
+      "rgb(255, 255, 255)",
+      370
+    ],
+    [
+      "rgb(0, 0, 0)",
+      63
+    ],
+    [
+      "rgb(249, 249, 249)",
+      24
+    ],
+    [
+      "rgb(140, 140, 140)",
+      13
+    ],
+    [
+      "rgb(240, 240, 240)",
+      3
+    ],
+    [
+      "rgb(6, 6, 6)",
+      2
+    ],
+    [
+      "rgb(230, 0, 0)",
+      2
+    ],
+    [
+      "rgb(43, 51, 63)",
+      2
+    ],
+    [
+      "rgba(0, 0, 0, 0.3)",
+      2
+    ],
+    [
+      "rgb(52, 57, 77)",
+      1
+    ],
+    [
+      "rgb(245, 245, 245)",
+      1
+    ]
+  ],
+  "jsonld": [
+    "\n        {\n            \"@context\" : \"https://schema.org\",\n            \"@type\" : \"Organization\",\n            \"url\" : \"https://www.cartier.com/en-us/home\",\n            \"contactPoint\" : [{\n                \"@type\" : \"ContactPoint\",\n                \"telephone\" : \"1-800-227-8437\",\n                \"contactType\" : \"customer service\",\n                \"contactOption\" : \"TollFree\",\n                \"areaServed\" : \"US\"\n            }\n            ]\n        }\n    "
+  ],
+  "videos": [
+    "https://www.cartier.com/on/demandware.static/-/Library-Sites-CartierSharedLibrary-BGTJ/default/homepage/2026/November/W1/US-CA/Marvellous_dreams_Banner_1920x1080.mp4",
+    "https://try.abtasty.com/cross-domain-iframe.html",
+    "https://www.google.com/recaptcha/api2/anchor?ar=1&k=6LfiiRcqAAAAAO8lFofB4RKDEAHQa_10fmfU11qV&co=aHR0cHM6Ly93d3cuY2FydGllci5jb206NDQz&hl=en&v=bSuJ2xBC8cHT21-c68JXN31m&size=invisible&anchor-ms=20000&execute-ms=30000&ovv=CADq00gF&cb=x9fjqpngit0o"
+  ],
+  "words": 1321
+}

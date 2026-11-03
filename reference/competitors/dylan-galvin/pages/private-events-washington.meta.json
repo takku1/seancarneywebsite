@@ -1,0 +1,146 @@
+{
+  "url": "https://www.dylangalvin.com/private-events-washington",
+  "status": 200,
+  "title": "Private Event Musician in Washington DC | Dylan Galvin",
+  "description": "Hire a private event musician in Washington, DC. Live acoustic guitar and vocals for private parties and special occasions.",
+  "og": {
+    "og:title": "Private Event Musician in Washington DC | Dylan Galvin",
+    "og:description": "Hire a private event musician in Washington, DC. Live acoustic guitar and vocals for private parties and special occasions.",
+    "og:type": "website"
+  },
+  "outline": [
+    "H1: Private Party Musician in Washington, D.C.",
+    "H2: About Dylan Galvin",
+    "H2: Why Live Music Elevates Your Private Event",
+    "H2: Events You Can Hire Dylan For",
+    "H2: Why Choose Dylan for Your Private Event in Washington, D.C.?",
+    "H2: TESTIMONIALS",
+    "H2: Book Your Private Event Musician Today",
+    "H2: Book Your Private Event Today",
+    "H2: Inquire Now",
+    "H2: Frequently Asked Questions"
+  ],
+  "nav": [
+    "ABOUT -> /about",
+    "PRIVATE & CORPORATE EVENTS -> /private-corporate-events",
+    "WEDDING MUSIC -> /wedding-music",
+    "CONTACT -> /contact",
+    "INQUIRE -> /contact"
+  ],
+  "ctas": [
+    "CONTACT -> /contact",
+    "INQUIRE -> /contact",
+    "Inquire -> /contact"
+  ],
+  "forms": [
+    [
+      "Name",
+      "Email*",
+      "Phone*",
+      "Event-date*",
+      "Venue-Name-2*",
+      "additional-details",
+      "submit"
+    ],
+    [
+      "Name",
+      "Fiance-s-Name*",
+      "Email*",
+      "Phone*",
+      "Wedding-Venue*",
+      "Wedding-Date*",
+      "submit",
+      "cf-turnstile-response"
+    ]
+  ],
+  "type": {
+    "h1": {
+      "font": "Salvager, sans-serif",
+      "size": "54px",
+      "weight": "700",
+      "color": "rgb(255, 255, 255)",
+      "transform": "none",
+      "spacing": "normal"
+    },
+    "h2": {
+      "font": "Salvager, sans-serif",
+      "size": "40px",
+      "weight": "700",
+      "color": "rgb(51, 51, 51)",
+      "transform": "none",
+      "spacing": "normal"
+    },
+    "body": {
+      "font": "\"Bitter Local\", Bitter",
+      "size": "15px",
+      "weight": "400",
+      "color": "rgb(51, 51, 51)",
+      "transform": "none",
+      "spacing": "normal"
+    },
+    "button": {
+      "font": "Salvager, sans-serif",
+      "size": "13.5px",
+      "weight": "400",
+      "color": "rgb(255, 255, 255)",
+      "transform": "uppercase",
+      "spacing": "2px"
+    }
+  },
+  "topColors": [
+    [
+      "rgb(51, 51, 51)",
+      248
+    ],
+    [
+      "rgb(255, 255, 255)",
+      55
+    ],
+    [
+      "rgb(22, 0, 66)",
+      37
+    ],
+    [
+      "rgba(255, 255, 255, 0)",
+      14
+    ],
+    [
+      "rgb(99, 99, 102)",
+      12
+    ],
+    [
+      "rgb(26, 27, 31)",
+      8
+    ],
+    [
+      "rgb(38, 34, 47)",
+      6
+    ],
+    [
+      "rgb(242, 242, 247)",
+      5
+    ],
+    [
+      "rgb(57, 59, 106)",
+      4
+    ],
+    [
+      "rgb(34, 34, 34)",
+      4
+    ],
+    [
+      "rgb(0, 0, 238)",
+      4
+    ],
+    [
+      "rgb(245, 247, 250)",
+      3
+    ]
+  ],
+  "jsonld": [
+    "\n{\n  \"@context\": \"https://schema.org\",\n  \"@graph\": [\n    {\n      \"@type\": \"WebPage\",\n      \"name\": \"Private Event Musician in Washington DC | Dylan Galvin\",\n      \"description\": \"Hire a private event musician in Washington, DC. Live acoustic guitar and vocals for private parties, celebrations, and special occasions across DC, Virginia, and Maryland.\",\n      \"url\": \"https://www.dylangalvin.com/private-events-washington\",\n      \"inLanguage\": \"en\",\n      \"isPartOf\": {\n        \"@id\": \"https://www.dylangalvin.com/#business\"\n      },\n      \"about\": {\n        \"@id\": \"https://www.dylangalvin.com/#person\"\n      },\n      \"contentLocation\": {\n        \"@type\": \"Place\",\n        \"address\": {\n          \"@type\": \"PostalAddress\",\n          \"addressLocality\": \"Washington\",\n          \"addressRegion\": \"DC\",\n          \"addressCountry\": \"US\"\n        }\n      }\n    },\n    {\n      \"@type\": \"BreadcrumbList\",\n      \"itemListElement\": [\n        {\n          \"@type\": \"ListItem\",\n          \"position\": 1,\n          \"name\": \"Home\",\n          \"item\": \"https://www.dylangalvin.com/\"\n        },\n        {\n          \"@type\": \"ListItem\",\n          \"position\": 2,\n          \"name\": \"Private & Corporate Events\",\n          \"item\": \"https://www.dylangalvin.com/private-corporate-events\"\n        },\n        {\n          \"@type\": \"ListItem\",\n          \"position\": 3,\n          \"name\": \"Private Event Musician in Washington\",\n          \"item\": \"https://www.dylangalvin.com/private-events-washington\"\n        }\n      ]\n    },\n    {\n      \"@type\": \"Service\",\n      \"serviceType\": \"Private Event Musician\",\n      \"provider\": {\n        \"@id\": \"https://www.dylangalvin.com/#business\"\n      },\n      \"areaServed\": {\n        \"@type\": \"City\",\n        \"name\": \"Washington\",\n        \"containedInPlace\": {\n          \"@type\": \"AdministrativeArea\",\n          \"name\": \"DC\"\n        }\n      },\n      \"url\": \"https://www.dylangalvin.com/private-events-washington\",\n      \"offers\": {\n        \"@type\": \"Offer\",\n        \"priceCurrency\": \"USD\",\n     ",
+    "\n{\n  \"@context\": \"https://schema.org\",\n  \"@graph\": [\n    {\n      \"@type\": [\"LocalBusiness\", \"EntertainmentBusiness\"],\n      \"@id\": \"https://www.dylangalvin.com/#business\",\n      \"name\": \"Dylan Galvin Entertainment\",\n      \"image\": \"https://cdn.prod.website-files.com/660593ada12bb1b42498d823/6607db63b743df512506a05a_logo.svg\",\n      \"email\": \"dylangalvinmusic@gmail.com\",\n      \"description\": \"Luxury live entertainment for weddings, corporate events, and private parties across Washington DC, Maryland, and Virginia. Services include solo acoustic guitar, vocals, live looping, DJ, wireless roaming performance, and full sound system. Performing across the United States since 2009, now based in the DMV (Washington DC, Maryland, and Virginia).\",\n      \"url\": \"https://www.dylangalvin.com\",\n      \"telephone\": \"+12025739654\",\n      \"priceRange\": \"$$$\",\n      \"founder\": {\"@id\": \"https://www.dylangalvin.com/#person\"},\n      \"areaServed\": [\n        {\"@type\": \"City\", \"name\": \"Washington\", \"addressRegion\": \"DC\", \"addressCountry\": \"US\"},\n        {\"@type\": \"AdministrativeArea\", \"name\": \"Maryland\", \"addressCountry\": \"US\"},\n        {\"@type\": \"AdministrativeArea\", \"name\": \"Virginia\", \"addressCountry\": \"US\"}\n      ],\n      \"sameAs\": [\n        \"https://www.instagram.com/dylangalvinevents\",\n        \"https://www.facebook.com/dylangalvinentertainment\"\n      ]\n    },\n    {\n      \"@type\": \"Person\",\n      \"@id\": \"https://www.dylangalvin.com/#person\",\n      \"name\": \"Dylan Galvin\",\n      \"jobTitle\": \"Professional Musician, Guitarist, and Live Entertainer\",\n      \"description\": \"Dylan Galvin is a professional guitarist, vocalist, and live entertainer based in the Washington DC area. A graduate of Berklee College of Music, he has performed at over 1,500 events since 2009, including luxury weddings, corporate galas, and private celebrations across Washington DC, Maryland, and Virginia. His mentors include John Mayer, Paul Simon, and Livingston Taylor.\",\n      \"url\": \"https://www.dylangalvin.com/abo"
+  ],
+  "videos": [],
+  "words": 1448
+}

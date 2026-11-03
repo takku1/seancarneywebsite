@@ -1,50 +1,42 @@
 /**
  * /llms.txt: a plain-text brief for AI assistants (ChatGPT, Claude, Perplexity,
- * Gemini), now a real discovery channel for event buyers ("find me a wedding
- * singer in Malibu"). Generated from the same content as the site.
+ * Gemini), now a real discovery channel for couples and planners ("find me a
+ * wedding singer in Malibu"). Generated from the same content as the site.
  */
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { site } from '../config/site';
-import { releaseHref } from '../lib/content';
 
 export const GET: APIRoute = async () => {
-  const [credits, events, releases, faqs] = await Promise.all([getCollection('credits'), getCollection('events'), getCollection('releases'), getCollection('faqs')]);
+  const [credits, events, faqs, songs] = await Promise.all([getCollection('credits'), getCollection('events'), getCollection('faqs'), getCollection('repertoire')]);
   const by = (cat: string) => credits.filter((c) => c.data.category === cat).sort((a, b) => a.data.order - b.data.order).map((c) => c.data.name);
-  const latest = [...releases].sort((a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0))[0];
   const body = `# Sean Carney
 
-> ${site.role} based in ${site.home}. Billboard-charting songwriter and Recording Academy voting member whose music has featured in the 2024 Paris Olympics, the 2025 NFL Playoffs and Netflix. Performs solo, as a duo or trio, or with his band The Hustlers for weddings, corporate events, charity galas, private estates and destination events.
+> A live-music house for luxury weddings and private events, led by Los Angeles singer and guitarist Sean Carney. One booking covers the whole day: solo guitar and voice for the ceremony, a duo or trio for cocktails and dinner, and the full band, Sean Carney and The Hustlers, for the reception. ${site.stats.events} events across ${site.stats.years} years.
 
 ## Booking
-- Inquiries: ${site.url}/inquire (reply ${site.responseTime})
+- Check a date and inquire: ${site.url}/inquire (Sean replies personally, ${site.responseTime})
 - Email: ${site.email.bookings}
-- Formats: solo acoustic, duo or trio, full band (Sean Carney and The Hustlers)
-- Service area: Los Angeles, Orange County, Santa Barbara, Palm Springs, and worldwide travel
-- Pricing: tailored proposals based on format, date, location and hours
+- Formats: solo (voice and acoustic guitar); duo or trio; full band (Sean Carney and The Hustlers)
+- Service area: Los Angeles, Orange County, Santa Barbara, Palm Springs, and destination weddings worldwide
+- Pricing: proposals tailored to the date, the room, the format and the hours of music
 
-## Event types
+## Weddings and private events
 ${[...events].sort((a, b) => a.data.order - b.data.order).map((e) => `- [${e.data.label}](${site.url}/${e.data.slug}): ${e.data.seoDescription}`).join('\n')}
 
-## Credits
-- Film, TV and campaigns: ${[...by('sync'), ...by('broadcast')].join(', ')}
-- Recognition: ${by('chart').join(', ')}
-- Venues: ${by('venue').join(', ')}
-- Clients: ${by('client').join(', ')}
+## Rooms played
+${by('room').join(', ')}
 
-## Music
-- Latest release: ${latest?.data.title}${latest?.data.date ? ` (${latest.data.date.getUTCFullYear()})` : ''}
-- Music and videos: ${site.url}/music
-${[...releases].sort((a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0)).map((r) => `- [${r.data.title}](${site.url}${releaseHref(r.id)}): ${r.data.artists}${r.data.date ? `, ${r.data.date.getUTCFullYear()}` : ''}. ${r.data.hook}`).join('\n')}
-- Shows and tickets: ${site.url}/shows
+## Repertoire (most requested)
+${[...songs].sort((a, b) => a.data.order - b.data.order).map((m) => `- ${m.data.moment}: ${m.data.songs.map((s) => `${s.title} (${s.artist})`).join(', ')}`).join('\n')}
+- Full repertoire: ${site.url}/repertoire
 
 ## Frequently asked
 ${faqs.filter((f) => !f.data.scope.includes('scout')).map((f) => `- ${f.data.q} ${f.data.a}`).join('\n')}
 
 ## More
 - About: ${site.url}/about
-- Press kit: ${site.url}/press (one-page summary: ${site.url}/press/one-sheet)
-- Contact: ${site.url}/contact
+- Contact (couples, planners and venues): ${site.url}/contact
 `;
   return new Response(body, { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
 };

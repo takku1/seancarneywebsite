@@ -3,7 +3,6 @@ import { getCollection } from 'astro:content';
 import { site } from '../../config/site';
 import Icon, { type IconName } from '../ui/Icon.astro';
 import InquireLabel from '../ui/InquireLabel.astro';
-import NotifyForm from '../ui/NotifyForm.astro';
 
 const events = (await getCollection('events')).sort((a, b) => a.data.order - b.data.order);
 const year = new Date().getFullYear();
@@ -12,14 +11,14 @@ const year = new Date().getFullYear();
 <footer class="site-footer">
   <div class="container">
     <div class="closing">
-      <p class="closing-line">Planning an event? Start with the date.</p>
+      <p class="closing-line">Every wedding begins with the date.</p>
       <a href="/inquire" class="btn" data-track="cta_click" data-track-location="footer"><InquireLabel /> <Icon name="arrow-right" /></a>
     </div>
 
     <div class="cols">
       <div>
         <a href="/" class="wordmark">Sean Carney</a>
-        <p class="muted">{site.role}. {site.home}.</p>
+        <p class="muted">{site.tagline} {site.home}.</p>
         <ul class="socials" aria-label="Social">
           {site.socials.map((s) => (
             <li>
@@ -29,32 +28,26 @@ const year = new Date().getFullYear();
             </li>
           ))}
         </ul>
-        <div class="fanlist" data-section="footer_list">
-          <h2 class="col-title">New music, first</h2>
-          <NotifyForm topic="news" tone="surface" cta="Join" location="footer" />
-        </div>
       </div>
-      <nav aria-label="Private events">
-        <h2 class="col-title">Private events</h2>
+      <nav aria-label="Weddings and events">
+        <h2 class="col-title">Weddings and events</h2>
         <ul>
-          <li><a href="/private-events">Overview</a></li>
           {events.map((e) => <li><a href={`/${e.data.slug}`}>{e.data.navLabel}</a></li>)}
+          <li><a href="/private-events">All private events</a></li>
         </ul>
       </nav>
-      <nav aria-label="Artist">
-        <h2 class="col-title">Artist</h2>
+      <nav aria-label="The house">
+        <h2 class="col-title">The house</h2>
         <ul>
-          <li><a href="/music">Music</a></li>
-          <li><a href="/shows">Shows</a></li>
-          <li><a href="/merch">Merch</a></li>
-          <li><a href="/press">Press</a></li>
+          <li><a href="/repertoire">Repertoire</a></li>
           <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
         </ul>
       </nav>
       <div>
-        <h2 class="col-title">Management and bookings</h2>
+        <h2 class="col-title">Bookings</h2>
         <ul>
-          <li><a href="/contact">All contacts</a></li>
+          <li><a href="/inquire" data-track="cta_click" data-track-location="footer_col"><InquireLabel /></a></li>
           <li><a href={`mailto:${site.email.bookings}`} data-track-location="footer">{site.email.bookings}</a></li>
         </ul>
       </div>
@@ -123,8 +116,6 @@ const year = new Date().getFullYear();
     word-break: break-word;
   }
   .cols a:hover { color: var(--text); }
-  .fanlist { margin-top: 2rem; max-width: 28rem; }
-  .fanlist :global(.btn) { min-width: 6.5rem; justify-content: center; }
   .socials { display: flex; gap: 0.25rem; margin-top: 1.25rem; }
   .socials a {
     display: inline-flex;

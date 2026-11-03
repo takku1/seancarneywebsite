@@ -1,0 +1,62 @@
+{
+  "origin": "https://johnnyrockettmusic.com",
+  "captured": "2026-11-03T18:19:46.352Z",
+  "pages": [
+    {
+      "name": "home",
+      "url": "https://johnnyrockettmusic.com/",
+      "status": 200,
+      "title": "Johnny Rockett Music | Book Your Live Musician Today",
+      "words": 789
+    },
+    {
+      "name": "services-and-events",
+      "url": "https://johnnyrockettmusic.com/services-and-events",
+      "status": 200,
+      "title": "Services | Book Live Music Now! — Johnny Rockett Music",
+      "words": 190
+    },
+    {
+      "name": "about",
+      "url": "https://johnnyrockettmusic.com/about",
+      "status": 200,
+      "title": "About | Book Your Live Music Today — Johnny Rockett Music",
+      "words": 805
+    },
+    {
+      "name": "photos-and-videos",
+      "url": "https://johnnyrockettmusic.com/photos-and-videos",
+      "status": 200,
+      "title": "Moments and Memories Captured Live — Johnny Rockett Music",
+      "words": 607
+    },
+    {
+      "name": "photos-and-videos-1",
+      "url": "https://johnnyrockettmusic.com/photos-and-videos-1",
+      "status": 200,
+      "title": "Moments and Memories Captured Live — Johnny Rockett Music",
+      "words": 468
+    },
+    {
+      "name": "frequently-asked-questions",
+      "url": "https://johnnyrockettmusic.com/frequently-asked-questions",
+      "status": 200,
+      "title": "FAQs | Book Your Musician Today — Johnny Rockett Music",
+      "words": 97
+    },
+    {
+      "name": "contact",
+      "url": "https://johnnyrockettmusic.com/contact",
+      "status": 200,
+      "title": "Contact | Book Your Event Today — Johnny Rockett Music",
+      "words": 416
+    },
+    {
+      "name": "thankyou",
+      "url": "https://johnnyrockettmusic.com/thankyou",
+      "status": 200,
+      "title": "Contact | Book Your Event Today — Johnny Rockett Music",
+      "words": 375
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 ---
-/** Management and Bookings: separate routes signal a team and tag the lead source. */
+/** Contact routes: couples, planners and venues, and everything else. Each route tags the lead source. */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/ui/PageHeader.astro';
 import Icon from '../components/ui/Icon.astro';
@@ -8,16 +8,15 @@ import { site } from '../config/site';
 import { graph, breadcrumbSchema } from '../lib/seo/schema';
 
 const routes = [
-  { title: 'Private events and corporate', body: 'Weddings, galas, company events, estates and destination dates.', cta: 'inquire' as const },
-  { title: 'Press and media', body: 'Interviews, features, premieres and photo requests.', email: site.email.press, subject: 'Press inquiry', track: 'press' },
-  { title: 'Sync and licensing', body: 'Film, television, advertising and trailer placements.', email: site.email.licensing, subject: 'Licensing inquiry', track: 'licensing' },
-  { title: 'Management', body: 'Partnerships, endorsements and everything else.', email: site.email.management, subject: 'Management inquiry', track: 'management' },
+  { title: 'Weddings and private events', body: 'Ceremonies, receptions, company evenings, galas, estates and destination dates.', cta: 'inquire' as const },
+  { title: 'Planners and venues', body: 'Preferred-vendor lists, insurance certificates, riders and timelines.', email: site.email.bookings, subject: 'Planner or venue inquiry', track: 'planner' },
+  { title: 'Everything else', body: 'Press, partnerships and general questions.', email: site.email.management, subject: 'General inquiry', track: 'general' },
 ];
 const jsonLd = graph(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Contact', path: '/contact' }]));
 ---
 
-<BaseLayout pageType="contact" title="Management and Bookings | Sean Carney" description="Contact Sean Carney's team for private events, press, sync licensing and management." jsonLd={jsonLd}>
-  <PageHeader title="Management and bookings" />
+<BaseLayout pageType="contact" title="Contact | Sean Carney" description="Contact Sean Carney for weddings and private events, planner and venue requests, and general questions." jsonLd={jsonLd}>
+  <PageHeader title="Contact" intro={`Sean replies personally, ${site.responseTime}.`} />
   <section class="section" data-section="contact_routes">
     <div class="container">
       <ul class="routes">

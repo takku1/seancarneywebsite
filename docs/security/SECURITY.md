@@ -11,13 +11,12 @@ Browser ──HTTPS──► Cloudflare (TLS, WAF, rate rules)
                     ├─ static assets (prerendered HTML/CSS/JS/images)   no server code
                     └─ Worker: src/middleware.ts ─► /api/* routes
                          ├─ /api/inquire  ─► GoHighLevel (CRM), Resend (email), Turnstile
-                         ├─ /api/notify   ─► GoHighLevel
                          ├─ /api/scout    ─► Anthropic (AI), Google Calendar
                          ├─ /api/availability ─► Google Calendar (free/busy)
                          ├─ /api/signal, /api/scout/trending ─► Cloudflare KV
                          ├─ /api/scout/insights (admin token) ─► Cloudflare KV
                          └─ /api/csp-report ─► Workers Logs
-Build time only: YouTube Data API, Spotify Web API, Instagram API (media pipeline)
+Build time only: YouTube Data API, Instagram API (media pipeline)
 ```
 
 ## 2. Browser security features required (ASVS 3.1.1)
@@ -28,13 +27,13 @@ The server only ever calls these fixed hosts; no URL is ever built from visitor 
 
 | Service | Host | From | Purpose | Credential | Failure behavior |
 |---|---|---|---|---|---|
-| GoHighLevel | services.leadconnectorhq.com (+ webhook URL) | /api/inquire, /api/notify | CRM write | `GHL_PRIVATE_TOKEN` | Logged; falls back to webhook; inquiry still acknowledged |
+| GoHighLevel (Sean's account is SHA-BAM, a white-label of it) | services.leadconnectorhq.com (+ webhook URL) | /api/inquire, Scout `submit_inquiry` | CRM write | `GHL_PRIVATE_TOKEN` | Logged; falls back to webhook; inquiry still acknowledged |
 | Resend | api.resend.com | /api/inquire | Notify Sean and confirm to the client | `RESEND_API_KEY` | Logged; the CRM write already happened |
 | Cloudflare Turnstile | challenges.cloudflare.com | /api/inquire | Bot check | `TURNSTILE_SECRET_KEY` | Fails closed (403) when configured |
 | Anthropic | api.anthropic.com | /api/scout | AI replies | `ANTHROPIC_API_KEY` | Falls back to guided mode |
 | Google OAuth and Calendar | oauth2.googleapis.com, www.googleapis.com | /api/availability, /api/scout | Free/busy only | `GOOGLE_SA_*` | Returns "unknown"; the UI stays quiet |
 | Cloudflare KV | binding `SCOUT_KV` | signals, insights, budget | Anonymous counters | Binding | No-op if unbound |
-| YouTube, Spotify, Instagram | googleapis.com, accounts/api.spotify.com, graph.instagram.com | **build only** | Media pipeline | Build variables | Curated fallback; the build never fails |
+| YouTube, Instagram | googleapis.com, graph.instagram.com | **build only** | Media pipeline | Build variables | Curated fallback; the build never fails |
 
 Concurrency and resources: each request makes at most 1–3 outbound calls (Scout up to 4 model rounds); SDK timeouts are 45 s with 1 retry for Anthropic and platform defaults elsewhere.
 
@@ -43,20 +42,19 @@ Concurrency and resources: each request makes at most 1–3 outbound calls (Scou
 | Class | Data | Where it lives | Protection | Retention |
 |---|---|---|---|---|
 | **Confidential** | API keys, tokens, signing key | Worker secrets only | Never in code or logs; least privilege | Rotate every 90 days (below) |
-| **Personal** | Inquiry contact details, notify-list emails | GHL (system of record); in transit via TLS | Never in URLs or browser storage; masked in session replay; not sent to analytics | Per Sean's CRM policy; unsubscribe honored |
-| **Personal (hashed, ads)** | SHA-256 of email/phone, IP, user agent, `_fbp`/`_fbc` on inquiry and list-signup conversions | Meta Conversions API (`lib/integrations/meta-capi.ts`), server-side only | Sent only with consent + no opt-out (`ads_ok` from the browser) + no `Sec-GPC: 1`; never raw PII; token is a Worker secret; disclosed on /privacy | Meta's retention |
+| **Personal** | Inquiry contact details | GHL (system of record); in transit via TLS | Never in URLs or browser storage; masked in session replay; not sent to analytics | Per Sean's CRM policy |
+| **Personal (hashed, ads)** | SHA-256 of email/phone, IP, user agent, `_fbp`/`_fbc` on inquiry conversions | Meta Conversions API (`lib/integrations/meta-capi.ts`), server-side only | Sent only with consent + no opt-out (`ads_ok` from the browser) + no `Sec-GPC: 1`; never raw PII; token is a Worker secret; disclosed on /privacy | Meta's retention |
 | **Personal (transient)** | Scout chat text | Visitor's tab (sessionStorage), Anthropic for processing | HMAC-signed, cleared on tab close or "Clear chat", masked in replay | Tab lifetime |
 | **Internal** | Lead tier/score, attribution | GHL note; sessionStorage (tier, one page) | Not in URLs | CRM policy |
-| **Preference (no PII)** | Fan-prompt state: `sc_fan_joined`, `sc_fan_prompt_dismissed` (timestamp) in localStorage; `sc_fan_prompt_shown` in sessionStorage | Visitor's browser, via `lib/storage.ts` | No email or identifier stored; evicted by "Clear data saved in this browser" | Until cleared; dismissal is honored for 21 days |
 | **Visit record (no PII)** | `sc_visits` (first-visit date, last-visit time, count, weeks already reported) in localStorage; `sc_visit_session` in sessionStorage | Visitor's browser, via `lib/analytics/retention.ts` | No identifier; disclosed on /privacy; evicted by "Clear data". The only thing sent is an anonymous `{cohort: "2026-W45", week: N}` beacon, validated server-side (regex + 0–12 range) | Until cleared |
 | **Anonymous (retention)** | Cohort counters `ret:<ISO week>` → `{w0..w12}` | Cloudflare KV | No ID, IP or page; one +1 per visitor per week | 400-day TTL |
-| **Anonymous** | Topic counts, checked dates, scrubbed gap questions, city demand | Cloudflare KV | PII scrubbed (emails, phones, addresses) | 120-day TTL |
+| **Anonymous** | Topic counts, checked dates, scrubbed gap questions | Cloudflare KV | PII scrubbed (emails, phones, addresses) | 120-day TTL |
 | **Public** | Site content, Sean's published contact email | Repo / site | Integrity via reviewed commits | n/a |
 
 ## 5. Logging inventory (ASVS 16.1.1, 16.2, 16.4)
 - **Where:** Workers Logs (Cloudflare), one JSON line per event; UTC timestamps; no raw IPs (salted daily hash `who`). Encoded as JSON, so log injection isn't possible (ASVS 16.4.1). Only Cloudflare account members can read them (16.4.2).
 - **Security events** (`kind: "security"`): `rate_limited`, `body_too_large`, `origin_rejected`, `method_rejected`, `content_type_rejected`, `bad_signature`, `turnstile_failed`, `honeypot`, `auth_failed`, `validation_failed`, `csp_violation`, `unhandled_error`.
-- **Operational:** `[inquiry]` (lead id, tier, integration results; no contact details once the CRM is configured), `[notify]`, `[scout]` (provider errors), `[media]` (build-time fallbacks).
+- **Operational:** `[inquiry]` (lead id, tier, integration results; no contact details once the CRM is configured), `[scout]` (provider errors), `[media]` (build-time fallbacks).
 - **Alerting (to configure):** Cloudflare notification on Worker error-rate spikes; a weekly review of `rate_limited` / `bad_signature` / `csp_violation` counts.
 
 ## 6. Secrets and rotation (ASVS 13.1.4, 13.3)
@@ -78,8 +76,8 @@ Stored as Worker secrets (`wrangler secret put`) and build variables; never comm
 | 1.3.6 SSRF | Met | Fixed outbound hosts only (§3) |
 | 1.3.11 mail injection | **Fixed** | `headerSafe()` strips CR/LF from subject and reply-to (`lib/inquiry/process.ts`) |
 | 1.3.12 ReDoS | Met | Simple anchored and alternation regexes; inputs length-capped |
-| 2.2.1–2.2.2 server-side validation | Met | Zod schemas on every API (`lib/inquiry/schema.ts`, `api/notify.ts`) |
-| 2.4.1 anti-automation | **Fixed** | Per-route rate limits in `src/middleware.ts`, enforced by Cloudflare Rate Limiting bindings declared in `wrangler.jsonc` (strict: 3/min for inquire, notify and insights; standard: 20/min) |
+| 2.2.1–2.2.2 server-side validation | Met | Zod schemas on every write path (`lib/inquiry/schema.ts` for `/api/inquire` and Scout's `submit_inquiry`, tool schemas in `lib/scout/tools.ts`); beacons are type-checked and range-validated (`/api/signal`) |
+| 2.4.1 anti-automation | **Fixed** | Per-route rate limits in `src/middleware.ts`, enforced by Cloudflare Rate Limiting bindings declared in `wrangler.jsonc` (strict: 3/min for inquire and insights; standard: 20/min) |
 | 2.4.x / OWASP API4 resource limits | **Fixed** | `middleware.ts`: POST bodies need `Content-Length` (411) and are capped per route, `maxBodySize` 4–64 KB (413, logged `body_too_large`); malformed or `null` Origin is rejected (403) |
 | 2.4.2 human timing | Met | `started_at` minimum fill time plus honeypots |
 | 3.2.2 safe text rendering | Met | No `innerHTML` with untrusted data |
@@ -121,7 +119,7 @@ Stored as Worker secrets (`wrangler secret put`) and build variables; never comm
 ## 9. Privacy controls (AuditForge GDPR / CCPA lanes)
 - **GDPR / ePrivacy:** GA4, Clarity and Meta load **only after** the visitor clicks Allow (nothing is requested before consent; verified with test IDs). Plausible is cookieless and always on. Withdrawing consent switches loaded vendors to denied immediately and removes them on the next page load. The consent bar appears only when such a vendor is configured; the choice can be changed, and all site data cleared, on `/privacy#choices`.
 - **CCPA / CPRA:** notice at collection (Scout panel, forms), "Do not sell or share" toggle, Global Privacy Control honored automatically, retention stated on `/privacy`.
-- **AI disclosure** (CA bot law, EU AI Act Art. 50): see `docs/current/04-scout-ai-governance.md`.
+- **AI disclosure** (CA bot law, EU AI Act Art. 50): see `docs/current/05-scout-concierge.md`.
 
 ## 10. AuditForge scan result
 

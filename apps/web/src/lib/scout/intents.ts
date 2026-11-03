@@ -27,7 +27,7 @@ export const INTENTS: Intent[] = [
   { id: 'insurance', question: 'Can you provide a COI and tech rider?', re: /\b(insurance|coi|certificate|liability|rider|w-?9|stage plot|tech spec)\b/i, faq: 'c-paperwork', pages: ['/corporate'] },
   { id: 'sound', question: 'Do you bring your own sound?', re: /\b(sound system|pa system|speakers|mic|microphone|av|audio|equipment|setup)\b/i, faq: 'c-av', pages: ['/corporate'] },
   { id: 'privacy', question: 'Will our event be posted online?', re: /\b(nda|private|privacy|post(ed)? online|social media|discreet|photos)\b/i, faq: 'e-privacy', pages: ['/estate'] },
-  { id: 'music_style', question: 'What does Sean sound like?', re: /\b(sound like|style|genre|listen|hear|play|watch|show|video|clips?|footage|sample|songs?|playlist|drive|mood|vibe)\b/i },
+  { id: 'music_style', question: 'Can we see Sean live?', re: /\b(sound like|style|genre|listen|hear|play|watch|show|video|clips?|footage|sample|songs?|playlist|drive|mood|vibe)\b/i },
   { id: 'wedding_set', question: 'What does a wedding set include?', re: /\b(wedding set|set include|what('s| is) included|packages?|coverage|hours of music)\b/i, faq: 'w-ceremony-reception', pages: ['/weddings'] },
   { id: 'custom_song', question: 'Can Sean write a song for our brand?', re: /\b(custom song|write (a|us)|original song|jingle|brand song)\b/i, faq: 'c-custom', pages: ['/corporate'] },
 ];

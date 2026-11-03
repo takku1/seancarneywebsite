@@ -1,0 +1,114 @@
+{
+  "url": "https://johnnyrockettmusic.com/thankyou",
+  "status": 200,
+  "title": "Contact | Book Your Event Today — Johnny Rockett Music",
+  "description": "Contact Johnny Rockett Music for personalized entertainment at weddings, corporate events, and celebrations in Charlotte, NC. Fill out the form to get started.",
+  "og": {
+    "og:site_name": "Johnny Rockett Music",
+    "og:title": "Contact | Book Your Event Today — Johnny Rockett Music",
+    "og:url": "https://johnnyrockettmusic.com/thankyou",
+    "og:type": "website",
+    "og:description": "Contact Johnny Rockett Music for personalized entertainment at weddings, corporate events, and celebrations in Charlotte, NC. Fill out the form to get started."
+  },
+  "outline": [
+    "H1: Book A Call",
+    "H2: \"Outstanding experience! Johnny played the music at my wedding ceremony. He had some great suggestions and even learned a few that I specifically wanted. Several of my guests mentioned his rendition of, \"I wanna hold your hand\" by the Beatles. He was early for the event and helpful when he realized we forgot a mic for our vows and set one up for us. 100% recommend him for your event.\"",
+    "H2: \"Johnny is a great performer and I feel lucky to have heard him on multiple occasions. He’s always been extremely communicative and brings a professional demeanor into every event. On the musical front, he brings his witty and approachable demeanor to the microphone. Whether it’s a small and light event, or a full on concert, he is able to match the vibe and add to the entertainment of the occasion. I would highly recommend him!\"",
+    "H2: \"Awesome Performer! Johnny Rockett was an absolute pleasure to work with for our daughter's wedding welcome party. He took numerous requests from our guests, and had everyone up and dancing all night long. He did an amazing job keeping the energy high and getting our friends and family excited for the main event. We cannot recommend Johnny highly enough - he truly helped make our daughter's wedding weekend an unforgettable celebration.\"",
+    "H2: \"Johnny Rockett Music was the perfect choice for our wedding ceremony and cocktail hour. They made the entire process so easy. On the day of our wedding, they seamlessly set the tone, creating beautiful vibes that welcomed all our guests. We are so grateful for the incredible value they provided in making our special day truly unforgettable.\"",
+    "H2: \"Outstanding Guitarist! Guests are still raving! Johnny exceeded our expectations! He is a talented guitarist and singer and blew our guests away! Words cannot express how happy we were with the outstanding experience Johnny provided us, from start to finish.\""
+  ],
+  "nav": [
+    "Skip to Content -> #page",
+    " -> /",
+    "Home -> /",
+    "About -> /about",
+    "Live Event Clips -> /photos-and-videos-1",
+    "Services -> /services-and-events",
+    "Media -> /photos-and-videos",
+    "FAQs -> /frequently-asked-questions",
+    "Contact -> /contact",
+    " -> https://www.instagram.com/johnnyrockettmusic1/",
+    " -> https://www.facebook.com/johnnyrockettmusician",
+    " -> https://www.youtube.com/@JohnnyRockett"
+  ],
+  "ctas": [
+    "Contact -> /contact",
+    "Book A Call -> https://calendly.com/johnnyrockettmusician/introduction-call-clone"
+  ],
+  "forms": [],
+  "type": {
+    "h1": {
+      "font": "\"Libre Baskerville\"",
+      "size": "66.4px",
+      "weight": "400",
+      "color": "rgb(28, 28, 28)",
+      "transform": "none",
+      "spacing": "-1.328px"
+    },
+    "h2": {
+      "font": "\"Libre Baskerville\"",
+      "size": "14.272px",
+      "weight": "400",
+      "color": "rgb(0, 0, 0)",
+      "transform": "none",
+      "spacing": "-0.28544px"
+    },
+    "body": {
+      "font": "Montserrat",
+      "size": "14.7px",
+      "weight": "400",
+      "color": "rgb(28, 28, 28)",
+      "transform": "none",
+      "spacing": "normal"
+    },
+    "button": {
+      "font": "Almarai",
+      "size": "16px",
+      "weight": "400",
+      "color": "rgb(250, 250, 250)",
+      "transform": "none",
+      "spacing": "normal"
+    }
+  },
+  "topColors": [
+    [
+      "rgb(0, 0, 0)",
+      347
+    ],
+    [
+      "rgb(28, 28, 28)",
+      152
+    ],
+    [
+      "rgb(250, 250, 250)",
+      11
+    ],
+    [
+      "rgba(255, 255, 255, 0.76)",
+      5
+    ],
+    [
+      "rgb(231, 237, 246)",
+      4
+    ],
+    [
+      "rgba(0, 0, 0, 0.5)",
+      4
+    ],
+    [
+      "rgba(255, 255, 255, 0.79)",
+      4
+    ],
+    [
+      "rgb(255, 255, 255)",
+      1
+    ]
+  ],
+  "jsonld": [
+    "{\"url\":\"https://johnnyrockettmusic.com\",\"name\":\"Johnny Rockett Music\",\"image\":\"//images.squarespace-cdn.com/content/v1/67a22e587f45ea7c1acb3172/1f25f9fc-1d77-4ab4-806a-bbef6bb0101b/dark_logo_transparent_background.png\",\"@context\":\"http://schema.org\",\"@type\":\"WebSite\"}",
+    "{\"address\":\"\",\"image\":\"https://static1.squarespace.com/static/67a22e587f45ea7c1acb3172/t/68334aca5ec5751eb59c4a36/1791141550109/\",\"openingHours\":\"\",\"@context\":\"http://schema.org\",\"@type\":\"LocalBusiness\"}"
+  ],
+  "videos": [],
+  "words": 375
+}

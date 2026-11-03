@@ -20,14 +20,6 @@ const vendors = {
 ---
 
 <script is:inline set:html={bootScript() /* soc2-ignore: generated at build from static experiment config, no visitor input */} />
-<script is:inline>
-  // Events-zone theme experiment: swap before first paint, no flicker.
-  (function (h) {
-    if (h.getAttribute('data-zone') !== 'events') return;
-    var v = h.getAttribute('data-exp-events-theme');
-    if (v === 'ivory' || v === 'night') h.setAttribute('data-theme', v);
-  })(document.documentElement);
-</script>
 
 {PUBLIC_PLAUSIBLE_DOMAIN && (
   <>

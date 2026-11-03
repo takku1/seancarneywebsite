@@ -1,0 +1,66 @@
+---
+/**
+ * The arc of the day: one booking, the format changing with each moment.
+ * Moment copy comes from the weddings "timeline" block (events.json), so it
+ * is written once; the format for each moment is set here.
+ */
+import { getEntry } from 'astro:content';
+
+const FORMAT: Record<string, string> = {
+  Ceremony: 'Solo',
+  'Cocktail hour': 'Duo or trio',
+  Dinner: 'Solo or trio',
+  'First dance': 'Solo',
+  Reception: 'Full band',
+};
+
+const weddings = await getEntry('events', 'weddings');
+const timeline = weddings?.data.blocks.find((b) => b.type === 'timeline');
+const moments = (timeline?.items ?? []).map((i) => (typeof i === 'string' ? { title: i, body: '' } : { title: i.title ?? '', body: i.body ?? '' }));
+---
+
+{moments.length > 0 && (
+  <section class="section arc" data-section="day_arc" aria-labelledby="arc-title">
+    <div class="container">
+      <div class="head">
+        <h2 id="arc-title">One booking, the whole day</h2>
+        <p>The music changes with the day: a single guitar at the aisle, harmony over cocktails, the full band when the dancing starts.</p>
+      </div>
+      <ol>
+        {moments.map((m) => (
+          <li>
+            <h3>{m.title}</h3>
+            <p class="fmt">{FORMAT[m.title] ?? ''}</p>
+            <p class="body">{m.body}</p>
+          </li>
+        ))}
+      </ol>
+      <a class="link-arrow" href="/weddings" data-track="arc_click" data-track-location="home">How the day sounds</a>
+    </div>
+  </section>
+)}
+
+<style>
+  .head { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 1.5rem clamp(2rem, 6vw, 6rem); align-items: end; }
+  h2 { font-size: var(--step-4); line-height: 1.02; text-wrap: balance; }
+  .head p { color: var(--text-muted); font-size: var(--step-1); line-height: 1.5; max-width: 40ch; }
+  ol {
+    list-style: none;
+    margin: clamp(3rem, 6vw, 5rem) 0 2.5rem;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    border-top: 1px solid var(--line-strong);
+  }
+  li { padding: 1.5rem 1.5rem 0 0; }
+  li + li { padding-left: 1.5rem; border-left: 1px solid var(--line); }
+  h3 { font-size: var(--step-2); line-height: 1.1; }
+  .fmt { margin-top: 0.4rem; font-size: var(--step--1); color: var(--accent); }
+  .body { margin-top: 0.9rem; color: var(--text-muted); font-size: var(--step--1); line-height: 1.6; }
+
+  @media (max-width: 899px) {
+    .head { grid-template-columns: minmax(0, 1fr); }
+    ol { grid-template-columns: minmax(0, 1fr); border-top: 0; border-left: 1px solid var(--line-strong); }
+    li, li + li { padding: 0 0 1.75rem 1.5rem; border-left: 0; }
+  }
+</style>

@@ -6,13 +6,13 @@
  * template with new words.
  */
 import { Image } from 'astro:assets';
-import { getCollection, type CollectionEntry } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
 import FilmGrid from '../home/FilmGrid.astro';
 import Testimonials from '../home/Testimonials.astro';
 import FaqList from './FaqList.astro';
 import SpotifyFacade from '../media/SpotifyFacade.astro';
 import Icon from '../ui/Icon.astro';
-import { creditsBy, faqsFor } from '../../lib/content';
+import { creditsBy, rooms, faqsFor } from '../../lib/content';
 import { site } from '../../config/site';
 import arena from '../../assets/photos/arena.jpg';
 
@@ -28,8 +28,8 @@ const asItems = (items?: (string | Item)[]) => (items ?? []).map((i) => (typeof 
 
 const clients = await creditsBy('client');
 const BIG_ROOMS = ['crypto-arena', 'el-rey', 'hotel-del', 'terranea', 'beverly-hills-hotel'];
-const venues = (await creditsBy('venue')).filter((v) => BIG_ROOMS.includes(v.id));
-const press = await getCollection('press');
+// "From arenas to ballrooms": stages and luxury rooms together.
+const venues = [...(await creditsBy('venue')), ...(await rooms())].filter((v) => BIG_ROOMS.includes(v.id));
 const faqs = await faqsFor(slug);
 const split = (s: string) => {
   const [song, artist] = s.split(', ');
@@ -168,17 +168,6 @@ const split = (s: string) => {
       );
     case 'testimonials':
       return <Testimonials eventType={b.eventType} strict={b.strict} limit={b.limit} />;
-    case 'quote': {
-      const q = press.find((p) => p.id === b.pressId);
-      return q ? (
-        <section class="section pq" data-section="event_press_quote">
-          <div class="container">
-            <blockquote><p>&ldquo;{q.data.quote}&rdquo;</p></blockquote>
-            <a href={q.data.url} target="_blank" rel="noopener" data-track="press_click" data-track-outlet={q.data.outlet} data-track-location={`event_${slug}`}>{q.data.outlet} <Icon name="arrow-up-right" /></a>
-          </div>
-        </section>
-      ) : null;
-    }
     case 'stages':
       return (
         <section class="section big-rooms" data-section="event_stages" aria-labelledby={id}>
@@ -291,10 +280,6 @@ const split = (s: string) => {
   .statement p { margin: 1.75rem auto 0; max-width: 52ch; color: var(--text-muted); font-size: var(--step-1); line-height: 1.5; }
 
   /* press quote */
-  .pq blockquote { margin: 0; }
-  .pq p { font-family: var(--font-display); font-style: italic; font-size: var(--step-4); line-height: 1.12; max-width: 24ch; padding-bottom: 0.1em; }
-  .pq a { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 44px; margin-top: 1rem; color: var(--text-muted); text-decoration: none; }
-  .pq a :global(svg) { width: 16px; height: 16px; }
 
   /* big rooms */
   .br-grid :global(img) { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; }

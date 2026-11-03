@@ -33,9 +33,6 @@ const META_MAP: Record<string, string> = {
   inquiry_submit: 'Lead', // carries event_id, deduped with the server-side Conversions API
   inquiry_start: 'InitiateCheckout',
   // generate_lead (thanks page) is a GA4 recommended event only; mapping it to Lead too double-counted every inquiry in Meta.
-  // Fan funnel: list signups and release-page views give ad delivery a real signal.
-  notify_signup: 'CompleteRegistration',
-  release_view: 'ViewContent',
 };
 
 function clean(props: Props): Record<string, string | number | boolean> {

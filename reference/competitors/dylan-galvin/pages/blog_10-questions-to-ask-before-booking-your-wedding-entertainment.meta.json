@@ -1,0 +1,165 @@
+{
+  "url": "https://www.dylangalvin.com/blog/10-questions-to-ask-before-booking-your-wedding-entertainment",
+  "status": 200,
+  "title": "10 Questions to Ask Before Booking a Band | Dylan Galvin",
+  "description": "Vetting a wedding musician? Use this trust-tested checklist of 10 questions to book entertainment with confidence.",
+  "og": {
+    "og:title": "10 Questions to Ask Before Booking a Band | Dylan Galvin",
+    "og:description": "Vetting a wedding musician? Use this trust-tested checklist of 10 questions to book entertainment with confidence.",
+    "og:type": "website",
+    "og:image": "https://cdn.prod.website-files.com/66732b917cb61a30b9dc062e/6ae9e0b88403fdd4d2ce7c14_6a7c6ea1f17eb4dfafb9988c_image%2520(15).png"
+  },
+  "outline": [
+    "H3: Home",
+    "H3: blog",
+    "H3: 10 Questions to Ask Before Booking Your Wedding Entertainment",
+    "H1: 10 Questions to Ask Before Booking Your Wedding Entertainment",
+    "H2: Key Takeaways",
+    "H2: Why a Vetting Checklist Matters for Wedding Entertainment",
+    "H2: The 10-Question Wedding Entertainment Checklist",
+    "H3: Why It Matters",
+    "H3: How many weddings have you performed?",
+    "H3: What's your backup plan if you're sick or unavailable?",
+    "H3: Do you perform live, or use tracks?",
+    "H3: What's included in the fee, and are there hidden costs?",
+    "H3: Can you learn our first dance song?",
+    "H3: How do you coordinate with our planner and other vendors?",
+    "H3: What equipment do you bring, and are you insured?",
+    "H3: Can your set adapt across ceremony, cocktail hour, and reception?",
+    "H3: What's your contract, deposit, and cancellation policy?",
+    "H3: Can I see reviews or talk to a past couple?",
+    "H2: Common Mistakes Couples Make When Booking Entertainment",
+    "H2: Expert Tips for Vetting a Wedding Musician",
+    "H2: Conclusion",
+    "H2: Ready to Book Entertainment You Can Trust?",
+    "H2: Frequently Asked Questions",
+    "H3: How far in advance should we book wedding entertainment?",
+    "H3: What's the difference between a live wedding musician and a DJ?",
+    "H3: Should we ask to see the performer play live before booking?",
+    "H3: What questions reveal if a wedding musician is truly experienced?",
+    "H3: Blog Categories",
+    "H2: Birthday Party Entertainment",
+    "H2: Corporate Events",
+    "H2: Private Events",
+    "H2: Wedding Events",
+    "H3: Latest Blogs",
+    "H3: Wedding Dinner Music: How Loud, How Long and What Happens During the Toasts",
+    "H3: Wedding Ceremony Sound Systems Compared: Battery, Plugged-In, Venue and Unplugged",
+    "H3: Wedding Prelude Songs: The Half Hour Before the Ceremony and the One Song That Closes It",
+    "H3: Wedding Song Requests With Live Music: Who Decides What Gets Played",
+    "H3: Live Music Sound, Power and AV: What Your Venue Needs to Provide",
+    "H3: Birthday Party Entertainment, Revisited: New Requests and Fresh Stories",
+    "H3: Engagement Party Songs: How the Set Actually Gets Built"
+  ],
+  "nav": [
+    "ABOUT -> /about",
+    "PRIVATE & CORPORATE EVENTS -> /private-corporate-events",
+    "WEDDING MUSIC -> /wedding-music",
+    "CONTACT -> /contact",
+    "INQUIRE -> /contact"
+  ],
+  "ctas": [
+    "CONTACT -> /contact",
+    "INQUIRE -> /contact",
+    "See full wedding music details and pricing -> https://www.dylangalvin.com/wedding-music",
+    "get in touch to check availability for your date -> https://www.dylangalvin.com/contact",
+    "Wedding Song Requests With Live Music: Who Decides What Gets Played -> /blog/wedding-song-requests-live-musician",
+    "Birthday Party Entertainment, Revisited: New Requests and Fresh Stories -> /blog/birthday-party-entertainment-ideas"
+  ],
+  "forms": [
+    [
+      "query*",
+      "submit"
+    ]
+  ],
+  "type": {
+    "h1": {
+      "font": "Salvager, sans-serif",
+      "size": "50px",
+      "weight": "700",
+      "color": "rgb(51, 51, 51)",
+      "transform": "none",
+      "spacing": "2px"
+    },
+    "h2": {
+      "font": "\"Bitter Local\", Bitter, serif",
+      "size": "40px",
+      "weight": "700",
+      "color": "rgb(51, 51, 51)",
+      "transform": "none",
+      "spacing": "normal"
+    },
+    "body": {
+      "font": "\"Bitter Local\", Bitter, serif",
+      "size": "14px",
+      "weight": "400",
+      "color": "rgb(51, 51, 51)",
+      "transform": "none",
+      "spacing": "normal"
+    },
+    "button": {
+      "font": "Salvager, sans-serif",
+      "size": "13.5px",
+      "weight": "400",
+      "color": "rgb(255, 255, 255)",
+      "transform": "uppercase",
+      "spacing": "2px"
+    }
+  },
+  "topColors": [
+    [
+      "rgb(51, 51, 51)",
+      276
+    ],
+    [
+      "rgb(0, 0, 238)",
+      22
+    ],
+    [
+      "rgb(0, 0, 0)",
+      20
+    ],
+    [
+      "rgb(255, 255, 255)",
+      13
+    ],
+    [
+      "rgb(99, 99, 102)",
+      12
+    ],
+    [
+      "rgb(26, 27, 31)",
+      8
+    ],
+    [
+      "rgb(242, 242, 247)",
+      5
+    ],
+    [
+      "rgb(33, 33, 33)",
+      3
+    ],
+    [
+      "rgb(244, 244, 244)",
+      2
+    ],
+    [
+      "rgba(255, 255, 255, 0)",
+      2
+    ],
+    [
+      "rgb(58, 58, 60)",
+      2
+    ],
+    [
+      "rgb(255, 233, 230)",
+      1
+    ]
+  ],
+  "jsonld": [
+    "\n{\n  \"@context\": \"https://schema.org\",\n  \"@graph\": [\n    {\n      \"@type\": [\"LocalBusiness\", \"EntertainmentBusiness\"],\n      \"@id\": \"https://www.dylangalvin.com/#business\",\n      \"name\": \"Dylan Galvin Entertainment\",\n      \"image\": \"https://cdn.prod.website-files.com/660593ada12bb1b42498d823/6607db63b743df512506a05a_logo.svg\",\n      \"email\": \"dylangalvinmusic@gmail.com\",\n      \"description\": \"Luxury live entertainment for weddings, corporate events, and private parties across Washington DC, Maryland, and Virginia. Services include solo acoustic guitar, vocals, live looping, DJ, wireless roaming performance, and full sound system. Performing across the United States since 2009, now based in the DMV (Washington DC, Maryland, and Virginia).\",\n      \"url\": \"https://www.dylangalvin.com\",\n      \"telephone\": \"+12025739654\",\n      \"priceRange\": \"$$$\",\n      \"founder\": {\"@id\": \"https://www.dylangalvin.com/#person\"},\n      \"areaServed\": [\n        {\"@type\": \"City\", \"name\": \"Washington\", \"addressRegion\": \"DC\", \"addressCountry\": \"US\"},\n        {\"@type\": \"AdministrativeArea\", \"name\": \"Maryland\", \"addressCountry\": \"US\"},\n        {\"@type\": \"AdministrativeArea\", \"name\": \"Virginia\", \"addressCountry\": \"US\"}\n      ],\n      \"sameAs\": [\n        \"https://www.instagram.com/dylangalvinevents\",\n        \"https://www.facebook.com/dylangalvinentertainment\"\n      ]\n    },\n    {\n      \"@type\": \"Person\",\n      \"@id\": \"https://www.dylangalvin.com/#person\",\n      \"name\": \"Dylan Galvin\",\n      \"jobTitle\": \"Professional Musician, Guitarist, and Live Entertainer\",\n      \"description\": \"Dylan Galvin is a professional guitarist, vocalist, and live entertainer based in the Washington DC area. A graduate of Berklee College of Music, he has performed at over 1,500 events since 2009, including luxury weddings, corporate galas, and private celebrations across Washington DC, Maryland, and Virginia. His mentors include John Mayer, Paul Simon, and Livingston Taylor.\",\n      \"url\": \"https://www.dylangalvin.com/abo",
+    "\n  {\n    \"@context\": \"https://schema.org\",\n    \"@type\": \"BlogPosting\",\n    \"headline\": \"10 Questions to Ask Before Booking Your Wedding Entertainment \",\n    \"description\": \" Vetting a wedding musician? Use this trust-tested checklist of 10 questions to book entertainment with confidence. \",\n    \"image\": \"https://cdn.prod.website-files.com/66732b917cb61a30b9dc062e/6ae9e0b88403fdd4d2ce7c14_6a7c6ea1f17eb4dfafb9988c_image%2520(15).png\",\n    \"author\": {\"@type\": \"Person\", \"name\": \"Dylan Galvin\"},\n    \"publisher\": {\"@type\": \"Organization\", \"name\": \"Dylan Galvin Entertainment\"},\n    \"datePublished\": \"Nov 03, 2026\",\n    \"dateModified\": \"Nov 03, 2026\"\n      }\n"
+  ],
+  "videos": [],
+  "words": 2378
+}

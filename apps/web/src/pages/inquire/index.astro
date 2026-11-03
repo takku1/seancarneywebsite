@@ -4,14 +4,14 @@ import Icon from '../../components/ui/Icon.astro';
 import { PUBLIC_TURNSTILE_SITE_KEY, PUBLIC_CALL_BOOKING_URL } from 'astro:env/client';
 import { EVENT_TYPES, GUESTS, FORMATS, MOMENTS, BUDGETS, ROLES } from '../../lib/inquiry/schema';
 import { site } from '../../config/site';
-import { headlineCredits } from '../../lib/content';
+import { rooms } from '../../lib/content';
 import ScoutInvite from '../../components/scout/ScoutInvite.astro';
 
-const credits = (await headlineCredits()).slice(0, 4).map((c) => c.data.name);
+const roomNames = (await rooms()).slice(0, 3).map((c) => c.data.name);
 const steps = ['Occasion', 'Date and place', 'The event', 'Investment', 'Your details'];
 ---
 
-<BaseLayout zone="events"
+<BaseLayout
   pageType="inquire"
   title="Inquire | Sean Carney"
   description="Check Sean Carney's availability for your wedding, corporate event, gala or private celebration. Personal reply within one business day."
@@ -22,7 +22,7 @@ const steps = ['Occasion', 'Date and place', 'The event', 'Investment', 'Your de
         <h1>Tell us about the date</h1>
         <p class="lede">Five short steps, about two minutes. Sean reads every inquiry and replies personally {site.responseTime}.</p>
         <div class="scout-side"><ScoutInvite variant="inline" source="inquire" text="Rather talk it through? Scout can take your details conversationally." /></div>
-        <p class="proof">Heard on the {credits.slice(0, 3).join(', ')} and {credits[3]}.</p>
+        {roomNames.length === 3 && <p class="proof">Trusted at {roomNames[0]}, {roomNames[1]} and {roomNames[2]}.</p>}
         {PUBLIC_CALL_BOOKING_URL && (
           <p class="alt">
             Prefer to talk first? <a href={PUBLIC_CALL_BOOKING_URL} target="_blank" rel="noopener" data-track="call_booking_click" data-track-location="inquire_side">Book a 15-minute call</a>

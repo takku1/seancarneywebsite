@@ -29,23 +29,35 @@ export default defineConfig({
     validateData(),
     cspHeaderHashes(),
     sitemap({
-      filter: (page) => !['/inquire/thanks', '/api/', '/links', '/press/one-sheet'].some((p) => page.includes(p)),
+      filter: (page) => !['/inquire/thanks', '/api/', '/links'].some((p) => page.includes(p)),
     }),
   ],
   // 301s from the old GoHighLevel URLs so existing links and rankings carry over.
   redirects: {
     '/home': '/',
     '/live-events': '/private-events',
-    '/tour': '/shows',
-    '/appearances': '/shows',
-    '/video': '/music#film',
-    '/epk': '/press',
+    '/tour': '/',
+    '/appearances': '/',
+    '/video': '/weddings',
+    '/epk': '/about',
     '/events': '/private-events',
+    // Retired artist pages: links and rankings carry over to the wedding house.
+    '/music': '/repertoire',
+    '/music/california-cowboy': '/repertoire',
+    '/music/the-otherside': '/repertoire',
+    '/music/wanted': '/repertoire',
+    '/music/graveyard': '/repertoire',
+    '/music/stronger': '/repertoire',
+    '/music/come-together': '/repertoire',
+    '/shows': '/',
+    '/merch': '/',
+    '/press': '/about',
+    '/press/one-sheet': '/about',
     // Hidden "Sean Carney Luxury Events" sub-site on the old platform.
     '/events-home': '/private-events',
     '/wedding-events': '/weddings',
     '/events-contact-us': '/inquire',
-    '/tipjar': '/music',
+    '/tipjar': '/',
     '/thank-you': '/',
   },
   // Internal links prefetch on hover/focus (touch: on tap-start), so most navigations feel instant.
@@ -85,8 +97,6 @@ export default defineConfig({
       META_CAPI_ACCESS_TOKEN: envField.string({ context: 'server', access: 'secret', optional: true }),
       // Build-time media pipeline (set as Workers Builds variables, not runtime secrets).
       YOUTUBE_API_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
-      SPOTIFY_CLIENT_ID: envField.string({ context: 'server', access: 'secret', optional: true }),
-      SPOTIFY_CLIENT_SECRET: envField.string({ context: 'server', access: 'secret', optional: true }),
       INSTAGRAM_ACCESS_TOKEN: envField.string({ context: 'server', access: 'secret', optional: true }),
       // Scout AI backend (optional). Unset = guided mode.
       SCOUT_PROVIDER: envField.string({ context: 'server', access: 'secret', optional: true }),

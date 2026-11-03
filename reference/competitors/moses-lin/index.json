@@ -1,0 +1,63 @@
+{
+  "origin": "https://moseslinmusic.com",
+  "captured": "2026-11-03T18:29:50.794Z",
+  "pages": [
+    {
+      "name": "home",
+      "url": "https://web.archive.org/web/20250420153253if_/https://moseslinmusic.com/",
+      "status": 200,
+      "title": "Moses Lin Music",
+      "words": 1068
+    },
+    {
+      "name": "about",
+      "url": "https://web.archive.org/web/20250420153139if_/https://moseslinmusic.com/about",
+      "status": 200,
+      "title": "Meet Moses | Moses Lin Music",
+      "words": 527
+    },
+    {
+      "name": "faq",
+      "url": "https://web.archive.org/web/20250420144808if_/https://moseslinmusic.com/faq",
+      "status": 200,
+      "title": "FAQ | Moses Lin Music",
+      "words": 471
+    },
+    {
+      "name": "weddings",
+      "url": "https://web.archive.org/web/20240806054457if_/https://moseslinmusic.com/weddings",
+      "status": 200,
+      "title": "Weddings | Moses Lin Music",
+      "words": 807
+    },
+    {
+      "name": "contact_weddings",
+      "url": "https://web.archive.org/web/20230609220054if_/https://moseslinmusic.com/contact/weddings",
+      "status": 200,
+      "title": "Weddings - Moses Lin Music",
+      "words": 164
+    },
+    {
+      "name": "los-angeles-wedding-guitarist",
+      "url": "https://web.archive.org/web/20240412234727if_/https://moseslinmusic.com/los-angeles-wedding-guitarist",
+      "status": 200,
+      "title": "Los Angeles Wedding Guitarist | Moses Lin Music",
+      "words": 135
+    },
+    {
+      "name": "los-angeles-wedding-guitarist_malibu",
+      "url": "https://web.archive.org/web/20240720094143if_/https://moseslinmusic.com/los-angeles-wedding-guitarist/malibu",
+      "status": 200,
+      "title": "Malibu Wedding Guitarist | Moses Lin Music",
+      "words": 132
+    },
+    {
+      "name": "orange-county-wedding-guitarist",
+      "url": "https://web.archive.org/web/20240519071352if_/https://moseslinmusic.com/orange-county-wedding-guitarist",
+      "status": 200,
+      "title": "Orange County Wedding Guitarist | Moses Lin Music",
+      "words": 135
+    }
+  ],
+  "note": "Live site returned 502 on 2026-11-03; captured from Internet Archive (Wayback Machine) snapshots, dates in each url."
+}

@@ -1,0 +1,162 @@
+{
+  "url": "https://www.dylangalvin.com/blog/cocktail-hour-music",
+  "status": 200,
+  "title": "Wedding Cocktail Hour Music Guide | Dylan Galvin",
+  "description": "What music should you have for wedding cocktail hour? A live musician who roams the room beats a playlist every time. Here's the real story, the genre breakdown, and how to brief a musician for a cocktail hour guests won't forget.",
+  "og": {
+    "og:title": "Wedding Cocktail Hour Music Guide | Dylan Galvin",
+    "og:description": "What music should you have for wedding cocktail hour? A live musician who roams the room beats a playlist every time. Here's the real story, the genre breakdown, and how to brief a musician for a cocktail hour guests won't forget.",
+    "og:type": "website",
+    "og:image": "https://cdn.prod.website-files.com/66732b917cb61a30b9dc062e/6a92bf7f2e47a1e9fe148e4c_6a92bf5b878de395f110a93d_dylan-galvin-cocktail-hour-hero-desktop-crop.jpeg"
+  },
+  "outline": [
+    "H3: Home",
+    "H3: blog",
+    "H3: Wedding Cocktail Hour Music: The Complete Guide",
+    "H3: Wedding Events",
+    "H1: Wedding Cocktail Hour Music: The Complete Guide",
+    "H2: Key Takeaways",
+    "H2: What Actually Happens When a Room Warms Up",
+    "H2: Live Music vs. Playlist: An Honest Comparison",
+    "H2: The Roaming Musician Advantage",
+    "H2: A Genre Framework for Cocktail Hour Music",
+    "H2: How Loud Should Cocktail Hour Music Be?",
+    "H2: How to Brief a Musician for Cocktail Hour",
+    "H2: Venue and Logistics (DMV Context)",
+    "H2: The Transition to Dinner",
+    "H2: Common Mistakes to Avoid ‍",
+    "H2: Expert Tips",
+    "H2: Before You Book: More Resources",
+    "H2: Frequently Asked Questions",
+    "H3: Do we need a separate musician for cocktail hour if we already have a DJ or band for the reception? ‍",
+    "H3: Can cocktail hour music include songs with lyrics, or does it have to be instrumental? ‍",
+    "H3: How far in advance should we book cocktail hour music? ‍",
+    "H3: What if it rains or the venue changes location last minute? ‍",
+    "H3: Can we request specific songs or a custom arrangement for cocktail hour? ‍",
+    "H2: Conclusion",
+    "H2: ‍",
+    "H3: Blog Categories",
+    "H2: Birthday Party Entertainment",
+    "H2: Corporate Events",
+    "H2: Private Events",
+    "H2: Wedding Events",
+    "H3: Latest Blogs",
+    "H3: Wedding Dinner Music: How Loud, How Long and What Happens During the Toasts",
+    "H3: Wedding Ceremony Sound Systems Compared: Battery, Plugged-In, Venue and Unplugged",
+    "H3: Wedding Prelude Songs: The Half Hour Before the Ceremony and the One Song That Closes It",
+    "H3: Wedding Song Requests With Live Music: Who Decides What Gets Played",
+    "H3: Live Music Sound, Power and AV: What Your Venue Needs to Provide",
+    "H3: Birthday Party Entertainment, Revisited: New Requests and Fresh Stories",
+    "H3: Engagement Party Songs: How the Set Actually Gets Built"
+  ],
+  "nav": [
+    "ABOUT -> /about",
+    "PRIVATE & CORPORATE EVENTS -> /private-corporate-events",
+    "WEDDING MUSIC -> /wedding-music",
+    "CONTACT -> /contact",
+    "INQUIRE -> /contact"
+  ],
+  "ctas": [
+    "CONTACT -> /contact",
+    "INQUIRE -> /contact",
+    "GigSalad's 2025 booking data -> https://celebrityaccess.com/2026/01/30/gigsalad-sees-a-surge-in-live-music-bookings-in-2025/",
+    "Wedding Song Requests With Live Music: Who Decides What Gets Played -> /blog/wedding-song-requests-live-musician",
+    "Birthday Party Entertainment, Revisited: New Requests and Fresh Stories -> /blog/birthday-party-entertainment-ideas"
+  ],
+  "forms": [
+    [
+      "query*",
+      "submit"
+    ]
+  ],
+  "type": {
+    "h1": {
+      "font": "Salvager, sans-serif",
+      "size": "50px",
+      "weight": "700",
+      "color": "rgb(51, 51, 51)",
+      "transform": "none",
+      "spacing": "2px"
+    },
+    "h2": {
+      "font": "\"Bitter Local\", Bitter, serif",
+      "size": "40px",
+      "weight": "700",
+      "color": "rgb(51, 51, 51)",
+      "transform": "none",
+      "spacing": "normal"
+    },
+    "body": {
+      "font": "\"Bitter Local\", Bitter, serif",
+      "size": "14px",
+      "weight": "400",
+      "color": "rgb(51, 51, 51)",
+      "transform": "none",
+      "spacing": "normal"
+    },
+    "button": {
+      "font": "Salvager, sans-serif",
+      "size": "13.5px",
+      "weight": "400",
+      "color": "rgb(255, 255, 255)",
+      "transform": "uppercase",
+      "spacing": "2px"
+    }
+  },
+  "topColors": [
+    [
+      "rgb(51, 51, 51)",
+      195
+    ],
+    [
+      "rgb(0, 0, 238)",
+      20
+    ],
+    [
+      "rgb(0, 0, 0)",
+      20
+    ],
+    [
+      "rgb(255, 255, 255)",
+      13
+    ],
+    [
+      "rgb(99, 99, 102)",
+      12
+    ],
+    [
+      "rgb(26, 27, 31)",
+      8
+    ],
+    [
+      "rgb(242, 242, 247)",
+      5
+    ],
+    [
+      "rgb(33, 33, 33)",
+      3
+    ],
+    [
+      "rgb(244, 244, 244)",
+      2
+    ],
+    [
+      "rgba(255, 255, 255, 0)",
+      2
+    ],
+    [
+      "rgb(58, 58, 60)",
+      2
+    ],
+    [
+      "rgb(255, 233, 230)",
+      1
+    ]
+  ],
+  "jsonld": [
+    "\n{\n  \"@context\": \"https://schema.org\",\n  \"@graph\": [\n    {\n      \"@type\": [\"LocalBusiness\", \"EntertainmentBusiness\"],\n      \"@id\": \"https://www.dylangalvin.com/#business\",\n      \"name\": \"Dylan Galvin Entertainment\",\n      \"image\": \"https://cdn.prod.website-files.com/660593ada12bb1b42498d823/6607db63b743df512506a05a_logo.svg\",\n      \"email\": \"dylangalvinmusic@gmail.com\",\n      \"description\": \"Luxury live entertainment for weddings, corporate events, and private parties across Washington DC, Maryland, and Virginia. Services include solo acoustic guitar, vocals, live looping, DJ, wireless roaming performance, and full sound system. Performing across the United States since 2009, now based in the DMV (Washington DC, Maryland, and Virginia).\",\n      \"url\": \"https://www.dylangalvin.com\",\n      \"telephone\": \"+12025739654\",\n      \"priceRange\": \"$$$\",\n      \"founder\": {\"@id\": \"https://www.dylangalvin.com/#person\"},\n      \"areaServed\": [\n        {\"@type\": \"City\", \"name\": \"Washington\", \"addressRegion\": \"DC\", \"addressCountry\": \"US\"},\n        {\"@type\": \"AdministrativeArea\", \"name\": \"Maryland\", \"addressCountry\": \"US\"},\n        {\"@type\": \"AdministrativeArea\", \"name\": \"Virginia\", \"addressCountry\": \"US\"}\n      ],\n      \"sameAs\": [\n        \"https://www.instagram.com/dylangalvinevents\",\n        \"https://www.facebook.com/dylangalvinentertainment\"\n      ]\n    },\n    {\n      \"@type\": \"Person\",\n      \"@id\": \"https://www.dylangalvin.com/#person\",\n      \"name\": \"Dylan Galvin\",\n      \"jobTitle\": \"Professional Musician, Guitarist, and Live Entertainer\",\n      \"description\": \"Dylan Galvin is a professional guitarist, vocalist, and live entertainer based in the Washington DC area. A graduate of Berklee College of Music, he has performed at over 1,500 events since 2009, including luxury weddings, corporate galas, and private celebrations across Washington DC, Maryland, and Virginia. His mentors include John Mayer, Paul Simon, and Livingston Taylor.\",\n      \"url\": \"https://www.dylangalvin.com/abo",
+    "\n  {\n    \"@context\": \"https://schema.org\",\n    \"@type\": \"BlogPosting\",\n    \"headline\": \"Wedding Cocktail Hour Music: The Complete Guide\",\n    \"description\": \"What music should you have for wedding cocktail hour? A live musician who roams the room beats a playlist every time. Here&#39;s the real story, the genre breakdown, and how to brief a musician for a cocktail hour guests won&#39;t forget.\",\n    \"image\": \"https://cdn.prod.website-files.com/66732b917cb61a30b9dc062e/6a92bf7f2e47a1e9fe148e4c_6a92bf5b878de395f110a93d_dylan-galvin-cocktail-hour-hero-desktop-crop.jpeg\",\n    \"author\": {\"@type\": \"Person\", \"name\": \"Dylan Galvin\"},\n    \"publisher\": {\"@type\": \"Organization\", \"name\": \"Dylan Galvin Entertainment\"},\n    \"datePublished\": \"Sep 01, 2026\",\n    \"dateModified\": \"Sep 01, 2026\"\n      }\n"
+  ],
+  "videos": [],
+  "words": 2858
+}

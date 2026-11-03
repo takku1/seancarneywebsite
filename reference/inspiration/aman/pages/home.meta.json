@@ -1,0 +1,191 @@
+{
+  "url": "https://www.aman.com/",
+  "status": 200,
+  "title": "Aman Resorts, Hotels & Residences - Explore Luxury Destinations",
+  "description": "Explore the world of Aman. 36 luxury resorts, hotels & private residences in 21 countries. Book accommodation, experiences & journeys of discovery with Aman.",
+  "og": {
+    "og:url": "https://www.aman.com/homepage"
+  },
+  "outline": [
+    "H3: Amanvari, Mexico",
+    "H2: Join in Rituals of Celebration",
+    "H3: HOTELS & RESORTS",
+    "H3: Explore the World of Aman",
+    "H3: FESTIVE HIGHLIGHT",
+    "H3: New Year’s Eve at Borobudur, Indonesia",
+    "H2: Seasonal Experiences",
+    "H3: Aman Villas",
+    "H3: In the City",
+    "H3: Grand Ski Adventures",
+    "H3: A Novak Djokovic Programme",
+    "H3: By the Ocean",
+    "H3: To the Wilds",
+    "H3: AMAN RESIDENCES",
+    "H3: Own a Private Piece of Aman",
+    "H3: FEATURED RESIDENCE",
+    "H3: Unveiling Amanolu, Maldives",
+    "H2: The World of Aman",
+    "H3: Aman Gift Cards",
+    "H3: A Capsule Collection",
+    "H3: Aman at Sea",
+    "H2: More information",
+    "H2: Destinations",
+    "H3: Americas & Caribbean",
+    "H3: Europe, Middle East & Africa",
+    "H3: Asia",
+    "H3: Asia (continued).",
+    "H2: Privacy Preference Center",
+    "H3: Manage Consent Preferences",
+    "H3: Cookie List"
+  ],
+  "nav": [
+    "Aman resorts -> https://www.aman.com/",
+    "Reserve -> /book/aman#/booking/destination/dates",
+    " -> https://www.aman.com/",
+    "Destinations -> /destinations",
+    "Experiences -> /journeys",
+    "Festive -> /festive-season-aman",
+    "Exclusive Offers -> /exclusive-offers",
+    "Residences -> /residences",
+    "Contact us -> /contact-us",
+    "Aman at Sea -> https://www.amanatsea.com",
+    "Aman Shop -> https://shop.aman.com/",
+    "Aman Interiors -> /interiors",
+    "Janu -> https://www.janu.com/",
+    "All Destinations -> /destinations",
+    "Americas & Caribbean -> /",
+    "Asia -> /",
+    "Europe, Middle East & Africa -> /",
+    "Dominican Republic -> /",
+    "Mexico -> /",
+    "The BahamasComing soon -> /",
+    "Turks & Caicos Islands -> /",
+    "United States -> /",
+    "View All -> /destinations/country/usa-caribbean",
+    "AmaneraPlaya Grande, Dominican Republic -> /resorts/amanera",
+    "AmanvariEast Cape, Mexico -> /resorts/amanvari",
+    "AmancayaExuma, The Bahamas, Coming soon -> /amancaya",
+    "AmanyaraProvidenciales, Turks and Caicos -> /resorts/amanyara",
+    "Aman Miami BeachMiami Beach - Opening 2028 -> /hotels/aman-miami-beach",
+    "Aman New YorkNew York, USA -> /hotels/aman-new-york",
+    "Aman Beverly HillsBeverly Hills – Opening 2028 -> /aman-beverly-hills",
+    "AmanganiJackson Hole, USA, Reopening soon -> /resorts/amangani",
+    "AmangiriCanyon Point, Utah, USA -> /resorts/amangiri",
+    "AmansanuTEXAS HILL COUNTRY, USA, COMING SOON -> /residences/amansanu",
+    "View all -> /destinations/country/usa-caribbean",
+    "Bhutan -> /",
+    "Cambodia -> /",
+    "China -> /",
+    "India -> /",
+    "Indonesia -> /",
+    "Japan -> /"
+  ],
+  "ctas": [
+    "Reserve -> /book/aman#/booking/destination/dates",
+    "Contact us -> /contact-us",
+    "Contact Us -> /contact-us",
+    "Facebook -> https://www.facebook.com/amandestinations"
+  ],
+  "forms": [
+    [
+      "search",
+      "submit",
+      "utm_source",
+      "utm_medium",
+      "utm_campaign",
+      "utm_term",
+      "utm_content",
+      "gclid",
+      "fbclid",
+      "gbraid",
+      "wbraid",
+      "msclkid",
+      "ttclid",
+      "audience"
+    ]
+  ],
+  "type": {
+    "h1": null,
+    "h2": {
+      "font": "\"Lyon Text Web\", \"Lyon Display Web\", \"Times New Roman\", serif",
+      "size": "31.08px",
+      "weight": "400",
+      "color": "rgb(49, 49, 49)",
+      "transform": "none",
+      "spacing": "0.5px"
+    },
+    "body": {
+      "font": "WhitneySSm, \"Lyon Display Web\", \"Times New Roman\", serif",
+      "size": "9.8px",
+      "weight": "400",
+      "color": "rgb(49, 49, 49)",
+      "transform": "uppercase",
+      "spacing": "normal"
+    },
+    "button": {
+      "font": "WhitneySSm, \"Lyon Display Web\", \"Times New Roman\", serif",
+      "size": "14px",
+      "weight": "400",
+      "color": "rgb(49, 49, 49)",
+      "transform": "none",
+      "spacing": "normal"
+    }
+  },
+  "topColors": [
+    [
+      "rgb(49, 49, 49)",
+      1273
+    ],
+    [
+      "rgb(88, 88, 88)",
+      157
+    ],
+    [
+      "rgb(0, 0, 0)",
+      74
+    ],
+    [
+      "rgb(255, 255, 255)",
+      50
+    ],
+    [
+      "rgb(64, 64, 64)",
+      44
+    ],
+    [
+      "rgb(85, 85, 85)",
+      15
+    ],
+    [
+      "rgb(253, 249, 245)",
+      12
+    ],
+    [
+      "rgb(105, 105, 105)",
+      9
+    ],
+    [
+      "rgb(243, 238, 231)",
+      5
+    ],
+    [
+      "rgb(118, 118, 118)",
+      3
+    ],
+    [
+      "rgba(0, 0, 0, 0.7)",
+      2
+    ],
+    [
+      "rgb(56, 96, 190)",
+      2
+    ]
+  ],
+  "jsonld": [
+    "{\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Aman Resorts\",\n    \"legalName\": \"Amanresorts International Pte. Limited\",\n    \"alternateName\": [\n        \"Aman\",\n        \"Amanresorts\"\n    ],\n    \"award\": [\n        \"Travel + Leisure – Top 25 Hotel Brands in the World 2021\",\n        \"Hurun Report – Best Luxury Hotel Brand 2021\",\n        \"The Gallivanter’s Guide – Best Ever Hotel Group Worldwide 2021\",\n        \"Travel + Leisure – Best Brands in the World 2020\",\n        \"2020 KOL Award – Top 20 Best Destination Hotels 2020\",\n        \"Travel Video Awards – Best Video By a Hospitality Brand 2020\",\n        \"Ultimate Luxury Travel Related Awards – Best Wellness Hotel Group 2019\",\n        \"Business Traveller Reader’s Awards – Best Smaller Hotel Companies 2019\",\n        \"Spa China – Global Spa Brand of the Year 2019\",\n        \"Luxury Travel Intelligence – World’s Best Luxury Hotel Brands 2019\",\n        \"Travel + Leisure – Top 25 Hotel Brands 2019\",\n        \"Elle Décor – Lifetime Award 2019\",\n        \"Condé Nast Traveler China – The Gold List 2019\",\n        \"The Gallivanter’s Guide – Best Hotel Groups Worldwide 2019\",\n        \"Spa China – Best Global Spa Brand of the Year 2018\",\n        \"Travel + Leisure – Top Hotel Brands 2018\",\n        \"The Telegraph – The world’s greatest hotel groups, according to you 2017\"\n    ],\n    \"parentOrganization\": \"Aman Resorts Group Ltd.\",\n    \"logo\": \"https://www.aman.com/themes/custom/aman/logo.svg\",\n    \"url\": \"https://www.aman.com/\",\n    \"description\": \"Aman offers a guest experience that is intimate and discreet while providing the highest level of service. Each resort and setting is unique, but certain elements characterise all of them – a beautiful natural location, outstanding facilities, genuine service and a small number of rooms to ensure exclusivity and privacy.  Today, Aman embraces 33 resorts, hotels, and private residences in 20 countries. Aman continues to seek out transformative experiences and awe"
+  ],
+  "videos": [
+    "https://www.aman.com/media/oembed?url=https%3A//vimeo.com/1238308232%3Fshare%3Dcopy%26fl%3Dsv%26fe%3Dci&max_width=0&max_height=0&hash=FdIW2hpAWeQqpeD6SCd2MlZaSlJWTjffvw848z1tUik"
+  ],
+  "words": 695
+}

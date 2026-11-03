@@ -1,7 +1,7 @@
 /**
  * Google Calendar free/busy from a Cloudflare Worker, no SDK.
  *
- * Setup (see docs/current/03-integrations-and-workflows.md):
+ * Setup (see docs/current/04-integrations-and-workflows.md):
  *  1. Google Cloud project, enable "Google Calendar API".
  *  2. Create a service account and a JSON key. Put client_email and private_key in env.
  *  3. In Google Calendar, share each calendar with the service account email using

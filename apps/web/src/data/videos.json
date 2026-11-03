@@ -8,49 +8,6 @@
     "order": 0
   },
   {
-    "id": "do-or-die",
-    "title": "Do Or Die",
-    "youtubeId": "NB6c_5NsoDM",
-    "context": "original",
-    "note": "Featured in the 2025 NFL Playoffs",
-    "order": 1
-  },
-  {
-    "id": "stronger",
-    "title": "Stronger",
-    "youtubeId": "6SUsyFqWmGE",
-    "context": "original",
-    "order": 2
-  },
-  {
-    "id": "the-otherside",
-    "title": "The Otherside",
-    "youtubeId": "uq9IdUhf7W4",
-    "context": "original",
-    "order": 2
-  },
-  {
-    "id": "invincible",
-    "title": "Invincible",
-    "youtubeId": "k58Zuc_MmMY",
-    "context": "original",
-    "order": 3
-  },
-  {
-    "id": "wanted-video",
-    "title": "WANTED",
-    "youtubeId": "TLuOObXzf6M",
-    "context": "original",
-    "order": 3
-  },
-  {
-    "id": "graveyard",
-    "title": "Graveyard (with Kirsten Collins)",
-    "youtubeId": "3zYkoWnyalU",
-    "context": "original",
-    "order": 4
-  },
-  {
     "id": "tennessee-whiskey",
     "title": "Tennessee Whiskey",
     "youtubeId": "R5_SWpCimc0",
@@ -112,13 +69,5 @@
     "context": "live",
     "note": "Fleetwood Mac, live in San Diego",
     "order": 12
-  },
-  {
-    "id": "two-sean-carneys",
-    "title": "The Tale of Two Sean Carneys",
-    "youtubeId": "iBLdS53jpa4",
-    "context": "original",
-    "note": "Featuring Sean Carney",
-    "order": 20
   }
 ]
