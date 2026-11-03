@@ -1,0 +1,39 @@
+---
+/** /venues: the rooms Sean has played, each linking to its page. */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/ui/PageHeader.astro';
+import Icon from '../../components/ui/Icon.astro';
+import { rooms } from '../../lib/content';
+import { graph, breadcrumbSchema } from '../../lib/seo/schema';
+
+const list = await rooms();
+const jsonLd = graph(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Venues', path: '/venues' }]));
+---
+
+<BaseLayout pageType="venues" title="Wedding Venues | Sean Carney" description="Rooms Sean Carney has played across Southern California, from Hotel del Coronado to The Beverly Hills Hotel, for weddings and private events." jsonLd={jsonLd}>
+  <PageHeader title="Venues" intro="Rooms Sean has played, and the private estates and destinations in between. Planning at one of them? Each page has the details." />
+  <section class="section" data-section="venues_list" aria-label="Venues">
+    <div class="container">
+      <ul>
+        {list.map((r) => (
+          <li>
+            <a href={`/venues/${r.id}`} data-track="venue_click" data-track-venue={r.id} data-track-location="venues_index">
+              <span class="n">{r.data.name}</span>
+              {r.data.detail && <span class="d">{r.data.detail}</span>}
+              <Icon name="arrow-right" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  a { display: flex; align-items: baseline; gap: 1.25rem; min-height: 80px; padding-block: 1.25rem; border-bottom: 1px solid var(--line); text-decoration: none; }
+  .n { font-family: var(--font-display); font-size: var(--step-3); line-height: 1.05; }
+  .d { color: var(--text-muted); font-size: var(--step--1); }
+  a :global(svg) { margin-left: auto; align-self: center; width: 20px; height: 20px; color: var(--text-muted); }
+  a:hover .n, a:hover :global(svg) { color: var(--accent); }
+</style>

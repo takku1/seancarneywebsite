@@ -1,0 +1,112 @@
+---
+/**
+ * /venues/<room>: one page per room Sean has played (credits.json, category
+ * "room"). Everything stated is confirmed site content; Sean's own account
+ * goes in the room's `story`. Until a story exists the page is noindex (and
+ * left out of the sitemap), so thin venue pages never ship as SEO.
+ */
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/ui/Icon.astro';
+import InquireLabel from '../../components/ui/InquireLabel.astro';
+import FaqList from '../../components/events/FaqList.astro';
+import { graph, breadcrumbSchema, faqSchema } from '../../lib/seo/schema';
+
+export async function getStaticPaths() {
+  const all = (await getCollection('credits', (c) => c.data.category === 'room')).sort((a, b) => a.data.order - b.data.order);
+  return all.map((r) => ({ params: { room: r.id }, props: { r, all } }));
+}
+
+interface Props { r: CollectionEntry<'credits'>; all: CollectionEntry<'credits'>[] }
+const { r, all } = Astro.props;
+const name = r.data.name;
+const place = r.data.detail;
+const story = r.data.story;
+const others = all.filter((x) => x.id !== r.id);
+
+const moments = [
+  { when: 'Ceremony', fmt: 'Solo', body: 'Voice and acoustic guitar for the processional, the vows and the recessional.' },
+  { when: 'Cocktail hour and dinner', fmt: 'Duo or trio', body: 'Harmony and rhythm, quiet enough to talk over.' },
+  { when: 'Reception', fmt: 'Full band', body: 'Sean Carney and The Hustlers, once the dancing starts.' },
+];
+const faqs = [
+  { id: `${r.id}-played`, data: { q: `Has Sean performed at ${name}?`, a: `Yes. ${name}${place ? ` in ${place}` : ''} is one of the rooms Sean has played.` } },
+  { id: `${r.id}-coi`, data: { q: `Can Sean provide a certificate of insurance naming ${name}?`, a: 'Yes, on request, along with a W-9, a stage plot and a tech rider.' } },
+  { id: `${r.id}-formats`, data: { q: `Which format suits a wedding at ${name}?`, a: "Solo, duo or trio, or the full band. The right one depends on the space you've booked within the venue, the guest count and the moment of the day; many couples combine them." } },
+  { id: `${r.id}-sound`, data: { q: "Do you bring sound or use the venue's AV?", a: "Either. A self-contained system for smaller spaces, or plugged into the venue's or your production team's setup for larger ones." } },
+];
+const title = `Live Wedding Music at ${name} | Sean Carney`;
+const description = `Live wedding and event music at ${name}${place ? `, ${place}` : ''}: solo for the ceremony, a trio for cocktails, the full band for the reception.`;
+const jsonLd = graph(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Venues', path: '/venues' }, { name, path: `/venues/${r.id}` }]), faqSchema(faqs.map((f) => f.data)));
+---
+
+<BaseLayout pageType="venue" title={title} description={description} jsonLd={jsonLd} noindex={!story}>
+  <header class="vh" data-section="venue_header">
+    <div class="container">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/venues">Venues</a> <span aria-hidden="true">/</span> <span aria-current="page">{name}</span></nav>
+      <h1>Live music at {name}</h1>
+      {place && <p class="place">{place}</p>}
+      {story ? (
+        <div class="story">{story.split('\n').filter(Boolean).map((p) => <p>{p}</p>)}</div>
+      ) : (
+        <p class="lede">Sean has performed at {name}. Mention the venue when you inquire and the music is planned around the room you've booked.</p>
+      )}
+      <a href="/inquire?type=wedding" class="btn" data-track="cta_click" data-track-location="venue" data-track-venue={r.id}><InquireLabel /></a>
+    </div>
+  </header>
+
+  <section class="section day" data-section="venue_day" aria-labelledby="day-title">
+    <div class="container">
+      <h2 id="day-title">A day at {name}</h2>
+      <ol>
+        {moments.map((m) => (
+          <li><h3>{m.when}</h3><p class="fmt">{m.fmt}</p><p>{m.body}</p></li>
+        ))}
+      </ol>
+      <p class="more">Planning details for the venue team: <a href="/planners">the planner toolkit</a>.</p>
+    </div>
+  </section>
+
+  <FaqList faqs={faqs} location={`venue_${r.id}`} />
+
+  {others.length > 0 && (
+    <section class="section others" data-section="venue_others" aria-labelledby="others-title">
+      <div class="container">
+        <h2 id="others-title">Other rooms</h2>
+        <ul>
+          {others.map((o) => (
+            <li><a href={`/venues/${o.id}`} data-track="venue_click" data-track-venue={o.id} data-track-location="venue_others"><span>{o.data.name}</span><Icon name="arrow-right" /></a></li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+</BaseLayout>
+
+<style>
+  .vh { padding-block: clamp(3rem, 8vw, 7rem) clamp(2.5rem, 5vw, 4rem); border-bottom: 1px solid var(--line); }
+  .crumbs { font-size: var(--step--1); color: var(--text-muted); }
+  .crumbs a { color: inherit; text-underline-offset: 0.2em; }
+  h1 { margin-top: 1.25rem; font-size: var(--step-5); line-height: 0.98; max-width: 14ch; text-wrap: balance; }
+  .place { margin-top: 1rem; color: var(--text-muted); }
+  .lede, .story { margin-block: 1.75rem 2rem; max-width: var(--measure); font-size: var(--step-1); line-height: 1.5; }
+  .story { display: grid; gap: 1rem; }
+  .day h2, .others h2 { font-size: var(--step-3); line-height: 1.05; }
+  .day ol { list-style: none; margin: 2.5rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line-strong); }
+  .day li { padding: 1.5rem 1.5rem 0 0; }
+  .day li + li { padding-left: 1.5rem; border-left: 1px solid var(--line); }
+  .day h3 { font-size: var(--step-2); line-height: 1.1; }
+  .fmt { margin-top: 0.4rem; font-size: var(--step--1); color: var(--accent); }
+  .day li p:last-child { margin-top: 0.75rem; color: var(--text-muted); }
+  .more { margin-top: 2.5rem; color: var(--text-muted); }
+  .others { background: var(--bg-raised); border-top: 1px solid var(--line); }
+  .others ul { list-style: none; margin: 1.5rem 0 0; padding: 0; border-top: 1px solid var(--line); }
+  .others a { display: flex; align-items: center; justify-content: space-between; min-height: 60px; border-bottom: 1px solid var(--line); text-decoration: none; }
+  .others span { font-family: var(--font-display); font-size: var(--step-2); }
+  .others a:hover span { color: var(--accent); }
+  .others :global(svg) { width: 18px; height: 18px; color: var(--text-muted); }
+  @media (max-width: 899px) {
+    .day ol { grid-template-columns: minmax(0, 1fr); border-top: 0; border-left: 1px solid var(--line-strong); }
+    .day li, .day li + li { padding: 0 0 1.5rem 1.5rem; border-left: 0; }
+  }
+</style>

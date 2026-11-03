@@ -89,6 +89,28 @@
         ]
       },
       {
+        "type": "steps",
+        "title": "How booking works",
+        "items": [
+          {
+            "title": "Share the date",
+            "body": "A short inquiry with the date, the place and a few details, or a call if you would rather talk."
+          },
+          {
+            "title": "A personal reply",
+            "body": "Sean replies within one business day with availability and a few questions about the day."
+          },
+          {
+            "title": "A proposal for your day",
+            "body": "Built around the date, the room, the formats and the hours of music."
+          },
+          {
+            "title": "Your date is held",
+            "body": "Once the agreement is signed. Then the timeline, the songs and the sound are planned with you and your planner."
+          }
+        ]
+      },
+      {
         "type": "faq"
       }
     ]

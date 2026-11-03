@@ -9,7 +9,7 @@ import { graph, breadcrumbSchema } from '../lib/seo/schema';
 
 const routes = [
   { title: 'Weddings and private events', body: 'Ceremonies, receptions, company evenings, galas, estates and destination dates.', cta: 'inquire' as const },
-  { title: 'Planners and venues', body: 'Preferred-vendor lists, insurance certificates, riders and timelines.', email: site.email.bookings, subject: 'Planner or venue inquiry', track: 'planner' },
+  { title: 'Planners and venues', body: 'Insurance certificates, riders, stage plots and timelines. The planner toolkit has the essentials.', email: site.email.bookings, subject: 'Planner or venue inquiry', track: 'planner', page: '/planners' },
   { title: 'Everything else', body: 'Press, partnerships and general questions.', email: site.email.management, subject: 'General inquiry', track: 'general' },
 ];
 const jsonLd = graph(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Contact', path: '/contact' }]));
@@ -27,9 +27,12 @@ const jsonLd = graph(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Con
             {r.cta === 'inquire' ? (
               <a href="/inquire" class="btn" data-track="cta_click" data-track-location="contact"><InquireLabel /></a>
             ) : (
-              <a class="link-arrow" href={`mailto:${r.email}?subject=${encodeURIComponent(r.subject!)}`} data-track="contact_route_click" data-track-route={r.track}>
-                <Icon name="envelope" /> {r.email}
-              </a>
+              <>
+                <a class="link-arrow" href={`mailto:${r.email}?subject=${encodeURIComponent(r.subject!)}`} data-track="contact_route_click" data-track-route={r.track}>
+                  <Icon name="envelope" /> {r.email}
+                </a>
+                {r.page && <a class="link-arrow toolkit" href={r.page} data-track="contact_route_click" data-track-route="planner_toolkit">The planner toolkit <Icon name="arrow-right" /></a>}
+              </>
             )}
           </li>
         ))}
@@ -49,4 +52,5 @@ const jsonLd = graph(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Con
     .routes { grid-template-columns: minmax(0, 1fr); }
     .routes li:nth-child(n) { border-right: 0; padding-left: 0; }
   }
+  .toolkit { margin-left: 1.5rem; }
 </style>

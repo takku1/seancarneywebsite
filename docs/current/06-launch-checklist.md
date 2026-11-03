@@ -18,7 +18,8 @@ Everything here is confirmed with Sean before the site goes live. Each item is a
 - [ ] The script signature logo as a vector.
 - [ ] Repertoire by moment: `src/data/repertoire.json` holds only songs already in Sean's own lists and filmed covers; Sean confirms and extends it.
 - [ ] Travel policy and destination-wedding notes.
-- [ ] The planner toolkit documents (COI sample, rider, stage plot).
+- [ ] The planner pack (COI sample, W-9, rider, stage plot) ready to send: `/planners` requests it by email.
+- [ ] A short story for each room in `credits.json` (`story`): the setting, the formats, a moment. Each venue page becomes indexable once its story exists.
 - [ ] The private investment guide sent after inquiry (pricing posture: `01-positioning-and-offer.md`).
 
 ## Security (from `docs/security/SECURITY.md`)

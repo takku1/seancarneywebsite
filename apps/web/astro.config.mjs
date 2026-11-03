@@ -4,6 +4,10 @@ import cloudflare from '@astrojs/cloudflare';
 import sitemap from '@astrojs/sitemap';
 import cspHeaderHashes from './integrations/csp-header-hashes.mjs';
 import validateData from './integrations/validate-data.mjs';
+import credits from './src/data/credits.json' with { type: 'json' };
+
+// Venue pages without Sean's own story are noindex, so they stay out of the sitemap too.
+const thinVenues = credits.filter((c) => c.category === 'room' && !('story' in c && c.story)).map((c) => `/venues/${c.id}`);
 
 const SITE = 'https://seancarneymusic.com';
 
@@ -29,7 +33,7 @@ export default defineConfig({
     validateData(),
     cspHeaderHashes(),
     sitemap({
-      filter: (page) => !['/inquire/thanks', '/api/', '/links'].some((p) => page.includes(p)),
+      filter: (page) => !['/inquire/thanks', '/api/', '/links'].some((p) => page.includes(p)) && !thinVenues.some((v) => page.replace(/\/$/, '').endsWith(v)),
     }),
   ],
   // 301s from the old GoHighLevel URLs so existing links and rankings carry over.

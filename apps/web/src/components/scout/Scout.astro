@@ -150,7 +150,7 @@ const data = enabled
       return el;
     }
     // Only known site routes and plain email addresses become links. External URLs never do.
-    const ROUTES = new Set(['/inquire', '/private-events', '/weddings', '/corporate', '/estate', '/galas', '/destination', '/repertoire', '/about', '/contact', '/privacy', '/terms']);
+    const ROUTES = new Set(['/inquire', '/private-events', '/weddings', '/corporate', '/estate', '/galas', '/destination', '/repertoire', '/planners', '/venues', '/about', '/contact', '/privacy', '/terms']);
     const TOKEN = /(^|[\s(])(\/[a-z-]+|[\w.+-]+@[\w-]+\.[a-z]{2,})(?=[\s).,!?]|$)/gi;
     function richText(text: string): DocumentFragment {
       const frag = document.createDocumentFragment();

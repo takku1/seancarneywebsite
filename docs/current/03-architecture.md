@@ -25,7 +25,8 @@ Browser ──> Cloudflare (static pages + _headers CSP)
 | Theme | `src/styles/global.css` | Ivory maison tokens, type scale, metric-matched font fallbacks, page transitions |
 | Home | `src/pages/index.astro`, `src/components/home/*` | Hero, Rooms, DayArc, Formats, FilmGrid, Testimonials, EventsBand (private events) |
 | Event pages | `src/pages/[event].astro`, `src/pages/private-events.astro`, `src/components/events/*`, `src/data/events.json` | weddings and each private-event type, composed from typed blocks |
-| Repertoire | `src/pages/repertoire.astro`, `src/data/repertoire.json` | songs by moment and era |
+| Repertoire | `src/pages/repertoire.astro`, `src/data/repertoire.json` | songs by moment |
+| Planners and venues | `src/pages/planners.astro`, `src/pages/venues/*` | the planner toolkit; one page per room (`credits.json`, category `room`), `noindex` and out of the sitemap until the room has a `story` (`astro.config.mjs` computes the sitemap exclusions from the data) |
 | Media | `src/lib/media/player.ts`, `yt-player.ts`, `src/components/media/*`, `src/lib/feeds/*` | click-to-load YouTube, the persistent dock, watch metrics, "Up next"; build-time YouTube and Instagram ranking |
 | Inquiry | `src/pages/inquire/*`, `src/lib/inquiry/*`, `src/pages/api/inquire.ts` | five-step form, lead scoring, GoHighLevel, Resend, Turnstile, Meta CAPI |
 | Availability | `src/lib/integrations/google-calendar.ts`, `src/pages/api/availability.ts` | indicative date check from free/busy |
@@ -42,8 +43,8 @@ Browser ──> Cloudflare (static pages + _headers CSP)
 | `repertoire.json` | songs by moment (ceremony and first dance, cocktail hour and dinner, the dance floor) |
 | `testimonials.json` | couples and planners, with occasion, place and consent |
 | `videos.json` | live-at-event films and covers (`context`: live, cover, session) |
-| `credits.json` | `room` (luxury rooms, typeset on home, About and inquiry), `venue` (stages, for the galas list), `client`, and broadcast/sync credits behind the About credentials line |
-| `faqs.json` | per-page FAQs, shared with Scout |
+| `credits.json` | `room` (luxury rooms, typeset on home, About and inquiry, each with a venue page and an optional `story`), `venue` (stages, for the galas list), `client`, and broadcast/sync credits behind the About credentials line |
+| `faqs.json` | per-page FAQs (scopes include `weddings`, `planners`, each event type and `scout`), shared with Scout |
 | `feed-rules.json` | pinned and excluded videos per placement |
 | `src/config/site.ts` | name, contacts, socials, stats, response time |
 

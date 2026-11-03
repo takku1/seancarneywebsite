@@ -22,6 +22,11 @@ const credits = defineCollection({
     logoApproved: z.boolean().default(false),
     headline: z.boolean().default(false),
     order: z.number().default(100),
+    /**
+     * Rooms only: Sean's own account of playing there (setting, formats, a moment).
+     * A venue page is indexed by search engines only once this exists, so thin pages never ship as SEO.
+     */
+    story: z.string().optional(),
   }),
 });
 

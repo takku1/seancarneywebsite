@@ -37,7 +37,7 @@ const jsonLd = graph(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Abo
     <div class="container cols">
       <div>
         <h2 id="rooms-title">The rooms</h2>
-        <ul class="names">{roomList.map((r) => <li><span>{r.data.name}</span>{r.data.detail && <small>{r.data.detail}</small>}</li>)}</ul>
+        <ul class="names">{roomList.map((r) => <li><a href={`/venues/${r.id}`} data-track="venue_click" data-track-venue={r.id} data-track-location="about"><span>{r.data.name}</span>{r.data.detail && <small>{r.data.detail}</small>}</a></li>)}</ul>
         <p class="note">And private estates across Southern California, with celebrations in more than {site.stats.countries.replace('+', '')} countries.</p>
       </div>
       {clients.length > 0 && (
@@ -76,7 +76,9 @@ const jsonLd = graph(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Abo
   .cols { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(2rem, 6vw, 6rem); }
   .places h2 { font-size: var(--step-3); margin-bottom: 1.75rem; }
   .names { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
-  .names li { display: flex; flex-direction: column; }
+  .names li, .names a { display: flex; flex-direction: column; }
+  .names a { text-decoration: none; }
+  .names a:hover span { color: var(--accent); }
   .names span { font-family: var(--font-display); font-size: var(--step-2); line-height: 1.15; }
   .names small { color: var(--text-muted); font-size: var(--step--1); }
   .note { margin-top: 1.75rem; color: var(--text-muted); max-width: 44ch; }

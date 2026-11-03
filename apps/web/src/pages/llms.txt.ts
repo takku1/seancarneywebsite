@@ -34,6 +34,10 @@ ${[...songs].sort((a, b) => a.data.order - b.data.order).map((m) => `- ${m.data.
 ## Frequently asked
 ${faqs.filter((f) => !f.data.scope.includes('scout')).map((f) => `- ${f.data.q} ${f.data.a}`).join('\n')}
 
+## Planners and venues
+- Planner toolkit (insurance, rider, sound, footprint, timing): ${site.url}/planners
+- Venues: ${site.url}/venues
+
 ## More
 - About: ${site.url}/about
 - Contact (couples, planners and venues): ${site.url}/contact

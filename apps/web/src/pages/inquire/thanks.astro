@@ -4,6 +4,13 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import YouTubeFacade from '../../components/media/YouTubeFacade.astro';
 import Icon from '../../components/ui/Icon.astro';
 import { site } from '../../config/site';
+import { PUBLIC_CALL_BOOKING_URL } from 'astro:env/client';
+
+const next = [
+  { t: 'A personal reply', b: `Sean replies ${site.responseTime} with availability and a few questions about the day.` },
+  { t: 'A proposal for your day', b: 'Built around the date, the room, the formats and the hours of music.' },
+  { t: 'Your date is held', b: 'Once the agreement is signed. Then the timeline, the songs and the sound are planned together.' },
+];
 ---
 
 <BaseLayout pageType="inquire_thanks" title="Thank you | Sean Carney" description="Your inquiry has been received." noindex>
@@ -11,13 +18,17 @@ import { site } from '../../config/site';
     <div class="container grid">
       <div>
         <h1>Thank you. Your note is with Sean.</h1>
-        <p class="lede">You will hear back personally {site.responseTime}, with availability and next steps. A confirmation is on its way to your inbox.</p>
-        <p class="follow">While you wait, follow along:</p>
-        <ul class="socials">
-          {site.socials.slice(0, 2).map((s) => (
-            <li><a class="link-arrow" href={s.url} target="_blank" rel="noopener" data-track="social_click" data-track-network={s.id} data-track-location="thanks">{s.label} <Icon name="arrow-up-right" /></a></li>
-          ))}
-        </ul>
+        <p class="lede">A confirmation is on its way to your inbox. Here is what happens next.</p>
+        <ol class="next">
+          {next.map((n) => <li><h2>{n.t}</h2><p>{n.b}</p></li>)}
+        </ol>
+        {PUBLIC_CALL_BOOKING_URL && (
+          <div class="call">
+            <p>Would you rather talk it through?</p>
+            <a class="btn" href={PUBLIC_CALL_BOOKING_URL} target="_blank" rel="noopener" data-track="call_booking_click" data-track-location="thanks">Book a 15-minute call <Icon name="arrow-up-right" /></a>
+          </div>
+        )}
+        <p class="follow"><a class="link-arrow" href="/repertoire">While you wait, browse the repertoire <Icon name="arrow-right" /></a></p>
       </div>
       <div>
         <YouTubeFacade id="vwvdaQuHuJI" title="Perfect, live acoustic" location="thanks" large />
@@ -47,10 +58,15 @@ import { site } from '../../config/site';
 </script>
 
 <style>
-  .grid { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: clamp(2rem, 5vw, 5rem); align-items: center; }
+  .grid { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: clamp(2rem, 5vw, 5rem); align-items: start; }
   h1 { font-size: var(--step-4); max-width: 16ch; }
   .lede { margin-top: 1.5rem; }
-  .follow { margin-top: 2.5rem; color: var(--text-muted); }
-  .socials { list-style: none; margin: 0.75rem 0 0; padding: 0; display: flex; gap: 2rem; }
+  .next { list-style: none; margin: 2rem 0 0; padding: 0; counter-reset: step; border-top: 1px solid var(--line); }
+  .next li { padding-block: 1rem; border-bottom: 1px solid var(--line); }
+  .next h2 { font-size: var(--step-1); line-height: 1.2; }
+  .next p { margin-top: 0.3rem; color: var(--text-muted); font-size: var(--step--1); }
+  .call { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.5rem; margin-top: 2rem; }
+  .call p { font-family: var(--font-display); font-size: var(--step-1); }
+  .follow { margin-top: 2.5rem; }
   @media (max-width: 899px) { .grid { grid-template-columns: minmax(0, 1fr); } }
 </style>

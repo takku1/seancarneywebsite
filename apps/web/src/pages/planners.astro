@@ -1,0 +1,83 @@
+---
+/**
+ * /planners: the planner toolkit. Every line restates something the site
+ * already commits to (FAQs, the weddings checklist); documents are sent on
+ * request rather than published.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/ui/PageHeader.astro';
+import FaqList from '../components/events/FaqList.astro';
+import Icon from '../components/ui/Icon.astro';
+import InquireLabel from '../components/ui/InquireLabel.astro';
+import { site } from '../config/site';
+import { faqsFor, rooms } from '../lib/content';
+import { graph, breadcrumbSchema, faqSchema } from '../lib/seo/schema';
+
+const faqs = await faqsFor('planners');
+const roomList = await rooms();
+const essentials = [
+  { k: 'Paperwork', v: 'A certificate of insurance naming the venue, a W-9, a stage plot and a tech rider, on request.' },
+  { k: 'Sound', v: 'A self-contained system for smaller rooms, or plugged into your production team for larger stages.' },
+  { k: 'Ceremony', v: 'Ceremony sound can run separately from the reception setup.' },
+  { k: 'Footprint', v: 'A solo setup fits beside a garden table or in the corner of a room, with a single power outlet.' },
+  { k: 'Timing', v: 'Sets are built around your run of show and cues, including timed moments.' },
+  { k: 'Music', v: 'Must-play and do-not-play lists are agreed in advance.' },
+  { k: 'Privacy', v: 'Nothing is posted without permission. NDAs are welcome.' },
+  { k: 'Lead time', v: 'Peak Saturdays are often reserved nine to eighteen months out.' },
+];
+const packHref = `mailto:${site.email.bookings}?subject=${encodeURIComponent('Planner pack request')}&body=${encodeURIComponent('Event date:\nVenue:\nWhat you need (COI, W-9, stage plot, tech rider):\n')}`;
+const jsonLd = graph(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Planners', path: '/planners' }]), faqSchema(faqs.map((f) => f.data)));
+---
+
+<BaseLayout pageType="planners" title="For Wedding and Event Planners | Sean Carney" description="Insurance, riders, sound, footprint and timing for placing Sean Carney in your wedding or event timeline. Planner pack on request." jsonLd={jsonLd}>
+  <PageHeader title="For planners" intro={`Everything you need to place Sean in your timeline. Anything else, ask directly: he replies ${site.responseTime}.`}>
+    <div class="hdr">
+      <a class="btn" href={packHref} data-track="planner_pack_click" data-track-location="planners_header"><Icon name="envelope" /> Request the planner pack</a>
+      <a class="link-arrow" href="/inquire" data-track="cta_click" data-track-location="planners_header"><InquireLabel /> <Icon name="arrow-right" /></a>
+    </div>
+  </PageHeader>
+
+  <section class="section" data-section="planner_essentials" aria-labelledby="essentials-title">
+    <div class="container cols">
+      <h2 id="essentials-title">The essentials</h2>
+      <dl>
+        {essentials.map((e) => (
+          <div><dt>{e.k}</dt><dd>{e.v}</dd></div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  {roomList.length > 0 && (
+    <section class="section rooms" data-section="planner_rooms" aria-labelledby="planner-rooms-title">
+      <div class="container cols">
+        <h2 id="planner-rooms-title">Rooms Sean knows</h2>
+        <ul>
+          {roomList.map((r) => (
+            <li><a href={`/venues/${r.id}`} data-track="venue_click" data-track-venue={r.id} data-track-location="planners"><span>{r.data.name}</span><small>{r.data.detail}</small><Icon name="arrow-right" /></a></li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <FaqList faqs={faqs} location="planners" />
+</BaseLayout>
+
+<style>
+  .hdr { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 2rem; margin-top: 2rem; }
+  .cols { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(2rem, 5vw, 5rem); }
+  h2 { font-size: var(--step-3); line-height: 1.05; }
+  dl { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0 2.5rem; }
+  dl div { padding-block: 1.1rem; border-top: 1px solid var(--line); }
+  dt { font-family: var(--font-display); font-size: var(--step-1); }
+  dd { margin: 0.35rem 0 0; color: var(--text-muted); }
+  .rooms { background: var(--bg-raised); border-block: 1px solid var(--line); }
+  .rooms ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .rooms a { display: flex; align-items: baseline; gap: 1rem; min-height: 64px; padding-block: 1rem; border-bottom: 1px solid var(--line); text-decoration: none; }
+  .rooms a span { font-family: var(--font-display); font-size: var(--step-2); line-height: 1.1; }
+  .rooms a small { color: var(--text-muted); font-size: var(--step--1); }
+  .rooms a :global(svg) { margin-left: auto; width: 18px; height: 18px; color: var(--text-muted); align-self: center; }
+  .rooms a:hover span, .rooms a:hover :global(svg) { color: var(--accent); }
+  @media (max-width: 899px) { .cols, dl { grid-template-columns: minmax(0, 1fr); } }
+</style>

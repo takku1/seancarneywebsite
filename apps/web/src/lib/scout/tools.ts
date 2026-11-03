@@ -26,6 +26,8 @@ export const SITE_PAGES: Record<string, string> = {
   '/galas': 'Charity galas',
   '/destination': 'Destination events',
   '/repertoire': 'Repertoire',
+  '/planners': 'For planners',
+  '/venues': 'Venues',
   '/about': 'About Sean',
   '/contact': 'Contact',
 };

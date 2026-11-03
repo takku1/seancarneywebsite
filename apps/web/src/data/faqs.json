@@ -12,7 +12,8 @@
     "q": "What happens after I inquire?",
     "a": "Sean replies personally within one business day with availability and questions about the event. Then you receive a tailored proposal, and your date is held once the agreement is signed.",
     "scope": [
-      "private-events"
+      "private-events",
+      "planners"
     ]
   },
   {
@@ -20,7 +21,8 @@
     "q": "How far ahead should we book?",
     "a": "Peak Saturdays are often reserved nine to eighteen months out, and corporate and private dates six to twelve months ahead. Shorter notice is sometimes possible, so it is always worth asking.",
     "scope": [
-      "private-events"
+      "private-events",
+      "planners"
     ]
   },
   {
@@ -36,7 +38,8 @@
     "q": "Can you play both the ceremony and the reception?",
     "a": "Yes. A common plan is solo acoustic for the ceremony and cocktail hour, then The Hustlers for the reception. Ceremony sound can run separately so nothing is heard being set up.",
     "scope": [
-      "weddings"
+      "weddings",
+      "planners"
     ]
   },
   {
@@ -68,7 +71,8 @@
     "q": "Can you provide a COI, W-9 and tech rider?",
     "a": "Yes. A certificate of insurance naming your venue, a W-9, a stage plot and a tech rider are available on request.",
     "scope": [
-      "corporate"
+      "corporate",
+      "planners"
     ]
   },
   {
@@ -84,7 +88,8 @@
     "q": "Do you bring sound, or use the venue's AV?",
     "a": "Either. Sean can bring a self-contained system for smaller rooms or plug into your production team's setup for larger stages.",
     "scope": [
-      "corporate"
+      "corporate",
+      "planners"
     ]
   },
   {
@@ -92,7 +97,8 @@
     "q": "Will our event be posted online?",
     "a": "Never without your permission. NDAs are welcome.",
     "scope": [
-      "estate"
+      "estate",
+      "planners"
     ]
   },
   {
@@ -108,7 +114,8 @@
     "q": "How much space does a solo setup need?",
     "a": "Very little. A solo acoustic setup fits in a corner of a living room or beside a garden table, with a single power outlet.",
     "scope": [
-      "estate"
+      "estate",
+      "planners"
     ]
   },
   {
@@ -116,7 +123,8 @@
     "q": "Can you fit our program timing exactly?",
     "a": "Yes. Sets are built around your run-of-show and producer's cues, including a timed featured performance.",
     "scope": [
-      "galas"
+      "galas",
+      "planners"
     ]
   },
   {
