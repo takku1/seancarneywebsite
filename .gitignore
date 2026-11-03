@@ -27,3 +27,7 @@ reference/competitors/*/pages/*.html
 reference/inspiration/*/shots/
 reference/inspiration/*/media/
 reference/inspiration/*/pages/*.html
+
+# Local agent run artifacts
+session.jsonl
+policy.json

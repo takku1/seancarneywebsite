@@ -1,9 +1,0 @@
-{
-  "verbs": [
-    "shell.exec"
-  ],
-  "workdir": ".",
-  "max_turns": 12,
-  "cmd_timeout_secs": 8,
-  "scrub_env": []
-}
