@@ -26,9 +26,11 @@
 
 - 2026-11-03: Client router adopted for flow and premium playback: video keeps playing in a docked mini-player across pages (seamless via `moveBefore()` in Chrome, resume-at-timestamp elsewhere); every page script uses `onPage(setup, when)` from `src/lib/lifecycle.ts`. Build format switched to `file` after finding Cloudflare 307-redirected every `/page` to `/page/` (canonical URLs pointed at redirects). Meta Conversions API added (consent-gated, hashed, deduplicated). Render pass on throttled mobile: CLS 0.067 → 0 (metric-matched font fallbacks), LCP home 2.1 → 1.4 s, music 2.7 → 1.9 s, private events 2.3 → 1.4 s; font preloads tested and rejected (they delayed first paint).
 
+- 2026-11-03: Repo on GitHub (takku1/seancarneywebsite, private, `main`). Sean's workflow: `scripts/setup-mac.sh` (fresh Mac to running site, Node pinned via `.node-version` = CI's 24) and `scripts/publish.sh` (sync, check + build, secret guard, commit, push to main). Found that Astro's file loader ships an empty collection on a JSON syntax error with exit 0; `integrations/validate-data.mjs` now makes that fatal in dev, build, check and CI.
+
 **Deprecated/Legacy:** GoHighLevel SmartSite and its hidden events sub-site (snapshot in `reference/current-site/`, all old URLs 301). The 20 MB image-only EPK PDF is replaced by `/press` and `/press/one-sheet`. Linktree and third-party smart links are replaced by `/links` and `/music/<id>`.
 
-**Key docs:** `docs/current/01-current-site-audit.md`, `02-launch-checklist.md`, `03-integrations-and-workflows.md`, `04-scout-ai-governance.md`, `05-growth-and-engagement.md`; `docs/security/SECURITY.md`; `docs/research/reports/Luxury event music website strategy.md`; `reference/current-site/media-and-links.md`; `apps/web/.env.example`
+**Key docs:** `docs/current/01-current-site-audit.md`, `02-launch-checklist.md`, `03-integrations-and-workflows.md`, `04-scout-ai-governance.md`, `05-growth-and-engagement.md`, `06-mac-setup.md` (Sean's Mac: `scripts/setup-mac.sh`, publishing: `scripts/publish.sh`); `docs/security/SECURITY.md`; `docs/research/reports/Luxury event music website strategy.md`; `reference/current-site/media-and-links.md`; `apps/web/.env.example`
 
 **Run locally:** `cd apps/web && npm run dev` then open http://localhost:4321
 

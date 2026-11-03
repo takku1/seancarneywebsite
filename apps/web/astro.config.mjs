@@ -3,6 +3,7 @@ import { defineConfig, envField } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
 import sitemap from '@astrojs/sitemap';
 import cspHeaderHashes from './integrations/csp-header-hashes.mjs';
+import validateData from './integrations/validate-data.mjs';
 
 const SITE = 'https://seancarneymusic.com';
 
@@ -24,6 +25,8 @@ export default defineConfig({
   // and every canonical URL (trailingSlash 'never') pointed at a redirect.
   build: { inlineStylesheets: 'never', format: 'file' },
   integrations: [
+    // First: malformed src/data/*.json must stop the build (Astro would otherwise ship that collection empty).
+    validateData(),
     cspHeaderHashes(),
     sitemap({
       filter: (page) => !['/inquire/thanks', '/api/', '/links', '/press/one-sheet'].some((p) => page.includes(p)),
