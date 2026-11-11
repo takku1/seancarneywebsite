@@ -117,7 +117,7 @@ step "Checking for secrets"
 BASE=""
 git rev-parse --verify --quiet "origin/$BRANCH" >/dev/null && BASE="origin/$BRANCH"
 unstage() { [ "$PUSH_ONLY" = 1 ] || git reset --quiet; }
-BAD_FILES="$(git diff --cached --name-only $BASE | grep -E '(^|/)\.env(\..+)?$|\.dev\.vars$|\.pem$|\.p12$|\.key$' | grep -v '\.env\.example$' || true)"
+BAD_FILES="$(git diff --cached --name-only $BASE | grep -E '(^|/)\.env(\..+)?$|\.dev\.vars$|(^|/)\.staging/|\.pem$|\.p12$|\.key$' | grep -v '\.env\.example$' || true)"
 KEY_HITS="$(git diff --cached -U0 $BASE | grep -E '^\+' | grep -nE '(sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|AIza[0-9A-Za-z_-]{35}|xox[baprs]-[A-Za-z0-9-]{10,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|re_[A-Za-z0-9]{20,}|EAA[A-Za-z0-9]{40,})' || true)"
 if [ -n "$BAD_FILES" ] || [ -n "$KEY_HITS" ]; then
   unstage

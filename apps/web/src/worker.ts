@@ -16,11 +16,16 @@ export default {
         await purgeLeads(); // retention: resolved at 90 days, unresolved at 180
         // Bounded: up to 4 batches of 25 per run, least recently attempted first;
         // the rest waits for the next run (no cursor state between runs).
+        let processed = 0;
         for (let i = 0; i < 4; i++) {
           const r = await retryOpenLeads({ limit: 25 });
           if (!r.processed) break;
+          processed += r.processed;
           console.info(JSON.stringify({ ts: new Date().toISOString(), kind: 'lead', event: 'lead_retry_batch', ...r }));
         }
+        // One line per run, even when idle: proves the trigger fires (scripts/staging.sh cron),
+        // and its absence for 30+ minutes is an alert condition.
+        console.info(JSON.stringify({ ts: new Date().toISOString(), kind: 'lead', event: 'lead_cron_run', processed }));
       })().catch((e) => console.error(JSON.stringify({ ts: new Date().toISOString(), kind: 'lead', event: 'lead_retry_crashed', error: errorCode(e) }))),
     );
   },

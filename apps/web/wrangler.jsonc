@@ -18,5 +18,21 @@
   "ratelimits": [
     { "name": "RATE_LIMITER_STRICT", "namespace_id": "1001", "simple": { "limit": 3, "period": 60 } },
     { "name": "RATE_LIMITER", "namespace_id": "1002", "simple": { "limit": 20, "period": 60 } }
-  ]
+  ],
+  // Staging: its own Worker, D1 database and KV namespace, so tests never touch production
+  // data. Built with CLOUDFLARE_ENV=staging; driven by scripts/staging.sh (docs/current/13-staging.md).
+  // Bindings don't inherit from the top level, so each is repeated with staging names
+  // (scripts/staging.sh refuses to deploy a staging build that names a production resource).
+  "env": {
+    "staging": {
+      "name": "seancarneymusic-staging",
+      "workers_dev": true,
+      "kv_namespaces": [{ "binding": "SCOUT_KV" }],
+      "d1_databases": [{ "binding": "LEADS_DB", "database_name": "seancarneymusic-leads-staging" }],
+      "ratelimits": [
+        { "name": "RATE_LIMITER_STRICT", "namespace_id": "2001", "simple": { "limit": 3, "period": 60 } },
+        { "name": "RATE_LIMITER", "namespace_id": "2002", "simple": { "limit": 20, "period": 60 } }
+      ]
+    }
+  }
 }

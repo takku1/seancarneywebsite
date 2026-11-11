@@ -17,6 +17,10 @@
  * - Anything changed (budget, guests, format, message...) or a later day:
  *   a new key, so a planner's follow-up reaches Sean as a new lead rather
  *   than being swallowed as a duplicate of the original.
+ * The day is a business deduplication window, not a retry window: retries of
+ * one draft keep its key whenever they happen, but the same details prepared
+ * again on either side of midnight UTC become two leads. That errs toward a
+ * duplicate Sean can merge, never a lost inquiry.
  * The chat panel also offers Send only on the latest prepared draft, so a
  * model re-preparing with reworded details can't produce two sendable cards.
  *

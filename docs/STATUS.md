@@ -7,8 +7,8 @@
 | State | Where it stands |
 |---|---|
 | Implemented | All pages, the inquiry pipeline with durable acceptance, Scout (guided and Claude), media tooling |
-| Locally tested | `npm run verify` (types, 62 unit tests, including upgrades from earlier lead-table schemas; build, audit); `scripts/test_publish.sh` (11 cases); `npm run test:browser`, a smoke test (21 listed pages at desktop and phone width, API guards in the Workers runtime; not the full inquiry, Scout, availability, player or keyboard journeys); in the built Worker under `wrangler dev`: concurrent duplicate submissions produce one lead, and the cron backfills a pre-CRM lead to a stand-in webhook (2026-11-10) |
-| Deployed | Not yet: no Cloudflare staging or production |
+| Locally tested | `npm run verify` (types, 63 unit tests, including upgrades from earlier lead-table schemas; build, audit); `scripts/test_publish.sh` (11 cases); `npm run test:browser`, a smoke test (21 listed pages at desktop and phone width, API guards in the Workers runtime; not the full inquiry, Scout, availability, player or keyboard journeys); in the built Worker under `wrangler dev`: concurrent duplicate submissions produce one lead, and the cron backfills a pre-CRM lead to a stand-in webhook (2026-11-10) |
+| Deployed | Not yet. Staging is scripted and dry-run locally (`scripts/staging.sh`, `13-staging.md`); it waits on the Cloudflare login |
 | Production verified | Not yet: needs a real inquiry through Resend and SHA-BAM on staging |
 | Externally approved | Not yet: Sean's claims, venues, testimonials and media rights (`06-launch-checklist.md`) |
 
@@ -17,18 +17,19 @@
 | Dependency | Waiting on | Ready now |
 |---|---|---|
 | SHA-BAM CRM | Sean's account details | Leads held in `LEADS_DB` (D1) and emailed; the 15-minute cron backfills them once connected |
-| Cloudflare deployment | Cloudflare login, DNS, secrets | Build config, bindings, security; staging first (`06-launch-checklist.md`) |
+| Cloudflare deployment | Cloudflare login (staging); DNS and production secrets (launch) | Isolated staging environment and `scripts/staging.sh` (deploy, secrets, smoke, cron, retry); production config (`06-launch-checklist.md`) |
 | Scout's AI backend | Whether SHA-BAM includes Conversation AI and an external chat API | Provider seam, Claude adapter, guided mode (`12-scout-backend-decision.md`) |
 
-**Active Focus:** Staging deployment, then a real end-to-end inquiry (Resend is required before launch: while SHA-BAM is deferred it is Sean's only lead notification). Material still to come from Sean: room stories, the planner pack, missing player bios, format montages, the new YouTube and SHA-BAM consultation URLs, and Mark and Aimee's story with consent (`10-sce-build-brief.md`).
+**Active Focus:** Staging deployment (`bash scripts/staging.sh`, `13-staging.md`), then a real end-to-end inquiry (Resend is required before launch: while SHA-BAM is deferred it is Sean's only lead notification). Material still to come from Sean: room stories, the planner pack, missing player bios, format montages, the new YouTube and SHA-BAM consultation URLs, and Mark and Aimee's story with consent (`10-sce-build-brief.md`).
 
 **Architecture Summary:** An Astro 7 static site (`apps/web`) on Cloudflare Workers; prerendered pages (`build.format: 'file'`) are swapped by the ClientRouter, while Scout, the consent bar and a persistent audio/video dock survive navigation. The Worker runs only the APIs behind `src/middleware.ts`: inquiry (success only once the lead is held in the lead store, SHA-BAM or Sean's inbox), availability (Google Calendar free/busy), Scout, signal and CSP reports. Content is typed JSON in `src/data/`, validated at build; `media-library.json` is the media catalog, prepared by `scripts/media/media.py` from private originals in `resources/`. Analytics are first-party under an enforced hash-based CSP. Details: `docs/current/03-architecture.md`.
 
 **Key Decisions:**
+- 2026-11-11: Staging is a separate Worker, D1 database, KV namespace and set of rate-limit counters (`env.staging` in `wrangler.jsonc`), with no custom domain and no SHA-BAM until a test sub-account exists; a test and the deploy script both refuse a staging build that names a production resource. Application code is frozen apart from staging needs.
 - 2026-11-10: An inquiry is acknowledged only once it is held durably (`LEADS_DB`, SHA-BAM or the notify email), else 503 with the direct email (`03-architecture.md`).
 - 2026-11-10: The lead store is Cloudflare D1, not KV: a `UNIQUE` event id makes duplicate submissions atomic, rows start `pending` so none escapes recovery, and a 15-minute cron retries CRM, notification and confirmation deliveries under per-channel leases (an unexpired lease to start a step, token fencing to record) with per-step CRM checkpoints; delivery runs after the response once the lead is stored (form and Scout alike), with the three channels in parallel; retries work a backlog round-robin, least recently attempted first. "Accepted" means safely recorded, not yet delivered. Retention: resolved leads 90 days, unresolved up to 180. The guarantee is at-least-once: whenever a remote service acted but the Worker never learned it (timeout, lost response, or a crash before checkpointing), a retry repeats that step; closing it needs remote idempotency (SHA-BAM opportunity, Resend), on the integration test list.
 - 2026-11-10: POST routes declare an Origin policy (full origin: scheme, host, port): required for the inquiry form and Scout, checked when present elsewhere.
-- 2026-11-11: Scout prepares, the visitor sends: `submit_inquiry` returns a signed draft and only the visitor's Send click (`POST /api/scout/inquire`) creates the lead. Its idempotency key covers every business detail plus the day prepared: retries and double-clicks are one lead, a follow-up with changed details is a new one; only the latest draft is sendable. Verified in Chrome against the built Worker (one lead, one CRM delivery across repeated sends).
+- 2026-11-11: Scout prepares, the visitor sends: `submit_inquiry` returns a signed draft and only the visitor's Send click (`POST /api/scout/inquire`) creates the lead. Its idempotency key covers every business detail plus the day prepared: retries and double-clicks are one lead, a follow-up with changed details is a new one; only the latest draft is sendable. The day is a deduplication window, not a retry window: the same details prepared again across midnight UTC become two leads, never a lost one. Verified in Chrome against the built Worker (one lead, one CRM delivery across repeated sends).
 - 2026-11-10: Production requires `SCOUT_SIGNING_KEY` (otherwise Scout is guided-only); API rate limits are two tiers (strict 3/min, standard 20/min) defined once and checked against `wrangler.jsonc`.
 - 2026-11-10: Server logs carry allowlisted error codes only, never raw exception messages; the Meta access token travels in the request body, not the URL.
 - 2026-11-10: Hardening from the repository audit: Turnstile fails closed in production, keyed HMAC log pseudonyms, streamed-body size limits, Scout's daily cap documented as soft with the Claude Console limit as the hard cap.
@@ -51,8 +52,8 @@
 - The dark "night" theme and the `events_theme` A/B test: one ivory theme by decision.
 - GoHighLevel SmartSite and its events sub-site: replaced by this site (snapshot in `reference/current-site/`, old URLs 301).
 
-**Key docs:** `README.md` (repo map and commands); `docs/current/01`–`12` (positioning, design, architecture, integrations, Scout, launch checklist, Mac publishing, roadmap, Drive content update, SCE brief, media management, Scout backend decision); `docs/security/SECURITY.md`; `docs/research/reports/`; `apps/web/.env.example`.
+**Key docs:** `README.md` (repo map and commands); `docs/current/01`–`13` (positioning, design, architecture, integrations, Scout, launch checklist, Mac publishing, roadmap, Drive content update, SCE brief, media management, Scout backend decision, staging); `docs/security/SECURITY.md`; `docs/research/reports/`; `apps/web/.env.example`.
 
 **Run locally:** `cd apps/web && npm run dev` (http://localhost:4321); `npm run verify` is the full gate. Publish: `bash scripts/publish.sh "<description>"`.
 
-**Last Updated:** 2026-11-10
+**Last Updated:** 2026-11-11

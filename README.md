@@ -13,7 +13,7 @@ Start with **[docs/STATUS.md](docs/STATUS.md)**, the single source of truth for 
 | `docs/security/` | Security baseline (OWASP ASVS 5.0), audit baseline and SBOM |
 | `docs/research/` | Competitor and luxury-brand research reports and notes |
 | `docs/archive/` | Superseded documentation, dated by pivot (ignore unless asked) |
-| `scripts/` | Sean's Mac workflow (`setup-mac.sh`, `publish.sh`) |
+| `scripts/` | Sean's Mac workflow (`setup-mac.sh`, `publish.sh`); staging checks (`staging.sh`, `docs/current/13-staging.md`) |
 | `scripts/media/` | Media tooling: catalog-driven preparation, checks, built-site asset verification, tests |
 | `reference/` | Snapshot of the previous site and competitor/inspiration captures (heavy media stays local) |
 | `resources/` | Private, git-ignored: untouched Drive originals, briefs, contracts, incoming replacements |

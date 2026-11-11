@@ -33,11 +33,13 @@ Everything here is confirmed with Sean before the site goes live. Each item is a
 - [ ] DNS: DMARC (`_dmarc` TXT `v=DMARC1; p=none; rua=mailto:<reports address>`), moving to `p=quarantine` after 2–4 clean weeks; verify the sending domain in Resend (DKIM plus a `send.` return-path subdomain) before inquiry emails go live.
 - [ ] A Cloudflare notification for Worker error-rate spikes; a weekly review of security events.
 - [ ] An alert on lead log lines at error level: `lead_undeliverable`, `lead_crm_abandoned`, `lead_notify_abandoned`, `lead_delivery_crashed` and `lead_retention_expired_unresolved` (Workers Logs); and on config lines `scout_signing_key_missing`, `turnstile_secret_missing`, `rate_limiter_unbound` and `rate_limiter_error`. An abandoned notification means Sean was never told about that lead: check `GET /api/leads`, contact the couple, then `POST /api/leads` with `{"reopen": true}` once the cause is fixed.
-- [ ] After the first deploy, confirm the D1 database `seancarneymusic-leads` was created and bound as `LEADS_DB` (Worker > Settings > Bindings) and the 15-minute cron is listed under Triggers. Neither can be verified from the repository; both are expected from the config.
+- [ ] Alert when no `lead_cron_run` line has appeared for 30 minutes (the cron logs one per run, even when idle).
+- [ ] After the first production deploy, confirm the D1 database `seancarneymusic-leads` was created and bound as `LEADS_DB` (Worker > Settings > Bindings) and the 15-minute cron is listed under Triggers. Staging proves the same for its own database first (`13-staging.md`).
 
 ## Pre-launch QA
 - [ ] The booking wording on the FAQ ("the date is held once the agreement is signed") and `/terms`.
 - [ ] Real devices: iPhone (Safari), Android (Chrome), and the Instagram in-app browser. Check the hero film, Scout, the inquiry form, the date check, and the mini-player (start a film, browse two pages: it keeps playing in Chrome and resumes at the same second in Safari).
+- [ ] Staging passes `bash scripts/staging.sh` smoke, cron, and retry (`13-staging.md`): D1 bound, the cron fires, an inquiry is stored before delivery, and a broken delivery recovers without losing the lead.
 - [ ] On staging, send a real test inquiry: it returns success, the notification and confirmation emails arrive, and the lead appears in SHA-BAM (or in `GET /api/leads` while SHA-BAM is deferred). With email and CRM both switched off and no lead store, the form must show the direct-email message instead of success.
 - [ ] Run the home and weddings pages through Google's Rich Results Test.
 - [ ] Submit `sitemap-index.xml` in Google Search Console and Bing Webmaster Tools; confirm `/llms.txt` is reachable.

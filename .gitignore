@@ -5,6 +5,8 @@ apps/web/.astro/
 
 # Secrets (only the documented template is tracked)
 .dev.vars
+# Staging test settings and generated keys (scripts/staging.sh)
+.staging/
 .env
 .env.*
 !.env.example
