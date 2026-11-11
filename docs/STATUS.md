@@ -1,12 +1,33 @@
 # STATUS: Sean Carney Entertainment (SCE), luxury weddings and private events
 
-**Current Phase:** Pre-launch. Phases 1 and 2 are built, and the November 10 SCE brief and Drive content are applied; the code matches `docs/current/`. Phase 3 (growth) is next (`08-roadmap.md`). Launch waits on content confirmation and account setup (`06-launch-checklist.md`).
+**Current Phase:** Pre-launch, release hardening. Phases 1 and 2 are built, the November 10 SCE brief and Drive content are applied, and the code matches `docs/current/`. Growth work (phase 3) waits until launch (`08-roadmap.md`).
 
-**Active Focus:** Material still to come from Sean: room stories, the planner pack, missing player bios, format montages, the new YouTube and SHA-BAM consultation URLs, and Mark and Aimee's story with consent (`10-sce-build-brief.md`). Accounts to set up: SHA-BAM token, call-booking link, Resend, Turnstile.
+**Readiness:**
 
-**Architecture Summary:** An Astro 7 static site (`apps/web`) on Cloudflare Workers; prerendered pages (`build.format: 'file'`) are swapped by the ClientRouter, while Scout, the consent bar and a persistent audio/video dock survive navigation. The Worker runs only the APIs behind `src/middleware.ts`: inquiry (lead scoring → GoHighLevel/SHA-BAM → Resend), availability (Google Calendar free/busy), Scout, signal and CSP reports. Content is typed JSON in `src/data/`, validated at build; `media-library.json` is the media catalog, prepared by `scripts/media/media.py` from private originals in `resources/`. Analytics are first-party under an enforced hash-based CSP. Details: `docs/current/03-architecture.md`.
+| State | Where it stands |
+|---|---|
+| Implemented | All pages, the inquiry pipeline with durable acceptance, Scout (guided and Claude), media tooling |
+| Locally tested | `npm run verify` (types, 25 unit tests, build, audit); `scripts/test_publish.sh`; 22 pages checked at desktop and phone width; the inquiry/lead-queue path exercised on the production build (2026-11-10) |
+| Deployed | Not yet: no Cloudflare staging or production |
+| Production verified | Not yet: needs a real inquiry through Resend and SHA-BAM on staging |
+| Externally approved | Not yet: Sean's claims, venues, testimonials and media rights (`06-launch-checklist.md`) |
+
+**Deferred dependencies** (none blocks code work):
+
+| Dependency | Waiting on | Ready now |
+|---|---|---|
+| SHA-BAM CRM | Sean's account details | Leads held in `LEADS_KV` and emailed; `POST /api/leads` backfills once connected |
+| Cloudflare deployment | Cloudflare login, DNS, secrets | Build config, bindings, security; staging first (`06-launch-checklist.md`) |
+| Scout's AI backend | Whether SHA-BAM includes Conversation AI and an external chat API | Provider seam, Claude adapter, guided mode (`12-scout-backend-decision.md`) |
+
+**Active Focus:** Staging deployment, then a real end-to-end inquiry (Resend is required before launch: while SHA-BAM is deferred it is Sean's only lead notification). Material still to come from Sean: room stories, the planner pack, missing player bios, format montages, the new YouTube and SHA-BAM consultation URLs, and Mark and Aimee's story with consent (`10-sce-build-brief.md`).
+
+**Architecture Summary:** An Astro 7 static site (`apps/web`) on Cloudflare Workers; prerendered pages (`build.format: 'file'`) are swapped by the ClientRouter, while Scout, the consent bar and a persistent audio/video dock survive navigation. The Worker runs only the APIs behind `src/middleware.ts`: inquiry (success only once the lead is held in the lead store, SHA-BAM or Sean's inbox), availability (Google Calendar free/busy), Scout, signal and CSP reports. Content is typed JSON in `src/data/`, validated at build; `media-library.json` is the media catalog, prepared by `scripts/media/media.py` from private originals in `resources/`. Analytics are first-party under an enforced hash-based CSP. Details: `docs/current/03-architecture.md`.
 
 **Key Decisions:**
+- 2026-11-10: An inquiry is acknowledged only once it is held durably (`LEADS_KV`, SHA-BAM or the notify email), else 503 with the direct email; idempotent on the client event id; failures and pre-CRM leads queue for `POST /api/leads` (`03-architecture.md`).
+- 2026-11-10: Hardening from the repository audit: Turnstile fails closed in production, keyed HMAC log pseudonyms, streamed-body size limits, Scout's daily cap documented as soft with the Claude Console limit as the hard cap.
+- 2026-11-10: TypeScript 7 held until `@astrojs/check` supports it (Dependabot ignores TypeScript majors).
 - 2026-11-10: `resources/briefs/SCE Website.docx` governs brand and offer: SCE is the public brand, formats are Solo, Duo and Band (The Scene), and the offer includes a custom song (`/custom-song`) with Sean's songwriting credits in context. Prices stay private. (`10-sce-build-brief.md`)
 - 2026-11-10: Media is catalog-driven: 53 assets and 15 named placements in `media-library.json`; originals are never edited or committed (`11-media-management.md`).
 - 2026-11-10: Repo layout: app in `apps/web`, docs in `docs/`, media tooling in `scripts/media/`, Sean's Mac workflow in `scripts/`, private sources in git-ignored `resources/`. The release gate is local (`scripts/publish.sh`, `npm run verify`); GitHub CI is manual-only because Actions minutes are shared across the account's private repos.
@@ -25,7 +46,7 @@
 - The dark "night" theme and the `events_theme` A/B test: one ivory theme by decision.
 - GoHighLevel SmartSite and its events sub-site: replaced by this site (snapshot in `reference/current-site/`, old URLs 301).
 
-**Key docs:** `README.md` (repo map and commands); `docs/current/01`–`11` (positioning, design, architecture, integrations, Scout, launch checklist, Mac publishing, roadmap, Drive content update, SCE brief, media management); `docs/security/SECURITY.md`; `docs/research/reports/`; `apps/web/.env.example`.
+**Key docs:** `README.md` (repo map and commands); `docs/current/01`–`12` (positioning, design, architecture, integrations, Scout, launch checklist, Mac publishing, roadmap, Drive content update, SCE brief, media management, Scout backend decision); `docs/security/SECURITY.md`; `docs/research/reports/`; `apps/web/.env.example`.
 
 **Run locally:** `cd apps/web && npm run dev` (http://localhost:4321); `npm run verify` is the full gate. Publish: `bash scripts/publish.sh "<description>"`.
 

@@ -41,13 +41,16 @@ bash scripts/publish.sh "Add March show dates"
 ```
 This one command, in order:
 1. brings in anything new from GitHub first (your work is never overwritten),
-2. checks the site builds, the same check GitHub runs, so a broken site is never published,
-3. stops if anything looks like a password or API key,
-4. saves your changes with your description and pushes them to GitHub (`main`).
+2. checks the site: types, tests, a full build and a security check of its packages (`npm run verify`), so a broken site is never published,
+3. stops if anything looks like a password or API key, or if a file is over 25 MB (video masters stay in `resources/`),
+4. lists exactly which files will be saved and asks you to confirm,
+5. saves your changes with your description and pushes them to GitHub (`main`).
+
+To run the checks without saving anything: `bash scripts/publish.sh --check`.
 
 If it stops, it says why and nothing is published. Fix what it names and run it again, or ask Dillon.
 
 ## Good to know
 - Settings and keys go in `apps/web/.env`. That file is never published.
 - `docs/STATUS.md` is the overview of where the project stands.
-- `publish.sh` is the release check: it type-checks, tests and builds before anything is pushed. The GitHub check (Actions tab > ci > Run workflow) runs only when started by hand, because Actions minutes are shared across all private repos on the account.
+- `publish.sh` is the release check: it runs `npm run verify` (types, tests, build, dependency audit) before anything is pushed. Its own behavior is tested by `bash scripts/test_publish.sh`. The GitHub check (Actions tab > ci > Run workflow) runs only when started by hand, because Actions minutes are shared across all private repos on the account.

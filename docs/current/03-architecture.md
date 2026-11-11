@@ -9,7 +9,8 @@
 ```
 Browser ──> Cloudflare (static pages + _headers CSP)
    │            └─ Worker /api/* ── middleware ──> handlers
-   │                                    ├─ inquire      → score → GoHighLevel → Resend (+ Meta CAPI with consent)
+   │                                    ├─ inquire      → score → durable acceptance (LEADS_KV / SHA-BAM / Resend notify) → confirm (+ Meta CAPI with consent)
+   │                                    ├─ leads        → admin: list and retry leads waiting for the CRM
    │                                    ├─ availability → Google Calendar free/busy
    │                                    ├─ scout*       → guided mode | Claude adapter
    │                                    ├─ signal, csp-report
@@ -22,6 +23,8 @@ Media-management addition: `src/data/media-library.json` owns sources, preparati
 
 Music-planning addition: `src/lib/music-plan.ts` owns repertoire-only ranking and validated list state. `MusicQuiz.astro` and `MusicPlan.astro` render the flow, storing IDs through the existing storage helper. The inquiry form resolves them into its editable message; no new API or CRM field is introduced. SCE adds static `/custom-song` and `/videos` pages. See `10-sce-build-brief.md`.
 
+Lead acceptance: `src/lib/inquiry/deliver.ts` decides when an inquiry counts as received, for the form and Scout alike. The lead is written to `LEADS_KV` (90 days), sent to SHA-BAM/GoHighLevel (API v2, then the webhook; a non-2xx is a failure) and to Sean's inbox through Resend. The visitor sees success only if at least one of those three held it; otherwise `/api/inquire` returns 503 and the form shows the direct email address. The confirmation email goes out only after acceptance. The client `event_id` makes resubmissions idempotent. Leads the CRM has not taken (failed, or SHA-BAM not connected yet) are indexed as pending: `GET /api/leads` lists them without personal data and `POST /api/leads` retries them (admin token). Lead logs carry IDs and outcomes only. In `astro dev` with nothing configured, leads are accepted as a dry run.
+
 | Area | Where | What it does |
 |---|---|---|
 | Layout | `src/layouts/BaseLayout.astro`, `src/components/layout/*` | head, router, header/footer, persisted Scout, dock and consent bar |
@@ -32,7 +35,7 @@ Music-planning addition: `src/lib/music-plan.ts` owns repertoire-only ranking an
 | Repertoire | `src/pages/repertoire.astro`, `src/data/songbook.json`, `src/data/repertoire.json` | full searchable songbook plus songs by moment |
 | Planners and venues | `src/pages/planners.astro`, `src/pages/venues/*` | the planner toolkit; one page per room (`credits.json`, category `room`), `noindex` and out of the sitemap until the room has a `story` (`astro.config.mjs` computes the sitemap exclusions from the data) |
 | Media | `src/lib/media/player.ts`, `yt-player.ts`, `src/components/media/*`, `src/lib/feeds/*` | click-to-load YouTube, the persistent dock, watch metrics, "Up next"; build-time YouTube and Instagram ranking |
-| Inquiry | `src/pages/inquire/*`, `src/lib/inquiry/*`, `src/pages/api/inquire.ts` | five-step form, lead scoring, GoHighLevel, Resend, Turnstile, Meta CAPI |
+| Inquiry | `src/pages/inquire/*`, `src/lib/inquiry/*`, `src/pages/api/inquire.ts` | five-step form, lead scoring, durable acceptance (`deliver.ts`), GoHighLevel, Resend, Turnstile, Meta CAPI; `/api/leads` for reconciliation |
 | Availability | `src/lib/integrations/google-calendar.ts`, `src/pages/api/availability.ts` | indicative date check from free/busy |
 | Scout | `src/components/scout/*`, `src/lib/scout/*`, `src/pages/api/scout*` | the concierge; `05-scout-concierge.md` |
 | Analytics | `src/lib/analytics/*`, `src/components/analytics/*` | declarative tracking, first/last-touch attribution, A/B tests, retention cohorts, web vitals |

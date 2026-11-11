@@ -28,7 +28,7 @@
 Legacy addresses (`/music` and its release pages to `/repertoire`, `/press` to `/about`, `/shows` and `/merch` to the home page, and the old GoHighLevel URLs) redirect with 301s configured in `apps/web/astro.config.mjs`.
 
 ## The home page
-1. **Hero:** *"Live music for your wedding"*, then one supporting line, A/B tested (`hero_sub`): *"From the first note of the ceremony to the last song of the night"* or *"Fifteen years of weddings, from Hotel del Coronado to The Beverly Hills Hotel"*. Beneath it: *Solo · Trio · Full band*. Media: the film loop with a poster image as the first paint. Actions: "Check your date" (primary; label A/B tested by `cta_label`) and "Watch a wedding" (opens the live reel).
+1. **Hero:** *"One team. Your whole celebration."*, then one supporting line, A/B tested (`hero_sub`): *"Bespoke wedding entertainment, from acoustic cocktail sets to a full-band reception"* or *"Your people. Your music. A celebration shaped around the two of you"*. Beneath it: *Solo · Duo · Band*. Media: the film loop with a poster image as the first paint. Actions: "Check your date" (primary; label A/B tested by `cta_label`) and "Watch the live film" (opens the live reel).
 2. **The rooms:** typeset venue names directly under the hero.
 3. **The arc:** the day in moments, each with its format.
 4. **Formats:** Solo, Duo and Band, each with when it shines.

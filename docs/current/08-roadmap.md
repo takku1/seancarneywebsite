@@ -2,7 +2,7 @@
 
 ## Phase 1: the wedding house (built and verified 2026-11-03)
 - Ivory maison as the only theme; navigation: Weddings · Private events · Repertoire · About · Check your date.
-- Home: the wedding hero (the promise, *Solo · Trio · Full band*, the film loop), typeset rooms, the arc of the day, formats, film, couples' words.
+- Home: the wedding hero (the promise, *Solo · Duo · Band*, the film loop), typeset rooms, the arc of the day, formats, film, couples' words.
 - `/weddings` leads; `/private-events` and its four types restyled to match.
 - `/repertoire` from `repertoire.json`; About covers The Scene, the rooms and the one credentials line.
 - Scout's knowledge, intents and voice set to weddings and private events.
@@ -27,5 +27,6 @@
 |---|---|---|
 | Public pricing | none / "from" per format / private guide after inquiry | private guide now; revisit a "from" figure once inquiry volume is measurable |
 | Rooms and clients named | per venue and client | name only confirmed engagements |
-| Formats offered | duo vs trio, band sizes | list exactly what is bookable |
+| Formats offered | band sizes and line-ups | list exactly what is bookable |
+| Scout's AI backend | independent (current) / SHA-BAM Conversation AI / hybrid | keep the independent adapter until SHA-BAM's AI access is confirmed (`12-scout-backend-decision.md`) |
 | Body typeface | Geist / a humanist sans | test one alternative on the home page |

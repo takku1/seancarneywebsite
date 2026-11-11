@@ -80,7 +80,7 @@ Principles: least privilege (no tool can read CRM data, send arbitrary email, br
 
 ## 7. Provider abstraction
 
-`lib/scout/providers/types.ts` defines the seam. The provider is Claude (`claude-opus-5-5` by default, `SCOUT_MODEL` to override; effort `low`; prompt-cached knowledge; server-side refusal fallback where supported). No key means **guided mode**: scripted flows with no AI, no cost, and the same tools via direct endpoints. Switching providers changes only the adapter.
+`lib/scout/providers/types.ts` defines the seam. The provider is Claude (`claude-opus-5-5` by default, `SCOUT_MODEL` to override; effort `low`; prompt-cached knowledge; server-side refusal fallback where supported). No key means **guided mode**: scripted flows with no AI, no cost, and the same tools via direct endpoints. Switching providers changes only the adapter. Whether Scout stays on its own model, moves to SHA-BAM's Conversation AI, or uses a hybrid is an open decision: `12-scout-backend-decision.md`.
 
 ## 8. Security controls (mapped to OWASP LLM Top 10, 2025)
 
@@ -95,7 +95,7 @@ Principles: least privilege (no tool can read CRM data, send arbitrary email, br
 | LLM07 | System prompt leakage | The prompt is treated as public: nothing secret in it; instruction not to reveal it anyway |
 | LLM08 | Vector/embedding weaknesses | No vector store |
 | LLM09 | Misinformation | Grounded in site content; refuse unknowns; availability is indicative; prices never stated |
-| LLM10 | Unbounded consumption | 1,000-char messages; 150 KB transcript cap; 20-turn cap; per-IP rate limit (40 per 10 min, per isolate) plus a **Cloudflare WAF rate rule on `/api/scout` (set at deploy)**; daily AI-turn budget (`SCOUT_DAILY_LIMIT`, default 1,500) then guided mode; `max_tokens` 2000 |
+| LLM10 | Unbounded consumption | 1,000-char messages; 150 KB transcript cap; 20-turn cap; per-IP rate limit (40 per 10 min, per isolate) plus a **Cloudflare WAF rate rule on `/api/scout` (set at deploy)**; daily AI-turn budget (`SCOUT_DAILY_LIMIT`, default 1,500) then guided mode, a soft cap because KV counters are not atomic, failing closed to guided mode in production without storage; the hard cap is the API key's workspace spend limit in the Claude Console; `max_tokens` 2000 |
 
 **Secrets:** `ANTHROPIC_API_KEY`, `SCOUT_SIGNING_KEY` and `SCOUT_ADMIN_TOKEN` live only in Worker secrets (`wrangler secret put`). Rotate them every 90 days or immediately on suspicion; rotating the signing key just resets open chats. `/api/scout/insights` returns 404 without the bearer token.
 

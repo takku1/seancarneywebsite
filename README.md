@@ -40,4 +40,6 @@ Copy `apps/web/.env.example` to `apps/web/.env` for local API keys. A blank key 
 | Regenerate browser/install icons | `npm run brand:icons` |
 | Publish (Mac) | `bash scripts/publish.sh "<description>"` from the repo root |
 
+Publish-script tests, from the repo root: `bash scripts/test_publish.sh`. Check without saving: `bash scripts/publish.sh --check`.
+
 Python media tests, from the repo root: `py -m unittest scripts/media/test_media.py` (`python3` on macOS; needs Pillow).
