@@ -35,11 +35,22 @@ MAX_FILE_MB=25
 
 # ── 1. what changed, and sync with GitHub ────────────────────────────────────
 step "Your changes"
+PUSH_ONLY=0
 if [ -z "$(git status --porcelain)" ] && [ "$CHECK_ONLY" = 0 ]; then
-  ok "nothing to publish: everything is already on GitHub"
-  exit 0
+  # No new edits, but earlier saves may never have reached GitHub (e.g. the push failed offline).
+  git fetch --quiet origin 2>/dev/null || true
+  AHEAD=0
+  if git rev-parse --verify --quiet "origin/$BRANCH" >/dev/null; then AHEAD="$(git rev-list --count "origin/$BRANCH..HEAD")"; fi
+  if [ "$AHEAD" -eq 0 ]; then
+    ok "nothing to publish: everything is already on GitHub"
+    exit 0
+  fi
+  note "no new edits, but $AHEAD saved change(s) are not on GitHub yet:"
+  git log --format='%h %s' "origin/$BRANCH..HEAD" | sed 's/^/    /'
+  PUSH_ONLY=1
+else
+  git status --short | sed 's/^/  /'
 fi
-git status --short | sed 's/^/  /'
 
 if [ "$BRANCH" != "main" ] && [ "$CHECK_ONLY" = 0 ]; then
   note "you're on branch '$BRANCH', not main"
@@ -56,12 +67,17 @@ if [ "$CHECK_ONLY" = 0 ] && git rev-parse --verify --quiet "origin/$BRANCH" >/de
   BEHIND="$(git rev-list --count "HEAD..origin/$BRANCH")"
   if [ "$BEHIND" -gt 0 ]; then
     # Bring in others' changes without touching yours (stash, fast-forward, restore).
-    git stash push --include-untracked --quiet -m "publish.sh autostash"
+    # Only stash when there is something to stash: popping after an empty push
+    # would restore an unrelated older stash.
+    STASHED=0
+    if [ -n "$(git status --porcelain)" ]; then
+      git stash push --include-untracked --quiet -m "publish.sh autostash" && STASHED=1
+    fi
     if ! git merge --ff-only --quiet "origin/$BRANCH"; then
-      git stash pop --quiet || true
+      [ "$STASHED" = 1 ] && { git stash pop --quiet || true; }
       fail "Your copy and GitHub have both changed in different ways. Ask Dillon to help merge."
     fi
-    if ! git stash pop --quiet; then
+    if [ "$STASHED" = 1 ] && ! git stash pop --quiet; then
       fail "Your changes overlap with new changes from GitHub (conflict). Nothing was published. Ask Dillon to help; your work is safe in 'git stash list'."
     fi
     ok "brought in $BEHIND new change(s) from GitHub"
@@ -77,10 +93,13 @@ command -v npm >/dev/null 2>&1 || fail "npm not found. Run scripts/setup-mac.sh 
 (
   cd apps/web
   : >"$LOG"
-  # Clean install when packages are missing or package-lock.json is newer than the install.
-  if [ ! -f node_modules/.package-lock.json ] || [ package-lock.json -nt node_modules/.package-lock.json ]; then
-    echo "  installing packages (npm ci)..."
+  # Clean install unless the installed packages were made from this exact lockfile
+  # (its content hash is recorded after each successful npm ci; timestamps can lie).
+  LOCK_HASH="$(git hash-object package-lock.json)"
+  if [ ! -d node_modules ] || [ "$(cat node_modules/.publish-lock-hash 2>/dev/null)" != "$LOCK_HASH" ]; then
+    echo "  installing packages to match package-lock.json (npm ci)..."
     npm ci --no-fund --no-audit >>"$LOG" 2>&1 || { tail -30 "$LOG"; exit 1; }
+    mkdir -p node_modules && echo "$LOCK_HASH" >node_modules/.publish-lock-hash
   fi
   npm run verify >>"$LOG" 2>&1 || { tail -30 "$LOG"; exit 1; }
 ) || fail "A check failed (type error, test, build or a high-severity dependency advisory), so nothing was published. The error is above (full log: $LOG)."
@@ -93,11 +112,15 @@ fi
 
 # ── 3. never publish secrets ─────────────────────────────────────────────────
 step "Checking for secrets"
-git add -A
-BAD_FILES="$(git diff --cached --name-only | grep -E '(^|/)\.env(\..+)?$|\.dev\.vars$|\.pem$|\.p12$|\.key$' | grep -v '\.env\.example$' || true)"
-KEY_HITS="$(git diff --cached -U0 | grep -E '^\+' | grep -nE '(sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|AIza[0-9A-Za-z_-]{35}|xox[baprs]-[A-Za-z0-9-]{10,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|re_[A-Za-z0-9]{20,}|EAA[A-Za-z0-9]{40,})' || true)"
+[ "$PUSH_ONLY" = 1 ] || git add -A
+# Everything that will reach GitHub: staged edits plus any saved-but-unpushed commits.
+BASE=""
+git rev-parse --verify --quiet "origin/$BRANCH" >/dev/null && BASE="origin/$BRANCH"
+unstage() { [ "$PUSH_ONLY" = 1 ] || git reset --quiet; }
+BAD_FILES="$(git diff --cached --name-only $BASE | grep -E '(^|/)\.env(\..+)?$|\.dev\.vars$|\.pem$|\.p12$|\.key$' | grep -v '\.env\.example$' || true)"
+KEY_HITS="$(git diff --cached -U0 $BASE | grep -E '^\+' | grep -nE '(sk-ant-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|AIza[0-9A-Za-z_-]{35}|xox[baprs]-[A-Za-z0-9-]{10,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|re_[A-Za-z0-9]{20,}|EAA[A-Za-z0-9]{40,})' || true)"
 if [ -n "$BAD_FILES" ] || [ -n "$KEY_HITS" ]; then
-  git reset --quiet
+  unstage
   [ -n "$BAD_FILES" ] && printf '  secret files: %s\n' "$BAD_FILES"
   [ -n "$KEY_HITS" ] && note "a line looks like an API key or private key"
   fail "Stopped: that looks like a secret. Keys belong in apps/web/.env (never published) or Cloudflare secrets, not in the project."
@@ -111,23 +134,24 @@ while IFS= read -r f; do
   size=$(wc -c <"$f" | tr -d ' ')
   if [ "$size" -gt $((MAX_FILE_MB * 1024 * 1024)) ]; then BIG="$BIG  $f"; fi
 done <<EOF_FILES
-$(git diff --cached --name-only --diff-filter=AM)
+$(git diff --cached --name-only --diff-filter=AM $BASE)
 EOF_FILES
 if [ -n "$BIG" ]; then
-  git reset --quiet
+  unstage
   fail "Stopped: over ${MAX_FILE_MB} MB:$BIG. Keep originals in resources/ and add a web-sized version with the media tool (docs/current/11-media-management.md)."
 fi
 
-step "What will be saved"
-git diff --cached --name-status | sed 's/^/  /'
+step "What will be published"
+git diff --cached --name-status $BASE | sed 's/^/  /'
 if [ -t 0 ]; then
-  printf '  Save and publish these %s file(s)? [Y/n] ' "$(git diff --cached --name-only | wc -l | tr -d ' ')"
+  printf '  Publish these %s file(s)? [Y/n] ' "$(git diff --cached --name-only $BASE | wc -l | tr -d ' ')"
   read -r ans || ans=""
-  case "$ans" in ""|y|Y|yes) ;; *) git reset --quiet; fail "Stopped. Nothing was saved; your changes are untouched." ;; esac
+  case "$ans" in ""|y|Y|yes) ;; *) unstage; fail "Stopped. Nothing was published; your changes are untouched." ;; esac
 fi
 
 # ── 4. save and push ─────────────────────────────────────────────────────────
 step "Publishing"
+if [ "$PUSH_ONLY" = 0 ]; then
 MSG="${1:-}"
 if [ -z "$MSG" ]; then
   printf '  Describe the change in a few words (e.g. "Add March show dates"): '
@@ -135,6 +159,7 @@ if [ -z "$MSG" ]; then
 fi
 [ -n "$MSG" ] || { git reset --quiet; fail "A short description is needed."; }
 git commit --quiet -m "$MSG"
+fi
 git push --quiet origin "$BRANCH"
 ok "pushed to GitHub ($BRANCH): $(git log -1 --format='%h %s')"
 

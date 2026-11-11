@@ -12,7 +12,7 @@ Scope: Astro static site plus on-demand Cloudflare Worker API routes. **No user 
 Browser ──HTTPS──► Cloudflare (TLS, WAF, rate rules)
                     ├─ static assets (prerendered HTML/CSS/JS/images)   no server code
                     └─ Worker: src/middleware.ts ─► /api/* routes
-                         ├─ /api/inquire  ─► LEADS_KV (receipts), GoHighLevel (CRM), Resend (email), Turnstile
+                         ├─ /api/inquire  ─► LEADS_DB (receipts), GoHighLevel (CRM), Resend (email), Turnstile
                          ├─ /api/scout    ─► Anthropic (AI), Google Calendar
                          ├─ /api/availability ─► Google Calendar (free/busy)
                          ├─ /api/signal, /api/scout/trending ─► Cloudflare KV
@@ -29,7 +29,7 @@ The server only ever calls these fixed hosts; no URL is ever built from visitor 
 
 | Service | Host | From | Purpose | Credential | Failure behavior |
 |---|---|---|---|---|---|
-| GoHighLevel (Sean's account is SHA-BAM, a white-label of it) | services.leadconnectorhq.com (+ webhook URL) | /api/inquire, Scout `submit_inquiry` | CRM write | `GHL_PRIVATE_TOKEN` | Falls back to the webhook (non-2xx = failure); the lead is queued in `LEADS_KV` for `POST /api/leads`. Acknowledged only if the lead store or the notify email held it; otherwise 503 |
+| GoHighLevel (Sean's account is SHA-BAM, a white-label of it) | services.leadconnectorhq.com (+ webhook URL) | /api/inquire, Scout `submit_inquiry` | CRM write | `GHL_PRIVATE_TOKEN` | Falls back to the webhook (non-2xx = failure); the lead stays open in `LEADS_DB` for the 15-minute cron and `POST /api/leads` (claimed per attempt, resumable CRM steps, abandoned after 5 with an alert log). Acknowledged only if the lead store or the notify email held it; otherwise 503 |
 | Resend | api.resend.com | /api/inquire | Notify Sean and confirm to the client | `RESEND_API_KEY` | Errors are failures; the confirmation is sent only after the lead was held durably |
 | Cloudflare Turnstile | challenges.cloudflare.com | /api/inquire | Bot check | `TURNSTILE_SECRET_KEY` | Fails closed (403); in production a missing secret also fails closed (logged `turnstile_secret_missing`) |
 | Anthropic | api.anthropic.com | /api/scout | AI replies | `ANTHROPIC_API_KEY` | Falls back to guided mode |
@@ -44,7 +44,7 @@ Concurrency and resources: each request makes at most 1–3 outbound calls (Scou
 | Class | Data | Where it lives | Protection | Retention |
 |---|---|---|---|---|
 | **Confidential** | API keys, tokens, signing key | Worker secrets only | Never in code or logs; least privilege | Rotate every 90 days (below) |
-| **Personal** | Inquiry contact details | GHL (system of record); `LEADS_KV` receipt for 90 days (disclosed on /privacy); in transit via TLS | Never in URLs or browser storage; masked in session replay; not sent to analytics | Per Sean's CRM policy |
+| **Personal** | Inquiry contact details | GHL (system of record); `LEADS_DB` receipt for 90 days (disclosed on /privacy); in transit via TLS | Never in URLs or browser storage; masked in session replay; not sent to analytics | Per Sean's CRM policy |
 | **Personal (hashed, ads)** | SHA-256 of email/phone, IP, user agent, `_fbp`/`_fbc` on inquiry conversions | Meta Conversions API (`lib/integrations/meta-capi.ts`), server-side only | Sent only with consent + no opt-out (`ads_ok` from the browser) + no `Sec-GPC: 1`; never raw PII; token is a Worker secret; disclosed on /privacy | Meta's retention |
 | **Personal (transient)** | Scout chat text | Visitor's tab (sessionStorage), Anthropic for processing | HMAC-signed, cleared on tab close or "Clear chat", masked in replay | Tab lifetime |
 | **Internal** | Lead tier/score, attribution | GHL note; sessionStorage (tier, one page) | Not in URLs | CRM policy |
@@ -80,7 +80,7 @@ Stored as Worker secrets (`wrangler secret put`) and build variables; never comm
 | 1.3.12 ReDoS | Met | Simple anchored and alternation regexes; inputs length-capped |
 | 2.2.1–2.2.2 server-side validation | Met | Zod schemas on every write path (`lib/inquiry/schema.ts` for `/api/inquire` and Scout's `submit_inquiry`, tool schemas in `lib/scout/tools.ts`); beacons are type-checked and range-validated (`/api/signal`) |
 | 2.4.1 anti-automation | **Fixed** | Per-route rate limits in `src/middleware.ts`, enforced by Cloudflare Rate Limiting bindings declared in `wrangler.jsonc` (strict: 3/min for inquire and insights; standard: 20/min) |
-| 2.4.x / OWASP API4 resource limits | **Fixed** | `middleware.ts`: POST bodies are capped per route by declared `Content-Length`, or measured as they stream when undeclared (`lib/security/body.ts`), `maxBodySize` 4–64 KB (413, logged `body_too_large`); malformed or `null` Origin is rejected (403) |
+| 2.4.x / OWASP API4 resource limits | **Fixed** | `middleware.ts`: POST bodies are capped per route by declared `Content-Length`, or measured as they stream when undeclared (`lib/security/body.ts`), `maxBodySize` 4–64 KB (413, logged `body_too_large`); POST Origin policy per route (`lib/security/origin.ts`): required and same-host for the inquiry form and Scout, checked when present elsewhere; malformed, `null` and cross-origin values are rejected (403) |
 | 2.4.2 human timing | Met | `started_at` minimum fill time plus honeypots |
 | 3.2.2 safe text rendering | Met | No `innerHTML` with untrusted data |
 | 3.3.x cookies | N/A | The site sets no cookies; vendor cookies are consent-gated (§9) |

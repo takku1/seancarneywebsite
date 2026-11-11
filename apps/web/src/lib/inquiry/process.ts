@@ -2,7 +2,7 @@
  * The one lead pipeline. Used by the inquiry form (/api/inquire) and by Scout,
  * so every lead gets the same scoring, CRM write, attribution and emails.
  *
- * score -> durable acceptance (lib/inquiry/deliver.ts): lead store (KV) +
+ * score -> durable acceptance (lib/inquiry/deliver.ts): lead database (D1) +
  * GoHighLevel/SHA-BAM (API v2, webhook fallback) + Resend notify, then confirm.
  */
 import {
@@ -17,7 +17,7 @@ import {
 } from 'astro:env/server';
 import { upsertContact, createOpportunity, addNote } from '../integrations/ghl';
 import { scoreLead, EVENT_TYPES, BUDGETS, ROLES, FORMATS, type Inquiry } from './schema';
-import { acceptLead, listPending, retryPending, type DeliveryDeps, type LeadRecord, type LeadStore } from './deliver';
+import { acceptLead, listOpen, retryOpen, reopenAbandoned, type CrmProgress, type DeliveryDeps, type LeadDB, type LeadRecord } from './deliver';
 
 /** Pipeline value estimate per budget band (midpoints), for GHL forecasting. */
 const BUDGET_VALUE: Record<string, number | undefined> = { under_5k: 3500, '5k_10k': 7500, '10k_20k': 15000, '20k_40k': 30000, '40k_plus': 45000, discuss: undefined };
@@ -88,27 +88,31 @@ async function sendEmail(to: string, subject: string, html: string, replyTo?: st
 type Lead = ReturnType<typeof scoreLead>;
 export type InquiryRecord = LeadRecord<Inquiry, Lead>;
 
-/** The LEADS_KV binding (wrangler.jsonc); null in plain `astro dev` or if unbound. */
-async function leadStore(): Promise<LeadStore | null> {
+/** The LEADS_DB binding (D1, wrangler.jsonc); null in plain `astro dev` or if unbound. */
+async function leadDB(): Promise<LeadDB | null> {
   try {
     const mod = (await import('cloudflare:workers')) as { env?: Record<string, unknown> };
-    return (mod.env?.LEADS_KV as LeadStore | undefined) ?? null;
+    return (mod.env?.LEADS_DB as LeadDB | undefined) ?? null;
   } catch {
     return null;
   }
 }
 
-/** CRM delivery: GoHighLevel/SHA-BAM API v2, then the webhook. Throws unless one of them took the lead. */
-function crmSink(): ((r: InquiryRecord) => Promise<void>) | null {
+/**
+ * CRM delivery: GoHighLevel/SHA-BAM API v2, then the webhook. Throws unless one
+ * of them took the lead. API steps record their result in `progress`, so a
+ * retry after a partial success never creates a second contact, opportunity or note.
+ */
+function crmSink(): ((r: InquiryRecord, progress: CrmProgress) => Promise<void>) | null {
   const api = GHL_PRIVATE_TOKEN && GHL_LOCATION_ID;
   if (!api && !GHL_WEBHOOK_URL) return null;
-  return async ({ inquiry: i, lead, leadId, channel }) => {
+  return async ({ inquiry: i, lead, leadId, channel }, progress) => {
     const payload = crmPayload(i, lead, leadId, channel);
     let apiError = '';
     if (api) {
       try {
         const cfg = { token: GHL_PRIVATE_TOKEN!, locationId: GHL_LOCATION_ID! };
-        const contactId = await upsertContact(cfg, {
+        progress.contactId ??= await upsertContact(cfg, {
           firstName: payload.firstName,
           lastName: payload.lastName,
           email: i.email,
@@ -117,21 +121,26 @@ function crmSink(): ((r: InquiryRecord) => Promise<void>) | null {
           source: payload.source,
           tags: payload.tags,
         });
-        if (GHL_PIPELINE_ID && GHL_STAGE_NEW_ID) {
-          await createOpportunity(cfg, {
-            contactId,
+        if (GHL_PIPELINE_ID && GHL_STAGE_NEW_ID && !progress.opportunityId) {
+          progress.opportunityId = (await createOpportunity(cfg, {
+            contactId: progress.contactId,
             pipelineId: GHL_PIPELINE_ID,
             stageId: GHL_STAGE_NEW_ID,
             name: `${payload.event_type} | ${payload.event_date || 'TBD'} | ${i.location} | Tier ${lead.tier}`,
             monetaryValue: BUDGET_VALUE[i.budget],
             source: payload.source,
-          });
+          })) ?? 'created';
         }
-        await addNote(cfg, contactId, Object.entries(payload).filter(([k]) => !['firstName', 'lastName', 'name', 'tags'].includes(k)).map(([k, v]) => `${k}: ${v}`).join('\n'));
+        if (!progress.noted) {
+          await addNote(cfg, progress.contactId, Object.entries(payload).filter(([k]) => !['firstName', 'lastName', 'name', 'tags'].includes(k)).map(([k, v]) => `${k}: ${v}`).join('\n'));
+          progress.noted = true;
+        }
         return;
       } catch (err) {
         apiError = `api: ${(err as Error).message}`;
         if (!GHL_WEBHOOK_URL) throw new Error(apiError);
+        // A partial API write plus a full webhook would duplicate the contact's data: only fall back if the API wrote nothing.
+        if (progress.contactId) throw new Error(`${apiError} (partial; retry resumes)`);
       }
     }
     const res = await fetch(GHL_WEBHOOK_URL!, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) });
@@ -141,9 +150,9 @@ function crmSink(): ((r: InquiryRecord) => Promise<void>) | null {
 
 const emailReady = () => !!(RESEND_API_KEY && INQUIRY_FROM_EMAIL);
 
-function deps(store: LeadStore | null): DeliveryDeps<InquiryRecord> {
+function deps(db: LeadDB | null): DeliveryDeps<InquiryRecord> {
   return {
-    store,
+    db,
     sendToCrm: crmSink(),
     notifyOwner: emailReady() && INQUIRY_NOTIFY_EMAIL
       ? ({ inquiry: i, lead, leadId, channel }) =>
@@ -153,7 +162,7 @@ function deps(store: LeadStore | null): DeliveryDeps<InquiryRecord> {
     allowDryRun: import.meta.env.DEV,
     log: (event, fields) => {
       const line = JSON.stringify({ ts: new Date().toISOString(), kind: 'lead', event, ...fields });
-      if (event === 'lead_undeliverable' || event === 'lead_delivery_failed' || event === 'lead_retry_failed') console.error(line);
+      if (/(undeliverable|failed|abandoned)$/.test(event)) console.error(line);
       else console.info(line);
     },
   };
@@ -171,21 +180,20 @@ export async function processInquiry(i: Inquiry, channel: 'form' | 'scout'): Pro
     createdAt: new Date().toISOString(),
     inquiry: i,
     lead,
-    delivery: { crm: 'skipped', notify: 'skipped', confirm: 'skipped' },
-    attempts: 0,
   };
-  const result = await acceptLead(record, deps(await leadStore()), i.event_id);
+  const result = await acceptLead(record, deps(await leadDB()), i.event_id);
   return { accepted: result.accepted, leadId: result.leadId, tier: lead.tier, duplicate: result.duplicate };
 }
 
-/** Admin: leads the CRM has not taken yet (no personal data). */
-export async function pendingLeads() {
-  const store = await leadStore();
-  return store ? listPending(store) : null;
+/** Admin: open leads (CRM not yet taken, or Sean not yet notified), no personal data. null = no database bound. */
+export async function openLeads(opts: { limit?: number; cursor?: string | null }) {
+  const db = await leadDB();
+  return db ? listOpen(db, opts) : null;
 }
 
-/** Admin: re-send pending leads to the CRM (e.g. once SHA-BAM is connected). */
-export async function retryPendingLeads() {
-  const d = deps(await leadStore());
-  return retryPending(d);
+/** One bounded retry batch: cron every 15 minutes, or POST /api/leads (e.g. once SHA-BAM is connected). */
+export async function retryOpenLeads(opts: { limit?: number; cursor?: string | null; reopen?: boolean } = {}) {
+  const db = await leadDB();
+  const reopened = db && opts.reopen ? await reopenAbandoned(db) : 0;
+  return { reopened, ...(await retryOpen(deps(db), opts)) };
 }

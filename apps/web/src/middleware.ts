@@ -16,6 +16,7 @@ import { defineMiddleware } from 'astro:middleware';
 import { clientKey, logSecurity } from './lib/security/log';
 import { exceeds } from './lib/security/body';
 import { requireAuth } from './lib/security/auth';
+import { checkOrigin, type OriginPolicy } from './lib/security/origin';
 
 interface RouteRule {
   methods: string[];
@@ -28,12 +29,14 @@ interface RouteRule {
   admin?: true;
   /** maxBodySize in bytes for POST bodies (default 16 KB). */
   maxBodySize?: number;
+  /** POST Origin policy (lib/security/origin.ts); default 'if-present'. Browser-only routes use 'required'. */
+  origin?: OriginPolicy;
 }
 
 const JSON_ONLY = ['application/json'];
 const RULES: [RegExp, RouteRule][] = [
-  [/^\/api\/inquire$/, { methods: ['POST'], types: JSON_ONLY, tier: 'strict', limit: { max: 5, windowSec: 600 } }],
-  [/^\/api\/scout$/, { methods: ['GET', 'POST'], types: JSON_ONLY, maxBodySize: 65536, limit: { max: 60, windowSec: 600 } }],
+  [/^\/api\/inquire$/, { methods: ['POST'], types: JSON_ONLY, origin: 'required', tier: 'strict', limit: { max: 5, windowSec: 600 } }],
+  [/^\/api\/scout$/, { methods: ['GET', 'POST'], types: JSON_ONLY, origin: 'required', maxBodySize: 65536, limit: { max: 60, windowSec: 600 } }],
   [/^\/api\/scout\/trending$/, { methods: ['GET'], limit: { max: 60, windowSec: 600 } }],
   [/^\/api\/scout\/insights$/, { methods: ['GET'], tier: 'strict', admin: true, limit: { max: 10, windowSec: 600 } }],
   [/^\/api\/leads$/, { methods: ['GET', 'POST'], tier: 'strict', admin: true, limit: { max: 10, windowSec: 600 } }],
@@ -88,8 +91,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   if (method === 'POST') {
     const origin = req.headers.get('origin');
-    if (origin && hostOf(origin) !== url.host) {
-      logSecurity('origin_rejected', { route: url.pathname, origin, who });
+    const verdict = checkOrigin(origin, url.host, rule.origin ?? 'if-present');
+    if (verdict !== 'ok') {
+      logSecurity('origin_rejected', { route: url.pathname, origin: origin ?? '(none)', reason: verdict, who });
       return problem(403, 'forbidden');
     }
     const type = (req.headers.get('content-type') ?? '').toLowerCase();
@@ -132,13 +136,4 @@ export const onRequest = defineMiddleware(async (context, next) => {
 function handleError(err: unknown, route: string, who: string): Response {
   logSecurity('unhandled_error', { route, message: err instanceof Error ? err.message : String(err), who });
   return problem(500, 'server_error');
-}
-
-/** Host of an Origin header; "null" or malformed origins yield '' (rejected as cross-origin). */
-function hostOf(origin: string): string {
-  try {
-    return new URL(origin).host;
-  } catch {
-    return '';
-  }
 }

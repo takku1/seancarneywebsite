@@ -20,6 +20,7 @@
     "audit:deps": "npm audit --omit=dev --audit-level=high",
     "sbom": "npm sbom --sbom-format cyclonedx --omit dev > ../../docs/security/sbom.cdx.json",
     "test": "node --test evals/*.test.mjs",
+    "test:browser": "node evals/browser-smoke.mjs",
     "eval:scout": "node evals/run-scout-evals.mjs",
     "brand:icons": "node scripts/prepare-brand.mjs",
     "verify": "astro check && npm test && astro build && npm audit --omit=dev --audit-level=high"
@@ -38,6 +39,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
+    "playwright-core": "^1.57.0",
     "typescript": "^6.0.3",
     "wrangler": "^4.158.0"
   },

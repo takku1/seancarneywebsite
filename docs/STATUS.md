@@ -7,7 +7,7 @@
 | State | Where it stands |
 |---|---|
 | Implemented | All pages, the inquiry pipeline with durable acceptance, Scout (guided and Claude), media tooling |
-| Locally tested | `npm run verify` (types, 25 unit tests, build, audit); `scripts/test_publish.sh`; 22 pages checked at desktop and phone width; the inquiry/lead-queue path exercised on the production build (2026-11-10) |
+| Locally tested | `npm run verify` (types, 35 unit tests, build, audit); `scripts/test_publish.sh` (11 cases); `npm run test:browser` (22 pages at desktop and phone width, API guards in the Workers runtime); in the built Worker under `wrangler dev`: concurrent duplicate submissions produce one lead, and the cron backfills a pre-CRM lead to a stand-in webhook (2026-11-10) |
 | Deployed | Not yet: no Cloudflare staging or production |
 | Production verified | Not yet: needs a real inquiry through Resend and SHA-BAM on staging |
 | Externally approved | Not yet: Sean's claims, venues, testimonials and media rights (`06-launch-checklist.md`) |
@@ -16,7 +16,7 @@
 
 | Dependency | Waiting on | Ready now |
 |---|---|---|
-| SHA-BAM CRM | Sean's account details | Leads held in `LEADS_KV` and emailed; `POST /api/leads` backfills once connected |
+| SHA-BAM CRM | Sean's account details | Leads held in `LEADS_DB` (D1) and emailed; the 15-minute cron backfills them once connected |
 | Cloudflare deployment | Cloudflare login, DNS, secrets | Build config, bindings, security; staging first (`06-launch-checklist.md`) |
 | Scout's AI backend | Whether SHA-BAM includes Conversation AI and an external chat API | Provider seam, Claude adapter, guided mode (`12-scout-backend-decision.md`) |
 
@@ -25,7 +25,9 @@
 **Architecture Summary:** An Astro 7 static site (`apps/web`) on Cloudflare Workers; prerendered pages (`build.format: 'file'`) are swapped by the ClientRouter, while Scout, the consent bar and a persistent audio/video dock survive navigation. The Worker runs only the APIs behind `src/middleware.ts`: inquiry (success only once the lead is held in the lead store, SHA-BAM or Sean's inbox), availability (Google Calendar free/busy), Scout, signal and CSP reports. Content is typed JSON in `src/data/`, validated at build; `media-library.json` is the media catalog, prepared by `scripts/media/media.py` from private originals in `resources/`. Analytics are first-party under an enforced hash-based CSP. Details: `docs/current/03-architecture.md`.
 
 **Key Decisions:**
-- 2026-11-10: An inquiry is acknowledged only once it is held durably (`LEADS_KV`, SHA-BAM or the notify email), else 503 with the direct email; idempotent on the client event id; failures and pre-CRM leads queue for `POST /api/leads` (`03-architecture.md`).
+- 2026-11-10: An inquiry is acknowledged only once it is held durably (`LEADS_DB`, SHA-BAM or the notify email), else 503 with the direct email (`03-architecture.md`).
+- 2026-11-10: The lead store is Cloudflare D1, not KV: a `UNIQUE` event id makes duplicate submissions atomic, rows start `pending` so none escapes recovery, and a 15-minute cron retries CRM and notification deliveries (claimed per attempt, resumable CRM steps, abandoned after 5 with an alert log).
+- 2026-11-10: POST routes declare an Origin policy: required for the inquiry form and Scout, checked when present elsewhere.
 - 2026-11-10: Hardening from the repository audit: Turnstile fails closed in production, keyed HMAC log pseudonyms, streamed-body size limits, Scout's daily cap documented as soft with the Claude Console limit as the hard cap.
 - 2026-11-10: TypeScript 7 held until `@astrojs/check` supports it (Dependabot ignores TypeScript majors).
 - 2026-11-10: `resources/briefs/SCE Website.docx` governs brand and offer: SCE is the public brand, formats are Solo, Duo and Band (The Scene), and the offer includes a custom song (`/custom-song`) with Sean's songwriting credits in context. Prices stay private. (`10-sce-build-brief.md`)

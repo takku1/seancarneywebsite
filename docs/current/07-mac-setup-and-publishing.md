@@ -46,6 +46,8 @@ This one command, in order:
 4. lists exactly which files will be saved and asks you to confirm,
 5. saves your changes with your description and pushes them to GitHub (`main`).
 
+If an earlier publish saved your changes but couldn't push them (for example, offline), running it again with no new edits checks and pushes those saved changes.
+
 To run the checks without saving anything: `bash scripts/publish.sh --check`.
 
 If it stops, it says why and nothing is published. Fix what it names and run it again, or ask Dillon.

@@ -2,10 +2,16 @@
 {
   "name": "seancarneymusic",
   "compatibility_date": "2026-11-01",
+  // Astro's handler plus a cron handler for lead-delivery retries.
+  "main": "src/worker.ts",
+  "triggers": { "crons": ["*/15 * * * *"] },
   "observability": { "enabled": true },
   // Anonymous Scout signals (topic counts, date demand). No id: wrangler provisions it on first deploy.
-  // LEADS_KV: durable inquiry receipts (90 days) and the pending-CRM index; see src/lib/inquiry/deliver.ts.
-  "kv_namespaces": [{ "binding": "SCOUT_KV" }, { "binding": "LEADS_KV" }],
+  "kv_namespaces": [{ "binding": "SCOUT_KV" }],
+  // Inquiry receipts (90 days), idempotency and the retry queue; see src/lib/inquiry/deliver.ts.
+  // D1 rather than KV: strongly consistent with atomic inserts. No id: provisioned on first deploy;
+  // the table is created on first use.
+  "d1_databases": [{ "binding": "LEADS_DB", "database_name": "seancarneymusic-leads" }],
   // Cloudflare Rate Limiting bindings (periods must be 10 or 60 s). Keys are per route + hashed client.
   // src/middleware.ts picks the tier per route; the in-memory fallback covers dev only.
   "ratelimits": [

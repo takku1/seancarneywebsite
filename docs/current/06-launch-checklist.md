@@ -23,7 +23,7 @@ Everything here is confirmed with Sean before the site goes live. Each item is a
 - [ ] The private investment guide sent after inquiry (pricing posture: `01-positioning-and-offer.md`).
 
 ## Security (from `docs/security/SECURITY.md`)
-- [x] Rate-limiting bindings `RATE_LIMITER_STRICT` / `RATE_LIMITER` and KV `SCOUT_KV` and `LEADS_KV` declared in `apps/web/wrangler.jsonc` (KV is provisioned on first deploy).
+- [x] Rate-limiting bindings `RATE_LIMITER_STRICT` / `RATE_LIMITER` KV `SCOUT_KV` and D1 `LEADS_DB` declared in `apps/web/wrangler.jsonc` (KV is provisioned on first deploy).
 - [ ] `LOG_HASH_KEY` secret (`openssl rand -hex 32`) so security-log pseudonyms are stable across Worker instances.
 - [x] CSP enforced: one header policy; `integrations/csp-header-hashes.mjs` writes the SHA-256 hashes of every inline script and style into `_headers` at build (no `unsafe-inline`).
 - [ ] A Cloudflare WAF rate rule on `/api/*` as an outer layer.
@@ -32,6 +32,8 @@ Everything here is confirmed with Sean before the site goes live. Each item is a
 - [ ] After turning on GA4 / Clarity / Meta / Turnstile, watch `csp_violation` logs for a week.
 - [ ] DNS: DMARC (`_dmarc` TXT `v=DMARC1; p=none; rua=mailto:<reports address>`), moving to `p=quarantine` after 2–4 clean weeks; verify the sending domain in Resend (DKIM plus a `send.` return-path subdomain) before inquiry emails go live.
 - [ ] A Cloudflare notification for Worker error-rate spikes; a weekly review of security events.
+- [ ] An alert on lead log lines `lead_undeliverable`, `lead_crm_abandoned` and `lead_notify_abandoned` (Workers Logs). An abandoned notification means Sean was never told about that lead: check `GET /api/leads`, contact the couple, then `POST /api/leads` with `{"reopen": true}` once the cause is fixed.
+- [ ] Confirm the 15-minute cron trigger is listed under the Worker's Triggers after the first deploy.
 
 ## Pre-launch QA
 - [ ] The booking wording on the FAQ ("the date is held once the agreement is signed") and `/terms`.
@@ -44,7 +46,7 @@ Everything here is confirmed with Sean before the site goes live. Each item is a
 - [ ] Plausible (`PUBLIC_PLAUSIBLE_DOMAIN`), Microsoft Clarity (`PUBLIC_CLARITY_ID`).
 - [ ] GA4 and Meta Pixel when ads start (`PUBLIC_GA4_ID`, `PUBLIC_META_PIXEL_ID`); with the pixel, the `META_CAPI_ACCESS_TOKEN` secret, then confirm in Events Manager that `Lead` shows as deduplicated (browser + server).
 - [ ] Cloudflare Turnstile keys (`PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`). **Required:** without the secret, production rejects every inquiry (logged as `turnstile_secret_missing`).
-- [ ] SHA-BAM (GoHighLevel) private integration or inbound webhook (`GHL_*`); custom fields: lead_tier, lead_score, event_type, budget, first/last channel. Deferred until Sean supplies the account details. Leads taken before it is connected wait in `LEADS_KV`; once it is, run `POST /api/leads` (admin token) to backfill them, then check `GET /api/leads` is empty.
+- [ ] SHA-BAM (GoHighLevel) private integration or inbound webhook (`GHL_*`); custom fields: lead_tier, lead_score, event_type, budget, first/last channel. Deferred until Sean supplies the account details. Leads taken before it is connected wait in `LEADS_DB`; once it is, the 15-minute cron backfills them automatically (or run `POST /api/leads` with the admin token, repeating with `nextCursor`), then check `GET /api/leads` shows nothing open.
 - [ ] The call-booking link for the thank-you page (`PUBLIC_CALL_BOOKING_URL`).
 - [ ] Resend (`RESEND_API_KEY`, `INQUIRY_FROM_EMAIL`, `INQUIRY_NOTIFY_EMAIL`) with a verified sending domain. **Required before launch:** while SHA-BAM is deferred, the notification email is the only way Sean hears about a new lead (stored leads alone notify no one).
 - [ ] Scout with AI on: a monthly spend limit on the API key's workspace in the Claude Console. `SCOUT_DAILY_LIMIT` is a soft cap (KV counters are not atomic); the Console limit is the hard one.
