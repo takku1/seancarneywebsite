@@ -38,7 +38,7 @@ Music-planning addition: `src/lib/music-plan.ts` owns repertoire-only ranking an
 | Analytics | `src/lib/analytics/*`, `src/components/analytics/*` | declarative tracking, first/last-touch attribution, A/B tests, retention cohorts, web vitals |
 | SEO | `src/components/seo/Seo.astro`, `src/lib/seo/schema.ts`, `src/pages/llms.txt.ts`, sitemap | Person, Service (weddings, private events) and FAQ JSON-LD; an AI-assistant brief at `/llms.txt` |
 | Integrations | `src/lib/integrations/ghl.ts`, `meta-capi.ts` | GoHighLevel API v2 with webhook fallback; Meta Conversions API |
-| Tooling | `scripts/setup-mac.sh`, `scripts/publish.sh`, `.github/workflows/ci.yml` | Mac setup, publishing to `main`, CI (check, build, audit) |
+| Tooling | `scripts/setup-mac.sh`, `scripts/publish.sh`, `.github/workflows/ci.yml` | Mac setup, publishing to `main` (the release gate: check, test, build), manual CI (check, test, build, audit) |
 
 ## Content model
 | Collection | Holds |

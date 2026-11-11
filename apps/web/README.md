@@ -29,7 +29,7 @@ scripts/        Node entry points: media.mjs (wraps ../../scripts/media/media.py
 | `npm run check` | Astro and TypeScript diagnostics |
 | `npm test` | Unit tests in `evals/*.test.mjs` |
 | `npm run eval:scout` | Scout concierge evaluation cases (against a running server, with an API key) |
-| `npm run verify` | check, test, build and dependency audit (what CI runs) |
+| `npm run verify` | check, test, build and dependency audit: the full gate (CI runs the same, manually) |
 | `npm run media:<list\|info\|build\|replace\|check\|report>` | Media catalog tool; see `docs/current/11-media-management.md` |
 | `npm run brand:icons` | Regenerate favicon and install icons from the SCE wordmark |
 | `npm run audit:deps` / `sbom` | Production dependency audit; CycloneDX SBOM to `docs/security/` |

@@ -7,7 +7,8 @@
 #
 # Steps (stops safely at the first problem, nothing half-done):
 #   1. brings in anything new from GitHub first (never overwrites your work)
-#   2. type check + full build, exactly like CI: a broken site is never pushed
+#   2. type check, unit tests and full build: a broken site is never pushed
+#      (this is the release gate; GitHub's CI only runs when started by hand)
 #   3. refuses if a secret (API key, .env file) is about to be published
 #   4. saves (commits) every change with your description, pushes to main
 #
@@ -62,7 +63,7 @@ if git rev-parse --verify --quiet "origin/$BRANCH" >/dev/null; then
   fi
 fi
 
-# ── 2. the site must still build (same checks as CI) ─────────────────────────
+# ── 2. the site must still build and pass its tests ──────────────────────────
 step "Checking the site builds"
 if [ -n "${FNM_DIR:-}" ] || command -v fnm >/dev/null 2>&1; then eval "$(fnm env --shell bash 2>/dev/null)" >/dev/null 2>&1 || true; fi
 command -v npm >/dev/null 2>&1 || fail "npm not found. Run scripts/setup-mac.sh first, then open a new Terminal window."
@@ -70,9 +71,10 @@ command -v npm >/dev/null 2>&1 || fail "npm not found. Run scripts/setup-mac.sh 
   cd apps/web
   [ -d node_modules ] || npm ci --no-fund --no-audit >"$LOG" 2>&1
   npx astro check >"$LOG" 2>&1 || { tail -30 "$LOG"; exit 1; }
+  npm test >>"$LOG" 2>&1 || { tail -30 "$LOG"; exit 1; }
   npx astro build >>"$LOG" 2>&1 || { tail -30 "$LOG"; exit 1; }
-) || fail "The site doesn't build with these changes, so nothing was published. The error is above (full log: $LOG)."
-ok "type check and build passed"
+) || fail "The site doesn't build or a test failed with these changes, so nothing was published. The error is above (full log: $LOG)."
+ok "type check, tests and build passed"
 
 # ── 3. never publish secrets ─────────────────────────────────────────────────
 step "Checking for secrets"
@@ -102,6 +104,6 @@ ok "pushed to GitHub ($BRANCH): $(git log -1 --format='%h %s')"
 REMOTE="$(git remote get-url origin | sed -E 's#^git@github.com:#https://github.com/#; s#\.git$##')"
 cat <<EOF
 
-${G}${B}Published.${N} GitHub now runs the same checks (Actions tab):
-  $REMOTE/actions
+${G}${B}Published.${N} Your changes are saved on GitHub:
+  $REMOTE
 EOF

@@ -64,7 +64,7 @@ Stored as Worker secrets (`wrangler secret put`) and build variables; never comm
 
 ## 7. Dependencies and remediation timeframes (ASVS 15.1.1, 15.1.2, 15.2.1, OWASP A03)
 - SBOM: `docs/security/sbom.cdx.json` (CycloneDX 1.5, 195 production components). Regenerate with `npm run sbom`.
-- `npm audit --omit=dev`: **0 vulnerabilities** (2026-11-01). Enforced in CI (`.github/workflows/ci.yml`, fails on high).
+- `npm audit --omit=dev`: **0 vulnerabilities** (2026-11-01). Enforced by `npm run verify` before pushing and by the manual CI workflow (`.github/workflows/ci.yml`); fails on high.
 - Dependabot weekly (npm) and monthly (GitHub Actions); actions pinned to commit SHAs.
 - Remediation timeframes: **Critical / CISA KEV-listed: 48 hours. High: 7 days. Medium: 30 days. Low: next release.** Prioritize with AuditForge's `kev_lookup`/`epss_lookup`.
 - Risky or dangerous components (15.1.4, 15.1.5): the Anthropic SDK (handles untrusted model output, which is escaped before rendering) and `set:html` (used only with build-time, non-user content: JSON-LD and inline config).
@@ -111,7 +111,7 @@ Stored as Worker secrets (`wrangler secret put`) and build variables; never comm
 | 14.2.3 nothing sensitive to trackers | **Fixed** | `data-clarity-mask` on Scout and all forms; analytics events carry no PII |
 | 14.3.2 no-store on sensitive responses | Met | All API JSON is `cache-control: no-store` |
 | 14.3.3 no sensitive data in browser storage | **Fixed** | All browser storage goes through `lib/storage.ts` (`sc_`-namespaced); `/privacy` has "Clear data saved in this browser" (GDPR Art. 17 eviction). Inquiry draft excludes name, email, phone, company and message; the Scout transcript is tab-scoped and clearable (documented residual risk) |
-| 15.2.1 vulnerable components | Met | `npm audit` 0; CI gate |
+| 15.2.1 vulnerable components | Met | `npm audit` 0; `npm run verify` gate |
 | 15.3.3 mass assignment | Met | Zod strips unknown fields |
 | 15.3.6 prototype pollution | **Fixed** | Null-prototype counters; reserved keys rejected (`lib/scout/signals.ts`) |
 | 16.3.3 security event logging | **Fixed** | `lib/security/log.ts` (§5) |

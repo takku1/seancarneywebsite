@@ -9,7 +9,7 @@
 **Key Decisions:**
 - 2026-11-10: `resources/briefs/SCE Website.docx` governs brand and offer: SCE is the public brand, formats are Solo, Duo and Band (The Scene), and the offer includes a custom song (`/custom-song`) with Sean's songwriting credits in context. Prices stay private. (`10-sce-build-brief.md`)
 - 2026-11-10: Media is catalog-driven: 53 assets and 15 named placements in `media-library.json`; originals are never edited or committed (`11-media-management.md`).
-- 2026-11-10: Repo layout: app in `apps/web`, docs in `docs/`, media tooling in `scripts/media/`, Sean's Mac workflow in `scripts/`, private sources in git-ignored `resources/`. CI runs check, unit tests, build and audit.
+- 2026-11-10: Repo layout: app in `apps/web`, docs in `docs/`, media tooling in `scripts/media/`, Sean's Mac workflow in `scripts/`, private sources in git-ignored `resources/`. The release gate is local (`scripts/publish.sh`, `npm run verify`); GitHub CI is manual-only because Actions minutes are shared across the account's private repos.
 - 2026-11-03: A luxury live-music house for weddings, with private events served quietly; one booking covers the day. No rock, country or western framing. (`01-positioning-and-offer.md`)
 - 2026-11-03: Visual direction "Ivory maison" (Aman-like restraint), the only theme; the Nov 10 brief adds Élan Artists as the roster/presentation reference. (`02-site-structure-and-design.md`)
 - 2026-11-03: Proof is rooms and couples (typeset venue names, named testimonials) plus one credentials line; no marketplace badges or logo walls.

@@ -50,4 +50,4 @@ If it stops, it says why and nothing is published. Fix what it names and run it 
 ## Good to know
 - Settings and keys go in `apps/web/.env`. That file is never published.
 - `docs/STATUS.md` is the overview of where the project stands.
-- Every push to `main` runs the checks on GitHub (the Actions tab of the repo).
+- `publish.sh` is the release check: it type-checks, tests and builds before anything is pushed. The GitHub check (Actions tab > ci > Run workflow) runs only when started by hand, because Actions minutes are shared across all private repos on the account.

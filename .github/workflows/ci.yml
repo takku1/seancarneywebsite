@@ -1,9 +1,9 @@
 # Build gate: types, unit tests, build, dependency audit, and the AuditForge-style secret/PII scan.
 name: ci
+# Manual only (Actions tab > ci > Run workflow): Actions minutes are shared across the
+# account's private repos. The release gate is local: scripts/publish.sh / npm run verify.
 on:
-  pull_request:
-  push:
-    branches: [main]
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:

@@ -17,7 +17,7 @@ Start with **[docs/STATUS.md](docs/STATUS.md)**, the single source of truth for 
 | `scripts/media/` | Media tooling: catalog-driven preparation, checks, built-site asset verification, tests |
 | `reference/` | Snapshot of the previous site and competitor/inspiration captures (heavy media stays local) |
 | `resources/` | Private, git-ignored: untouched Drive originals, briefs, contracts, incoming replacements |
-| `.github/` | CI (type check, tests, build, dependency audit) and Dependabot |
+| `.github/` | Manual CI (type check, tests, build, dependency audit; run from the Actions tab) and Dependabot |
 
 ## Quick start
 
@@ -33,7 +33,7 @@ Copy `apps/web/.env.example` to `apps/web/.env` for local API keys. A blank key 
 
 | Task | Command (from `apps/web`) |
 | :--- | :--- |
-| Full gate (types, tests, build, audit) | `npm run verify` |
+| Full gate (types, tests, build, audit); run before pushing | `npm run verify` |
 | Unit tests | `npm test` |
 | Scout evals (needs a running server and API key) | `npm run eval:scout` |
 | Media: list, build, replace, check, report | `npm run media:<command>` (see `docs/current/11-media-management.md`) |
