@@ -8,10 +8,20 @@
  * proves the draft came from this server unchanged, and it expires after 30
  * minutes.
  *
- * Each draft carries a stable idempotency key derived from the inquiry itself
- * (keyed hash of email, event type, date and location), not a per-call UUID:
- * repeated clicks, network retries, and the model preparing the same inquiry
- * twice all map to one lead.
+ * Each draft carries an idempotency key that identifies one SUBMISSION, not
+ * one event: a keyed hash of every business detail of the inquiry plus the
+ * UTC day the draft was prepared.
+ * - Retries, double-clicks and repeated sends of the same draft: same key,
+ *   one lead (the key is fixed inside the signed draft).
+ * - The same details prepared again the same day: same key, one lead.
+ * - Anything changed (budget, guests, format, message...) or a later day:
+ *   a new key, so a planner's follow-up reaches Sean as a new lead rather
+ *   than being swallowed as a duplicate of the original.
+ * The chat panel also offers Send only on the latest prepared draft, so a
+ * model re-preparing with reworded details can't produce two sendable cards.
+ *
+ * Drafts are bearer tokens for 30 minutes: never log them or send them to
+ * analytics (they are only held in the visitor's own tab).
  */
 const enc = new TextEncoder();
 export const DRAFT_TTL_MS = 30 * 60_000;
@@ -24,7 +34,7 @@ async function hmacHex(secret: string, data: string): Promise<string> {
 const b64url = (s: string) => btoa(String.fromCharCode(...enc.encode(s))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 const unb64url = (s: string) => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')), (c) => c.charCodeAt(0)));
 
-/** The fields that make two inquiries "the same inquiry". */
+/** The minimum a draft needs; every other business field also counts toward its key. */
 export interface DraftIdentity {
   email: string;
   event_type: string;
@@ -32,14 +42,28 @@ export interface DraftIdentity {
   location: string;
 }
 
-/** Stable, server-controlled idempotency key for one inquiry. */
-export async function inquiryKey(i: DraftIdentity, secret: string): Promise<string> {
-  const norm = [i.email.trim().toLowerCase(), i.event_type, (i.event_date ?? '').trim(), i.location.trim().toLowerCase().replace(/\s+/g, ' ')].join('|');
-  return `scout-${(await hmacHex(secret, `inquiry-key|${norm}`)).slice(0, 32)}`;
+/**
+ * The details that make up an inquiry's content. Attribution, experiments and
+ * the page are context, not content, so they don't change the key.
+ */
+const CONTENT_FIELDS = ['name', 'email', 'phone', 'company', 'role', 'event_type', 'event_date', 'date_flexible', 'location', 'guests', 'format', 'moments', 'budget', 'message'] as const;
+const DAY_MS = 86_400_000;
+
+function normalize(v: unknown): unknown {
+  if (typeof v === 'string') return v.trim().toLowerCase().replace(/\s+/g, ' ');
+  if (Array.isArray(v)) return [...v].map(normalize).sort();
+  return v ?? null;
+}
+
+/** Idempotency key for one submission: every business detail plus the UTC day it was prepared (see header). */
+export async function inquiryKey(i: DraftIdentity, secret: string, preparedAt: number): Promise<string> {
+  const content = CONTENT_FIELDS.map((f) => [f, normalize((i as unknown as Record<string, unknown>)[f])]);
+  const day = Math.floor(preparedAt / DAY_MS);
+  return `scout-${(await hmacHex(secret, `inquiry-key|${day}|${JSON.stringify(content)}`)).slice(0, 32)}`;
 }
 
 export async function signDraft<I extends DraftIdentity>(inquiry: I, secret: string, now = Date.now()): Promise<string> {
-  const body = b64url(JSON.stringify({ v: 1, inquiry, key: await inquiryKey(inquiry, secret), exp: now + DRAFT_TTL_MS }));
+  const body = b64url(JSON.stringify({ v: 1, inquiry, key: await inquiryKey(inquiry, secret, now), exp: now + DRAFT_TTL_MS }));
   return `${body}.${await hmacHex(secret, `draft|${body}`)}`;
 }
 

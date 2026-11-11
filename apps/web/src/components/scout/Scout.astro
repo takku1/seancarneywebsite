@@ -194,6 +194,11 @@ const data = enabled
       if (c.kind === 'inquiry_confirm') {
         // Scout prepared this; nothing is sent until the visitor presses Send (lib/scout/draft.ts).
         const s = c.summary;
+        // Only the latest prepared draft is sendable: an earlier one (e.g. before the details
+        // were corrected) can't be sent alongside it.
+        if (c !== latestDraft) {
+          return h('div', { class: 'card confirm replaced' }, h('strong', {}, 'Replaced'), h('span', {}, `${s.event}, ${s.date}, ${s.location}: updated details below.`));
+        }
         const send = h('button', { type: 'button', class: 'btn c-send', 'data-track': 'scout_inquiry_send' }, 'Send inquiry') as HTMLButtonElement;
         send.addEventListener('click', () => sendDraft(c, send));
         return h('div', { class: 'card confirm' },
@@ -230,7 +235,10 @@ const data = enabled
       render();
     }
 
+    /** The most recent unsent draft in the conversation; the only one card() renders with a Send button. */
+    let latestDraft: Card | undefined;
     function render() {
+      latestDraft = state.entries.flatMap((e) => e.cards ?? []).filter((c) => c.kind === 'inquiry_confirm').at(-1);
       log.replaceChildren(...state.entries.map((e) =>
         h('div', { class: `msg ${e.who}` },
           e.text && h('p', {}, e.who === 'scout' ? richText(e.text) : e.text),
@@ -617,6 +625,7 @@ const data = enabled
   .s-log :global(.card.confirm) { border-left: 2px solid var(--accent); }
   .s-log :global(.card.confirm .c-send) { justify-self: start; margin-top: 0.35rem; }
   .s-log :global(.card.confirm .c-send[aria-busy='true']) { opacity: 0.6; }
+  .s-log :global(.card.confirm.replaced) { border-left-color: var(--line-strong); opacity: 0.75; }
   .s-log :global(.card .c-err) { color: var(--text); }
   .s-log :global(.m-item) { display: grid; grid-template-columns: 96px 1fr; gap: 0.6rem; align-items: center; padding: 0; background: none; border: 1px solid var(--line); color: inherit; text-align: left; font: inherit; font-size: 0.9rem; cursor: pointer; text-decoration: none; }
   .s-log :global(.m-item.rel) { grid-template-columns: minmax(0, 1fr); padding: 0.6rem 0.75rem; }

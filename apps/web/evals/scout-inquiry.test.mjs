@@ -107,20 +107,65 @@ test('a simultaneous double-click creates one lead', {timeout: 10_000}, async ()
   } finally { restore(); }
 });
 
-test('the model preparing the same inquiry twice still yields one lead', {timeout: 10_000}, async () => {
+test('the same details prepared again the same day still yield one lead', {timeout: 10_000}, async () => {
   const {db, crm} = setup();
   try {
     const one = (await executeTool('submit_inquiry', ARGS, CTX)).card.token;
-    const two = (await executeTool('submit_inquiry', {...ARGS, message: 'reworded summary'}, CTX)).card.token;
+    const two = (await executeTool('submit_inquiry', ARGS, {...CTX, page: '/about'})).card.token; // context differs, content doesn't
     assert.notEqual(one, two, 'two different drafts');
     const r1 = await (await send(POST, one)).json();
     const r2 = await (await send(POST, two)).json();
     assert.equal(r2.leadId, r1.leadId);
     assert.equal(leads(db), 1);
     assert.equal(crm.length, 1);
-    const other = (await executeTool('submit_inquiry', {...ARGS, event_date: '2027-10-02'}, CTX)).card.token;
-    assert.notEqual((await (await send(POST, other)).json()).leadId, r1.leadId, 'a different date is a different inquiry');
   } finally { restore(); }
+});
+
+test('same planner, same event, updated details: a new lead, and Sean receives the update', {timeout: 10_000}, async () => {
+  const {db, crm} = setup();
+  try {
+    const original = (await executeTool('submit_inquiry', {...ARGS, budget: 'discuss'}, CTX)).card.token;
+    const updated = (await executeTool('submit_inquiry', {...ARGS, budget: '20k_40k', guests: '150 to 300', message: 'Now adding a ceremony set'}, CTX)).card.token;
+    const r1 = await (await send(POST, original)).json();
+    const r2 = await (await send(POST, updated)).json();
+    assert.notEqual(r2.leadId, r1.leadId, 'the follow-up is not swallowed as a duplicate');
+    assert.equal(leads(db), 2);
+    assert.deepEqual(crm, [r1.leadId, r2.leadId], 'both reached the CRM');
+    const stored = JSON.parse(db.raw.prepare('SELECT data FROM leads WHERE lead_id = ?').get(r2.leadId).data).inquiry;
+    assert.equal(stored.budget, '20k_40k', 'with the updated details');
+  } finally { restore(); }
+});
+
+test('identical details sent on a later day are a new inquiry', {timeout: 10_000}, async () => {
+  const {db, crm} = setup();
+  try {
+    const {signDraft} = await load('src/lib/scout/draft.ts');
+    const {card} = await executeTool('submit_inquiry', ARGS, CTX);
+    const inquiry = JSON.parse(Buffer.from(card.token.split('.')[0], 'base64url').toString()).inquiry;
+    const r1 = await (await send(POST, card.token)).json();
+    // Sent through a draft prepared a day later (valid now: its 30-minute window is open).
+    const tomorrow = await signDraft(inquiry, SECRET, Date.now() + 86_400_000 - 60_000);
+    const later = JSON.parse(Buffer.from(tomorrow.split('.')[0], 'base64url').toString());
+    assert.notEqual(later.key, JSON.parse(Buffer.from(card.token.split('.')[0], 'base64url').toString()).key);
+    const r2 = await (await send(POST, tomorrow)).json();
+    assert.notEqual(r2.leadId, r1.leadId);
+    assert.equal(leads(db), 2);
+    assert.equal(crm.length, 2);
+  } finally { restore(); }
+});
+
+test('the key covers content, not context: page and attribution do not change it, any detail does', {timeout: 10_000}, async () => {
+  const {inquiryKey} = await load('src/lib/scout/draft.ts');
+  const t = Date.UTC(2026, 10, 11, 12);
+  const base = {...ARGS, attribution: {}, experiments: {}, page: '/weddings'};
+  const k = await inquiryKey(base, SECRET, t);
+  assert.equal(await inquiryKey({...base, page: '/about', attribution: {first_channel: 'instagram'}}, SECRET, t), k);
+  assert.equal(await inquiryKey({...base, email: ' ADA@example.com '}, SECRET, t), k, 'case and whitespace are not content');
+  assert.equal(await inquiryKey(base, SECRET, t + 3_600_000), k, 'later the same UTC day');
+  for (const change of [{budget: '20k_40k'}, {guests: '150 to 300'}, {format: 'band'}, {message: 'add a ceremony set'}, {event_date: '2027-09-19'}, {phone: '555-0100'}]) {
+    assert.notEqual(await inquiryKey({...base, ...change}, SECRET, t), k, JSON.stringify(change));
+  }
+  assert.notEqual(await inquiryKey(base, SECRET, t + 86_400_000), k, 'the next day');
 });
 
 test('a tampered or forged draft is refused and creates nothing', {timeout: 10_000}, async () => {
