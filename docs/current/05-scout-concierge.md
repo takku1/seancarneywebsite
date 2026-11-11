@@ -97,7 +97,7 @@ Principles: least privilege (no tool can read CRM data, send arbitrary email, br
 | LLM09 | Misinformation | Grounded in site content; refuse unknowns; availability is indicative; prices never stated |
 | LLM10 | Unbounded consumption | 1,000-char messages; 150 KB transcript cap; 20-turn cap; rate limits: the standard API tier (20 requests per minute per client, a Cloudflare Rate Limiting binding; `lib/security/rate-tiers.ts`) plus a best-effort per-isolate cap of 40 AI turns per 10 minutes, and a **Cloudflare WAF rate rule on `/api/scout` (set at deploy)**; daily AI-turn budget (`SCOUT_DAILY_LIMIT`, default 1,500) then guided mode, a soft cap because KV counters are not atomic, failing closed to guided mode in production without storage; the hard cap is the API key's workspace spend limit in the Claude Console; `max_tokens` 2000 |
 
-**Transcript signing is required in production:** without `SCOUT_SIGNING_KEY`, `/api/scout` serves guided mode only (logged as `scout_signing_key_missing`), and unsigned history is rejected; only development runs unsigned.
+**Transcript signing is required in production:** without `SCOUT_SIGNING_KEY`, both `GET /api/scout` (which the panel asks before offering AI) and `POST` report guided mode, from one shared rule (`lib/scout/mode.ts`); the misconfiguration is logged once per instance as `scout_signing_key_missing`, and unsigned history is rejected. Only development runs unsigned.
 
 **Secrets:** `ANTHROPIC_API_KEY`, `SCOUT_SIGNING_KEY` and `SCOUT_ADMIN_TOKEN` live only in Worker secrets (`wrangler secret put`). Rotate them every 90 days or immediately on suspicion; rotating the signing key just resets open chats. `/api/scout/insights` returns 404 without the bearer token.
 

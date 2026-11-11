@@ -50,13 +50,38 @@ const RULES: [RegExp, RouteRule][] = [
 
 const memory = new Map<string, { n: number; reset: number }>();
 
+let lastLimiterAlert = 0;
+/** Alert-level config log, at most once a minute per isolate. */
+function limiterAlert(event: 'rate_limiter_unbound' | 'rate_limiter_error', binding: string, code?: string) {
+  if (Date.now() - lastLimiterAlert < 60_000) return;
+  lastLimiterAlert = Date.now();
+  console.error(JSON.stringify({ ts: new Date().toISOString(), kind: 'config', event, binding, ...(code ? { error: code } : {}) }));
+}
+
+/**
+ * Production uses the tier's Cloudflare binding (a global limit). If it is
+ * missing or errors, requests fall back to a per-isolate counter with the
+ * same numbers and an alert is logged. Deliberately not fail-closed: for the
+ * inquiry route that would turn real leads away during a platform outage,
+ * while Turnstile, the honeypot and timing checks still apply.
+ */
 async function allowed(key: string, rule: RouteRule): Promise<boolean> {
+  const { binding } = RATE_TIERS[rule.tier];
+  let rl: { limit(o: { key: string }): Promise<{ success: boolean }> } | undefined;
   try {
     const mod = (await import('cloudflare:workers')) as { env?: Record<string, unknown> };
-    const rl = mod.env?.[RATE_TIERS[rule.tier].binding] as { limit(o: { key: string }): Promise<{ success: boolean }> } | undefined;
-    if (rl) return (await rl.limit({ key })).success;
+    rl = mod.env?.[binding] as typeof rl;
   } catch {
-    /* not on Workers (dev/build): fall through to memory */
+    /* not on Workers (build tooling): fall through to memory */
+  }
+  if (rl) {
+    try {
+      return (await rl.limit({ key })).success;
+    } catch (e) {
+      limiterAlert('rate_limiter_error', binding, errorCode(e));
+    }
+  } else if (!import.meta.env.DEV) {
+    limiterAlert('rate_limiter_unbound', binding);
   }
   const now = Date.now();
   const h = memory.get(key);

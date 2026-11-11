@@ -13,6 +13,7 @@ import { matchIntents } from '../../lib/scout/intents';
 import { recordQuestion, recordDateCheck, consumeDailyBudget } from '../../lib/scout/signals';
 import { SCOUT_SIGNING_KEY, SCOUT_DAILY_LIMIT } from 'astro:env/server';
 import { signTranscript, verifyTranscript, visitorText } from '../../lib/scout/integrity';
+import { resolveScoutMode } from '../../lib/scout/mode';
 import { logSecurity } from '../../lib/security/log';
 import { errorCode } from '../../lib/security/errors';
 
@@ -38,23 +39,27 @@ function limited(ip: string): boolean {
   return h.n > RATE.max;
 }
 
-export const GET: APIRoute = () => {
-  const p = getScoutProvider();
-  return json(200, { mode: p ? 'ai' : 'guided' });
-};
+let keyWarned = false;
+/** The provider if Scout may run with AI right now (lib/scout/mode.ts), else null. Shared by GET and POST. */
+function aiProvider() {
+  const provider = getScoutProvider();
+  const m = resolveScoutMode({ hasProvider: !!provider, hasSigningKey: !!SCOUT_SIGNING_KEY, dev: import.meta.env.DEV });
+  if (m.mode === 'guided' && m.reason === 'signing_key_missing' && !keyWarned) {
+    keyWarned = true; // once per isolate: GET runs on every panel open
+    console.error(JSON.stringify({ ts: new Date().toISOString(), kind: 'config', event: 'scout_signing_key_missing', route: '/api/scout' }));
+  }
+  return m.mode === 'ai' ? provider : null;
+}
+
+export const GET: APIRoute = () => json(200, { mode: aiProvider() ? 'ai' : 'guided' });
 
 export const POST: APIRoute = async ({ request, locals }) => {
   // Request-scoped background work, so an inquiry taken by Scout delivers after the reply.
   const cf = (locals as { cfContext?: { waitUntil(p: Promise<unknown>): void } }).cfContext;
   const defer = cf ? (p: Promise<unknown>) => cf.waitUntil(p) : undefined;
-  const provider = getScoutProvider();
+  // Same rule as GET: no provider, or no signing key in production, means guided mode.
+  const provider = aiProvider();
   if (!provider) return json(200, { ok: false, mode: 'guided' });
-  // Without the signing key, browser-held history can't be trusted: production
-  // serves guided mode only (fail closed); development runs unsigned.
-  if (!SCOUT_SIGNING_KEY && !import.meta.env.DEV) {
-    console.error(JSON.stringify({ ts: new Date().toISOString(), kind: 'config', event: 'scout_signing_key_missing', route: '/api/scout' }));
-    return json(200, { ok: false, mode: 'guided' });
-  }
 
   const ip = request.headers.get('cf-connecting-ip') ?? 'local';
   if (limited(ip)) return json(429, { ok: false, error: 'rate_limited', reply: "I'm getting a lot of questions at once. Give it a minute, or send the details through the inquiry form." });
