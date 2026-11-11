@@ -29,7 +29,7 @@ The server only ever calls these fixed hosts; no URL is ever built from visitor 
 
 | Service | Host | From | Purpose | Credential | Failure behavior |
 |---|---|---|---|---|---|
-| GoHighLevel (Sean's account is SHA-BAM, a white-label of it) | services.leadconnectorhq.com (+ webhook URL) | /api/inquire, Scout `submit_inquiry` | CRM write | `GHL_PRIVATE_TOKEN` | Falls back to the webhook (non-2xx = failure); the lead stays open in `LEADS_DB` for the 15-minute cron and `POST /api/leads` (claimed per attempt, resumable CRM steps, abandoned after 5 with an alert log). Acknowledged only if the lead store or the notify email held it; otherwise 503 |
+| GoHighLevel (Sean's account is SHA-BAM, a white-label of it) | services.leadconnectorhq.com (+ webhook URL) | /api/inquire, Scout `submit_inquiry` | CRM write | `GHL_PRIVATE_TOKEN` | Falls back to the webhook (non-2xx = failure); the lead stays open in `LEADS_DB` for the 15-minute cron and `POST /api/leads` (per-channel leases with fenced writes, per-step CRM checkpoints, 20 s call timeouts; at-least-once; abandoned after 5 with an alert log). Acknowledged only if the lead store or the notify email held it; otherwise 503 |
 | Resend | api.resend.com | /api/inquire | Notify Sean and confirm to the client | `RESEND_API_KEY` | Errors are failures; the confirmation is sent only after the lead was held durably |
 | Cloudflare Turnstile | challenges.cloudflare.com | /api/inquire | Bot check | `TURNSTILE_SECRET_KEY` | Fails closed (403); in production a missing secret also fails closed (logged `turnstile_secret_missing`) |
 | Anthropic | api.anthropic.com | /api/scout | AI replies | `ANTHROPIC_API_KEY` | Falls back to guided mode |

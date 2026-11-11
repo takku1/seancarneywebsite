@@ -7,7 +7,7 @@
 | State | Where it stands |
 |---|---|
 | Implemented | All pages, the inquiry pipeline with durable acceptance, Scout (guided and Claude), media tooling |
-| Locally tested | `npm run verify` (types, 35 unit tests, build, audit); `scripts/test_publish.sh` (11 cases); `npm run test:browser` (22 pages at desktop and phone width, API guards in the Workers runtime); in the built Worker under `wrangler dev`: concurrent duplicate submissions produce one lead, and the cron backfills a pre-CRM lead to a stand-in webhook (2026-11-10) |
+| Locally tested | `npm run verify` (types, 38 unit tests, build, audit); `scripts/test_publish.sh` (11 cases); `npm run test:browser`, a smoke test (21 listed pages at desktop and phone width, API guards in the Workers runtime; not the full inquiry, Scout, availability, player or keyboard journeys); in the built Worker under `wrangler dev`: concurrent duplicate submissions produce one lead, and the cron backfills a pre-CRM lead to a stand-in webhook (2026-11-10) |
 | Deployed | Not yet: no Cloudflare staging or production |
 | Production verified | Not yet: needs a real inquiry through Resend and SHA-BAM on staging |
 | Externally approved | Not yet: Sean's claims, venues, testimonials and media rights (`06-launch-checklist.md`) |
@@ -26,7 +26,7 @@
 
 **Key Decisions:**
 - 2026-11-10: An inquiry is acknowledged only once it is held durably (`LEADS_DB`, SHA-BAM or the notify email), else 503 with the direct email (`03-architecture.md`).
-- 2026-11-10: The lead store is Cloudflare D1, not KV: a `UNIQUE` event id makes duplicate submissions atomic, rows start `pending` so none escapes recovery, and a 15-minute cron retries CRM and notification deliveries (claimed per attempt, resumable CRM steps, abandoned after 5 with an alert log).
+- 2026-11-10: The lead store is Cloudflare D1, not KV: a `UNIQUE` event id makes duplicate submissions atomic, rows start `pending` so none escapes recovery, and a 15-minute cron retries CRM, notification and confirmation deliveries under per-channel leases with fenced writes and per-step CRM checkpoints. The guarantee is at-least-once: a Worker dying between a remote success and its checkpoint can repeat that one step (a duplicate opportunity is possible until SHA-BAM offers a lookup or idempotency).
 - 2026-11-10: POST routes declare an Origin policy: required for the inquiry form and Scout, checked when present elsewhere.
 - 2026-11-10: Hardening from the repository audit: Turnstile fails closed in production, keyed HMAC log pseudonyms, streamed-body size limits, Scout's daily cap documented as soft with the Claude Console limit as the hard cap.
 - 2026-11-10: TypeScript 7 held until `@astrojs/check` supports it (Dependabot ignores TypeScript majors).

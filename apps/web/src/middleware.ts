@@ -91,7 +91,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   if (method === 'POST') {
     const origin = req.headers.get('origin');
-    const verdict = checkOrigin(origin, url.host, rule.origin ?? 'if-present');
+    const verdict = checkOrigin(origin, url.origin, rule.origin ?? 'if-present');
     if (verdict !== 'ok') {
       logSecurity('origin_rejected', { route: url.pathname, origin: origin ?? '(none)', reason: verdict, who });
       return problem(403, 'forbidden');

@@ -14,13 +14,18 @@ interface Cfg {
   locationId: string;
 }
 
+/** Per-call ceiling. Must stay well inside the delivery lease (lib/inquiry/deliver.ts LEASE_MS). */
+export const GHL_TIMEOUT_MS = 20_000;
+
 async function call<T>(cfg: Cfg, path: string, body: unknown): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     method: 'POST',
     headers: { authorization: `Bearer ${cfg.token}`, version: '2021-07-28', 'content-type': 'application/json', accept: 'application/json' },
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(GHL_TIMEOUT_MS),
   });
-  if (!res.ok) throw new Error(`ghl_${path}_${res.status}:${(await res.text()).slice(0, 200)}`);
+  // Status only: error bodies can echo the contact's details, and this message is logged.
+  if (!res.ok) throw new Error(`ghl_${path}_${res.status}`);
   return (await res.json()) as T;
 }
 

@@ -35,7 +35,7 @@ Copy `apps/web/.env.example` to `apps/web/.env` for local API keys. A blank key 
 | :--- | :--- |
 | Full gate (types, tests, build, audit); run before pushing | `npm run verify` |
 | Unit tests | `npm test` |
-| Browser and runtime smoke test (after `npm run build`; uses installed Chrome) | `npm run test:browser` |
+| Browser and runtime smoke test of the listed pages and API guards (after `npm run build`; uses installed Chrome) | `npm run test:browser` |
 | Scout evals (needs a running server and API key) | `npm run eval:scout` |
 | Media: list, build, replace, check, report | `npm run media:<command>` (see `docs/current/11-media-management.md`) |
 | Regenerate browser/install icons | `npm run brand:icons` |

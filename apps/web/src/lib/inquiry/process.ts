@@ -15,9 +15,9 @@ import {
   INQUIRY_NOTIFY_EMAIL,
   INQUIRY_FROM_EMAIL,
 } from 'astro:env/server';
-import { upsertContact, createOpportunity, addNote } from '../integrations/ghl';
+import { upsertContact, createOpportunity, addNote, GHL_TIMEOUT_MS } from '../integrations/ghl';
 import { scoreLead, EVENT_TYPES, BUDGETS, ROLES, FORMATS, type Inquiry } from './schema';
-import { acceptLead, listOpen, retryOpen, reopenAbandoned, type CrmProgress, type DeliveryDeps, type LeadDB, type LeadRecord } from './deliver';
+import { acceptLead, listOpen, retryOpen, reopenAbandoned, type Checkpoint, type CrmProgress, type DeliveryDeps, type LeadDB, type LeadRecord } from './deliver';
 
 /** Pipeline value estimate per budget band (midpoints), for GHL forecasting. */
 const BUDGET_VALUE: Record<string, number | undefined> = { under_5k: 3500, '5k_10k': 7500, '10k_20k': 15000, '20k_40k': 30000, '40k_plus': 45000, discuss: undefined };
@@ -81,6 +81,7 @@ async function sendEmail(to: string, subject: string, html: string, replyTo?: st
     method: 'POST',
     headers: { authorization: `Bearer ${RESEND_API_KEY}`, 'content-type': 'application/json' },
     body: JSON.stringify({ from: INQUIRY_FROM_EMAIL, to: [to], subject: headerSafe(subject), html, ...(replyTo ? { reply_to: headerSafe(replyTo) } : {}) }),
+    signal: AbortSignal.timeout(GHL_TIMEOUT_MS),
   });
   if (!res.ok) throw new Error(`resend_${res.status}`);
 }
@@ -101,27 +102,35 @@ async function leadDB(): Promise<LeadDB | null> {
 /**
  * CRM delivery: GoHighLevel/SHA-BAM API v2, then the webhook. Throws unless one
  * of them took the lead. API steps record their result in `progress`, so a
- * retry after a partial success never creates a second contact, opportunity or note.
+ * retry after a partial success resumes at the next step. Each step is checkpointed
+ * as soon as it succeeds, and the lease is re-checked before each remote write:
+ * `checkpoint` throws if this runner lost its lease, which stops it there.
  */
-function crmSink(): ((r: InquiryRecord, progress: CrmProgress) => Promise<void>) | null {
+function crmSink(): ((r: InquiryRecord, progress: CrmProgress, checkpoint: Checkpoint) => Promise<void>) | null {
   const api = GHL_PRIVATE_TOKEN && GHL_LOCATION_ID;
   if (!api && !GHL_WEBHOOK_URL) return null;
-  return async ({ inquiry: i, lead, leadId, channel }, progress) => {
+  return async ({ inquiry: i, lead, leadId, channel }, progress, checkpoint) => {
     const payload = crmPayload(i, lead, leadId, channel);
     let apiError = '';
     if (api) {
       try {
         const cfg = { token: GHL_PRIVATE_TOKEN!, locationId: GHL_LOCATION_ID! };
-        progress.contactId ??= await upsertContact(cfg, {
-          firstName: payload.firstName,
-          lastName: payload.lastName,
-          email: i.email,
-          phone: i.phone || undefined,
-          companyName: i.company || undefined,
-          source: payload.source,
-          tags: payload.tags,
-        });
+        if (!progress.contactId) {
+          // An upsert keyed on email: repeating it after a crash is harmless.
+          await checkpoint(progress); // lease check before the remote write
+          progress.contactId = await upsertContact(cfg, {
+            firstName: payload.firstName,
+            lastName: payload.lastName,
+            email: i.email,
+            phone: i.phone || undefined,
+            companyName: i.company || undefined,
+            source: payload.source,
+            tags: payload.tags,
+          });
+          await checkpoint(progress);
+        }
         if (GHL_PIPELINE_ID && GHL_STAGE_NEW_ID && !progress.opportunityId) {
+          await checkpoint(progress);
           progress.opportunityId = (await createOpportunity(cfg, {
             contactId: progress.contactId,
             pipelineId: GHL_PIPELINE_ID,
@@ -130,20 +139,24 @@ function crmSink(): ((r: InquiryRecord, progress: CrmProgress) => Promise<void>)
             monetaryValue: BUDGET_VALUE[i.budget],
             source: payload.source,
           })) ?? 'created';
+          await checkpoint(progress);
         }
         if (!progress.noted) {
+          await checkpoint(progress);
           await addNote(cfg, progress.contactId, Object.entries(payload).filter(([k]) => !['firstName', 'lastName', 'name', 'tags'].includes(k)).map(([k, v]) => `${k}: ${v}`).join('\n'));
           progress.noted = true;
+          await checkpoint(progress);
         }
         return;
       } catch (err) {
+        if ((err as Error).message === 'lease_lost') throw err;
         apiError = `api: ${(err as Error).message}`;
         if (!GHL_WEBHOOK_URL) throw new Error(apiError);
         // A partial API write plus a full webhook would duplicate the contact's data: only fall back if the API wrote nothing.
         if (progress.contactId) throw new Error(`${apiError} (partial; retry resumes)`);
       }
     }
-    const res = await fetch(GHL_WEBHOOK_URL!, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) });
+    const res = await fetch(GHL_WEBHOOK_URL!, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload), signal: AbortSignal.timeout(GHL_TIMEOUT_MS) });
     if (!res.ok) throw new Error(`${apiError ? apiError + '; ' : ''}webhook_${res.status}`);
   };
 }

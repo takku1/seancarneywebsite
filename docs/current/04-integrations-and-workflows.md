@@ -106,7 +106,7 @@ The KPI that matters is **booked revenue by first-touch channel**. It comes from
 | Piece | Status |
 |---|---|
 | Inquiry form, lead scoring, attribution, Turnstile, Resend | Built |
-| GHL API v2 contact, opportunity and note (webhook fallback) | Built; **needs a test against Sean's sub-account** (deferred until Sean supplies the details). Until then leads are held in `LEADS_DB` and emailed to Sean; after connecting, the 15-minute cron (or `POST /api/leads`) backfills them |
+| GHL API v2 contact, opportunity and note (webhook fallback) | Built; **needs a test against Sean's sub-account** (deferred until Sean supplies the details). Until then leads are held in `LEADS_DB` and emailed to Sean; after connecting, the 15-minute cron (or `POST /api/leads`) backfills them. On the test day, check whether the account can look up an existing opportunity for a contact (or accepts an idempotency key): that would close the one remaining duplicate window (a Worker dying between creating an opportunity and checkpointing it) |
 | Google Calendar availability check plus inline form message | Built; **needs real credentials to test** |
 | Discovery call link (`PUBLIC_CALL_BOOKING_URL`) | Built; needs the GHL calendar link |
 | GHL pipeline, workflows, contract template, Stripe, A2P registration | Configure in GHL (no code) |

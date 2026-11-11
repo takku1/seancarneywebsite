@@ -33,7 +33,7 @@ Everything here is confirmed with Sean before the site goes live. Each item is a
 - [ ] DNS: DMARC (`_dmarc` TXT `v=DMARC1; p=none; rua=mailto:<reports address>`), moving to `p=quarantine` after 2–4 clean weeks; verify the sending domain in Resend (DKIM plus a `send.` return-path subdomain) before inquiry emails go live.
 - [ ] A Cloudflare notification for Worker error-rate spikes; a weekly review of security events.
 - [ ] An alert on lead log lines `lead_undeliverable`, `lead_crm_abandoned` and `lead_notify_abandoned` (Workers Logs). An abandoned notification means Sean was never told about that lead: check `GET /api/leads`, contact the couple, then `POST /api/leads` with `{"reopen": true}` once the cause is fixed.
-- [ ] Confirm the 15-minute cron trigger is listed under the Worker's Triggers after the first deploy.
+- [ ] After the first deploy, confirm the D1 database `seancarneymusic-leads` was created and bound as `LEADS_DB` (Worker > Settings > Bindings) and the 15-minute cron is listed under Triggers. Neither can be verified from the repository; both are expected from the config.
 
 ## Pre-launch QA
 - [ ] The booking wording on the FAQ ("the date is held once the agreement is signed") and `/terms`.

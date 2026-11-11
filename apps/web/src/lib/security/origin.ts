@@ -8,19 +8,21 @@
  * - `if-present`: analytics beacons and CSP reports (some user agents send
  *   them without Origin; losing them is harmless) and admin routes, which are
  *   called by scripts and protected by a bearer token instead.
- * Either way a present Origin must match the request host exactly; `null`,
- * malformed and cross-origin values are rejected.
+ * Either way a present Origin must equal the request's own origin: scheme,
+ * host and port (so http:// does not pass for https://). `null`, malformed
+ * and cross-origin values are rejected.
  */
 export type OriginPolicy = 'required' | 'if-present';
 export type OriginVerdict = 'ok' | 'missing' | 'mismatch';
 
-export function checkOrigin(origin: string | null, host: string, policy: OriginPolicy): OriginVerdict {
+/** `expected` is the request URL's origin, e.g. `new URL(request.url).origin`. */
+export function checkOrigin(origin: string | null, expected: string, policy: OriginPolicy): OriginVerdict {
   if (origin === null || origin === '') return policy === 'required' ? 'missing' : 'ok';
-  let originHost = '';
+  let normalized = '';
   try {
-    originHost = new URL(origin).host; // "null" and garbage throw, leaving ''
+    normalized = new URL(origin).origin; // "null" and garbage throw; opaque origins serialize as "null"
   } catch {
     /* rejected below */
   }
-  return originHost && originHost === host ? 'ok' : 'mismatch';
+  return normalized !== '' && normalized !== 'null' && normalized === expected ? 'ok' : 'mismatch';
 }
