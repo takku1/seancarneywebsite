@@ -1,0 +1,70 @@
+---
+import songbook from '../../data/songbook.json';
+const choices=[
+  {name:'event',title:'What are we celebrating?',options:[['wedding','A wedding','From the aisle to the last dance'],['cocktail','Cocktails & conversation','A welcome party, dinner or gathering'],['corporate','A company occasion','A reception, celebration or brand event']]},
+  {name:'mood',title:'How should the room feel?',options:[['intimate','Close & personal','Space to listen, talk and take it in'],['lively','On its feet','Familiar choruses and a full floor'],['mixed','A little of both','Let the energy build through the day']]},
+  {name:'vibe',title:'What sounds most like you?',options:[['timeless','Timeless','Standards and songs across generations'],['modern','Right now','Modern favorites, reimagined'],['soulful','Soulful','Warm voices, groove and feeling']]},
+];
+---
+<section class="section quiz" id="find-your-sound" data-music-quiz aria-labelledby="quiz-title"><div class="container">
+  <div class="quiz-intro"><div><h2 id="quiz-title">Find the sound<br />of your celebration.</h2><p>A few choices. Thirty songs to start with. Make a list of favorites, set aside the songs you would rather skip, and share both with SCE.</p></div><span class="game-note">Your music, in four moves</span></div>
+  <form data-quiz-form>
+    <div class="progress"><label for="music-progress" data-quiz-progress-label>Step 1 of 4</label><progress id="music-progress" max="4" value="1" data-quiz-progress></progress></div>
+    {choices.map((q,i)=><fieldset data-quiz-step={i}><legend>{q.title}</legend><div class="choices">{q.options.map(([value,title,body])=><label><input type="radio" name={q.name} value={value} /><span><strong>{title}</strong><small>{body}</small></span></label>)}</div></fieldset>)}
+    <fieldset data-quiz-step="3"><legend>A style you always come back to?</legend><label class="genre-label" for="quiz-style">Choose a starting point</label><select id="quiz-style" name="genre"><option value="all">Surprise me with a mix</option>{songbook.map(g=><option value={g.id}>{g.genre}</option>)}</select><p class="note">We’ll lead with your style, then add a few discoveries from the rest of the repertoire.</p></fieldset>
+    <p role="status" data-quiz-error class="quiz-error"></p>
+    <div class="controls"><button type="button" class="link-arrow" data-quiz-back>Back</button><button type="button" class="btn" data-quiz-next>Next</button><button type="submit" class="btn" data-quiz-finish>Find my songs</button></div>
+  </form>
+  <div class="results" data-quiz-results hidden><div class="results-head"><h3>Your first thirty</h3><button class="link-arrow" type="button" data-quiz-again>Play again</button></div><p>This is a starting point, not a fixed set. SCE will shape the arrangements and timing with you.</p><ul data-quiz-songs></ul></div>
+  <noscript><p><a href="#songbook-title">Browse the full songbook below</a> to explore the repertoire. The music quiz needs JavaScript.</p></noscript>
+</div></section>
+<script>
+  import { onPage } from '../../lib/lifecycle';
+  import { suggestSongs, catalogFrom, readPlan, type Preferences } from '../../lib/music-plan';
+  import { getItem } from '../../lib/storage';
+  import groups from '../../data/songbook.json';
+  import recordings from '../../data/audio.json';
+  import { playNative } from '../../lib/media/player';
+  onPage(()=>{
+    const root=document.querySelector<HTMLElement>('[data-music-quiz]')!;
+    const form=root.querySelector<HTMLFormElement>('form')!;
+    const steps=[...form.querySelectorAll<HTMLFieldSetElement>('[data-quiz-step]')];
+    const back=root.querySelector<HTMLButtonElement>('[data-quiz-back]')!;
+    const next=root.querySelector<HTMLButtonElement>('[data-quiz-next]')!;
+    const finish=root.querySelector<HTMLButtonElement>('[data-quiz-finish]')!;
+    const error=root.querySelector<HTMLElement>('[data-quiz-error]')!;
+    const results=root.querySelector<HTMLElement>('[data-quiz-results]')!;
+    const songs=catalogFrom(groups);let step=0;
+    const render=()=>{steps.forEach((s,i)=>s.hidden=i!==step);back.hidden=step===0;next.hidden=step===3;finish.hidden=step!==3;root.querySelector('[data-quiz-progress-label]')!.textContent=`Step ${step+1} of 4`;root.querySelector<HTMLProgressElement>('progress')!.value=step+1;error.textContent='';};
+    const focus=()=>steps[step].querySelector<HTMLElement>('input,select')?.focus({preventScroll:true});
+    next.addEventListener('click',()=>{if(!steps[step].querySelector('input:checked')){error.textContent='Choose an option to continue.';focus();return;}step++;render();focus();});
+    back.addEventListener('click',()=>{step--;render();focus();});
+    form.addEventListener('submit',e=>{
+      e.preventDefault();
+      const data=new FormData(form);
+      if(['event','mood','vibe'].some(key=>!data.get(key))){error.textContent='Choose your event, mood and sound before finding songs.';return;}
+      const plan=readPlan(getItem('sc_music_plan'),songs);
+      const picks=suggestSongs(songs,Object.fromEntries(data) as unknown as Preferences,plan.avoid);
+      const share=document.querySelector<HTMLAnchorElement>('[data-plan-inquire]');
+      if(share)share.href=`/inquire?music=1${data.get('event')==='wedding'?'&type=wedding':data.get('event')==='corporate'?'&type=corporate':''}`;
+      const list=root.querySelector<HTMLElement>('[data-quiz-songs]')!;list.replaceChildren();
+      for(const song of picks){
+        const li=document.createElement('li');const text=document.createElement('span');const title=document.createElement('strong');title.textContent=song.title;const artist=document.createElement('small');artist.textContent=song.artist;text.append(title,artist);
+        const actions=document.createElement('span');actions.className='song-actions';
+        const clean=(s:string)=>s.toLowerCase().replace(/[^a-z0-9]/g,'');
+        const recording=recordings.find(r=>clean(r.title)===clean(song.title));
+        if(recording){li.dataset.mediaId=`audio-${recording.id}`;li.dataset.mediaSrc=recording.src;li.dataset.mediaType='audio';li.dataset.title=`${recording.title} · Sean Carney`;li.dataset.location='music_quiz';const preview=document.createElement('button');preview.type='button';preview.dataset.quizPreview='';preview.textContent='Listen';preview.setAttribute('aria-label',`Listen to ${song.title}`);actions.append(preview);}
+        for(const [kind,label] of [['must','Love it'],['avoid','Do not play']] as const){const b=document.createElement('button');b.type='button';b.dataset.songChoice=kind;b.dataset.songId=song.id;b.textContent=label;b.setAttribute('aria-label',`${label}: ${song.title}`);actions.append(b);}
+        li.append(text,actions);list.append(li);
+      }
+      form.hidden=true;results.hidden=false;results.querySelector('h3')?.setAttribute('tabindex','-1');results.querySelector<HTMLElement>('h3')?.focus({preventScroll:true});
+      document.dispatchEvent(new Event('sc:music-plan-render'));
+    });
+    root.querySelector('[data-quiz-again]')!.addEventListener('click',()=>{form.hidden=false;results.hidden=true;step=0;render();focus();});render();
+    root.addEventListener('click',e=>{const button=(e.target as Element|null)?.closest('[data-quiz-preview]');const tile=button?.closest<HTMLElement>('[data-media-id]');if(tile)playNative(tile,true);});
+  },'[data-music-quiz]');
+</script>
+<style>
+  .results :global(button[data-quiz-preview]) {min-height:44px;padding:0.4rem 0.75rem;border:1px solid var(--line-strong);background:var(--bg-raised);color:var(--text);cursor:pointer;}
+  .quiz{background:var(--bg-sunk);border-block:1px solid var(--line);}.quiz-intro{display:flex;justify-content:space-between;align-items:end;gap:2rem;margin-bottom:3rem;}h2{font-size:var(--step-4);line-height:1.05;}p{max-width:50ch;color:var(--text-muted);margin-top:1.25rem;}.game-note{font-family:var(--font-display);font-style:italic;font-size:var(--step-1);}.progress{max-width:25rem;margin-bottom:2.5rem;}.progress label{display:block;font-size:var(--step--1);margin-bottom:0.7rem;}progress{width:100%;height:3px;accent-color:var(--accent);}fieldset{border:0;margin:0;padding:0;}legend{font-family:var(--font-display);font-size:var(--step-3);margin-bottom:1.5rem;}.choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;}.choices label{cursor:pointer;position:relative;}.choices input{position:absolute;left:1rem;top:1.2rem;accent-color:var(--accent);}.choices span{display:grid;gap:0.6rem;min-height:10rem;border:1px solid var(--line-strong);padding:1rem 1.25rem 1.5rem 3rem;transition:background 200ms;}.choices input:checked+span{background:var(--bg-raised);border-color:var(--accent);}.choices input:focus-visible+span{outline:2px solid var(--accent);outline-offset:3px;}strong{font-family:var(--font-display);font-size:var(--step-2);font-weight:500;}small{color:var(--text-muted);}.controls{display:flex;gap:2rem;align-items:center;margin-top:2rem;}.quiz-error{color:var(--danger);}.genre-label{display:block;margin-bottom:0.75rem;}select{width:min(100%,36rem);min-height:52px;border:1px solid var(--line-strong);background:var(--bg-raised);color:var(--text);padding:0.8rem;font:inherit;border-radius:0;}.note{font-size:var(--step--1);}.results-head{display:flex;justify-content:space-between;align-items:center;gap:2rem;}h3{font-size:var(--step-3);}.results ul{list-style:none;padding:0;margin:2rem 0 0;}.results :global(li){display:flex;gap:1.5rem;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding:1rem 0;}.results :global(li>span:first-child){display:grid;gap:0.25rem;}.results :global(strong){font-family:var(--font-display);font-size:var(--step-1);font-weight:500;}.results :global(small){color:var(--text-muted);}.results :global(.song-actions){display:flex;gap:0.5rem;flex-shrink:0;}.results :global(button[data-song-choice]){min-height:44px;padding:0.4rem 0.75rem;border:1px solid var(--line-strong);background:transparent;color:var(--text);cursor:pointer;}.results :global(button[aria-pressed='true']){background:var(--text);color:var(--bg-raised);}@media(max-width:767px){.quiz-intro{display:block;}.game-note{display:block;margin-top:1rem;}.choices{grid-template-columns:minmax(0,1fr);}.choices span{min-height:6rem;}.results :global(li){align-items:start;flex-direction:column;gap:0.7rem;}}
+</style>

@@ -1,0 +1,20 @@
+---
+import { Image } from 'astro:assets';
+import { imageAsset } from '../../lib/media/library';
+import musicians from '../../data/musicians.json';
+---
+<section class="section players" data-section="our_players">
+  <div class="container"><div class="heading"><div><h2>Extraordinary players.<br />A sound that belongs to you.</h2><p>Meet a few of the voices and musicians who make up The Scene.</p></div><a href="/the-scene" class="link-arrow">Explore the roster</a></div>
+    <ul>{musicians.slice(0,4).map(m=><li><a href={`/the-scene#${m.id}`}><Image src={imageAsset(m.image.replace('.jpg',''))} alt={m.name} widths={[320,480,640]} sizes="(min-width:900px) 22vw, 45vw" /><span>{m.name}</span><small>{m.role}</small></a></li>)}</ul>
+  </div>
+</section>
+<style>
+  .players {background:var(--bg-raised);border-block:1px solid var(--line);}
+  .heading {display:flex;justify-content:space-between;align-items:end;gap:2rem;margin-bottom:3rem;}
+  h2 {font-size:var(--step-3);line-height:1.05;} .heading p {margin-top:1rem;color:var(--text-muted);}
+  ul {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(1rem,3vw,2.5rem);list-style:none;padding:0;margin:0;}
+  a {text-decoration:none;} li a {display:grid;gap:0.35rem;} li :global(img) {width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;object-position:50% 25%;margin-bottom:0.8rem;}
+  li span {font-family:var(--font-display);font-size:var(--step-1);} small {color:var(--text-muted);}
+  li a:hover span {color:var(--accent);}
+  @media(max-width:899px){ul{grid-template-columns:repeat(2,minmax(0,1fr));}.heading{align-items:start;flex-direction:column;}}
+</style>

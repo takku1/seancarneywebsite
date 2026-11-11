@@ -15,7 +15,8 @@ interface Props {
 const { title, description, image = '/og/default.jpg', imageAlt = 'Sean Carney performing', type = 'website', noindex = false, jsonLd } = Astro.props;
 const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site).href;
 const ogImage = new URL(image, Astro.site).href;
-const fullTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
+const cleanTitle = title.replace(/\s*\|\s*Sean Carney$/, '');
+const fullTitle = cleanTitle.includes(site.name) ? cleanTitle : `${cleanTitle} | ${site.name}`;
 ---
 
 <title>{fullTitle}</title>

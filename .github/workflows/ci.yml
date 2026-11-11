@@ -1,4 +1,4 @@
-# Build gate: types, build, dependency audit, and the AuditForge-style secret/PII scan.
+# Build gate: types, unit tests, build, dependency audit, and the AuditForge-style secret/PII scan.
 name: ci
 on:
   pull_request:
@@ -22,5 +22,6 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
       - run: npm ci
       - run: npx astro check
+      - run: npm test
       - run: npx astro build
       - run: npm audit --omit=dev --audit-level=high

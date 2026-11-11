@@ -1,0 +1,14 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {build} from 'esbuild';
+const built=await build({entryPoints:['src/lib/music-plan.ts'],bundle:true,write:false,format:'esm',platform:'node'});
+const {catalogFrom,suggestSongs,readPlan,chooseSong,planMessage}=await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString('base64')}`);
+const catalog=catalogFrom(JSON.parse(await readFile('src/data/songbook.json','utf8')));
+const prefs={event:'wedding',mood:'intimate',vibe:'timeless',genre:'all'};
+test('quiz recommends thirty unique songs from the real catalog',()=>{const picks=suggestSongs(catalog,prefs);assert.equal(picks.length,30);assert.equal(new Set(picks.map(s=>s.id)).size,30);assert.ok(picks.every(s=>catalog.some(c=>c.id===s.id)));});
+test('a genre preference leads the mix and changing the mood changes its order',()=>{const calm=suggestSongs(catalog,{...prefs,genre:'pop-classic-current'});const party=suggestSongs(catalog,{...prefs,genre:'pop-classic-current',mood:'lively'});assert.equal(calm[0].genre,'pop-classic-current');assert.notDeepEqual(calm.map(s=>s.id),party.map(s=>s.id));});
+test('Do Not Play songs never appear in recommendations',()=>{const first=suggestSongs(catalog,prefs);const avoid=first.slice(0,12).map(s=>s.id);const next=suggestSongs(catalog,prefs,avoid);assert.equal(next.length,30);assert.ok(next.every(s=>!avoid.includes(s.id)));});
+test('a song can move between favorites and Do Not Play, without belonging to both',()=>{let p={must:[],avoid:[]};const id=catalog[0].id;p=chooseSong(p,id,'must');p=chooseSong(p,id,'avoid');assert.deepEqual(p,{must:[],avoid:[id]});p=chooseSong(p,id,'avoid');assert.deepEqual(p,{must:[],avoid:[]});});
+test('stored plans discard unknown IDs, duplicates, conflicts and excess entries',()=>{const ids=catalog.slice(0,20).map(s=>s.id);const p=readPlan(JSON.stringify({must:[...ids,ids[0],'invented'],avoid:[ids[0]]}),catalog);assert.equal(p.avoid.length,1);assert.equal(p.must.length,11);assert.ok(!p.must.includes(ids[0]));assert.deepEqual(readPlan('{broken',catalog),{must:[],avoid:[]});});
+test('selection limits preserve existing choices and inquiry notes contain both lists',()=>{let p={must:[],avoid:[]};for(const s of catalog.slice(0,13))p=chooseSong(p,s.id,'must');assert.equal(p.must.length,12);p=chooseSong(p,catalog[20].id,'avoid');const text=planMessage(p,catalog);assert.match(text,/Songs we love:/);assert.match(text,/Do Not Play:/);assert.ok(text.includes(catalog[20].title));const longest=[...catalog].sort((a,b)=>(b.title.length+b.artist.length)-(a.title.length+a.artist.length));assert.ok(planMessage({must:longest.slice(0,12).map(s=>s.id),avoid:longest.slice(12,24).map(s=>s.id)},catalog).length<3000);});

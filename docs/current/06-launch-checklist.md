@@ -10,7 +10,7 @@ Everything here is confirmed with Sean before the site goes live. Each item is a
 - [ ] **Response time:** "within one business day" (`site.responseTime`); keep only if it is always true.
 - [ ] **Insurance and paperwork:** COI naming the venue, W-9, stage plot and tech rider available on request.
 - [ ] **Named testimonials:** Jordan and Isabela, Timea and Kris, Olivia and John (public on the earlier events site); each couple confirms they are happy to appear.
-- [ ] **Formats:** the solo, duo/trio and full-band options Sean actually offers, and the band's name (The Hustlers is used throughout).
+- [ ] **Formats:** the Solo, Duo and Band options Sean actually offers, and the band's name (The Scene is used throughout).
 
 ## Content and assets
 - [ ] Wedding photography and films with usage rights, plus photographer credit lines. This is the biggest content gap: most of the current library is western-styled artist portraits (hats, desert, fringe). The site uses the least western shots for now (`suit-hands-guitar`, `event-acoustic-garden`, `wedding-first-dance`, `canyon-suit-laugh`, `corporate-stage`).

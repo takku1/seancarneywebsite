@@ -5,11 +5,11 @@
     "label": "Weddings",
     "navLabel": "Weddings",
     "seoTitle": "Live Wedding Music in Los Angeles | Sean Carney",
-    "seoDescription": "Ceremony, cocktail hour and reception music from Sean Carney, solo or with his band The Hustlers. Fifteen years of weddings across Los Angeles and abroad.",
+    "seoDescription": "Ceremony, cocktail hour and reception music from Sean Carney, solo or with his band The Scene. Fifteen years of weddings across Los Angeles and abroad.",
     "headline": "Ceremony to last dance",
-    "intro": "Fifteen years of weddings in Los Angeles and around the world. Sean performs solo, as a duo or trio, or with his full band, The Hustlers, and shapes every set around the two of you.",
-    "image": "../assets/photos/canyon-suit-portrait.jpg",
-    "imageAlt": "Sean Carney in a black suit and hat, playing acoustic guitar in the canyons",
+    "intro": "One SCE team for your whole celebration: acoustic ceremony music, a duo or jazz ensemble over cocktails, then a full-band reception with sound and lighting. A custom song, written and recorded by Sean, makes the story yours.",
+    "image": "../assets/photos/wedding-evening.jpg",
+    "imageAlt": "Sean Carney performing at an evening wedding beneath string lights",
     "formType": "wedding",
     "order": 1,
     "blocks": [
@@ -35,15 +35,22 @@
           },
           {
             "title": "Reception",
-            "body": "The Hustlers take the floor, and keep it full."
+            "body": "The Scene take the floor, and keep it full."
           }
         ]
       },
       {
+        "type": "statement",
+        "title": "Your story, set to music",
+        "body": "SCE’s full-service wedding experience brings the ceremony, cocktail hour, reception band, sound and lighting together with an original song written and recorded for the couple. Sean plans the details and investment with you in your consultation.",
+        "href": "/custom-song",
+        "linkLabel": "Discover your custom song"
+      },
+      {
         "type": "feature",
-        "image": "../assets/photos/wedding-first-dance.jpg",
-        "alt": "A couple's first dance under string lights while Sean Carney performs",
-        "caption": "A first dance under string lights, live."
+        "image": "../assets/photos/wedding-garden.jpg",
+        "alt": "Sean Carney performing acoustic guitar in a garden at a wedding",
+        "caption": "An acoustic set in the garden, before the evening begins."
       },
       {
         "type": "testimonials",
@@ -311,7 +318,7 @@
     "seoTitle": "Destination Wedding and Event Musician | Sean Carney",
     "seoDescription": "Sean Carney has performed in more than 50 countries and travels for destination weddings, retreats and private events worldwide.",
     "headline": "Wherever the vows are",
-    "intro": "For destination weddings, retreats and offsites, Sean travels light as a soloist or brings The Hustlers, and works through logistics early with your team.",
+    "intro": "For destination weddings, retreats and offsites, Sean travels light as a soloist or brings The Scene, and works through logistics early with your team.",
     "image": "../assets/photos/beach-sunset.jpg",
     "imageAlt": "Sean Carney with a guitar on the beach at sunset",
     "formType": "destination",

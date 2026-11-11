@@ -1,0 +1,52 @@
+---
+import tracks from '../../data/audio.json';
+import Icon from '../ui/Icon.astro';
+interface Props { compact?: boolean; location: string; }
+const { compact = false, location } = Astro.props;
+const songs = compact ? tracks.slice(0, 4) : tracks;
+---
+<section class="section listening" data-section="acoustic_listening" aria-labelledby={`listening-${location}`}>
+  <div class="container listening-grid">
+    <div>
+      <h2 id={`listening-${location}`}>A familiar song.<br />A personal arrangement.</h2>
+      <p>Sean’s voice and guitar, recorded in acoustic arrangements for the aisle, the first dance, and the hours in between.</p>
+      <p class="hint">Choose a song. Keep listening as you explore.</p>
+      {compact && <a href="/repertoire#listen" class="link-arrow">Hear all {tracks.length} recordings <Icon name="arrow-right" /></a>}
+      {compact && <p><a href="/repertoire#find-your-sound" class="link-arrow">Find your sound with the music quiz</a></p>}
+    </div>
+    <ol aria-label="Acoustic recordings">
+      {songs.map((s, i) => <li data-media-id={`audio-${s.id}`} data-media-src={s.src} data-media-type="audio" data-title={`${s.title} · Sean Carney`} data-location={location}>
+        <button type="button" data-audio-play aria-pressed="false" aria-label={`Listen to ${s.title}, Sean Carney’s acoustic arrangement`}>
+          <span class="number">{String(i + 1).padStart(2, '0')}</span><span class="song"><span>{s.title}</span><small>{s.artist}</small></span><Icon name="play" />
+        </button>
+      </li>)}
+    </ol>
+  </div>
+</section>
+<script>
+  import { playNative } from '../../lib/media/player';
+  document.addEventListener('click', (e) => {
+    const button = (e.target as Element | null)?.closest('[data-audio-play]');
+    const tile = button?.closest<HTMLElement>('[data-media-id]');
+    if (tile) playNative(tile, true);
+  });
+</script>
+<style>
+  .listening { background: var(--bg-raised); border-block: 1px solid var(--line); }
+  .listening-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(2rem, 6vw, 6rem); }
+  h2 { font-size: var(--step-3); line-height: 1.08; }
+  p { margin-top: 1.25rem; color: var(--text-muted); max-width: 38ch; }
+  .hint { font-size: var(--step--1); margin-bottom: 1.5rem; }
+  ol { list-style: none; margin: 0; padding: 0; }
+  li { border-top: 1px solid var(--line); }
+  li:last-child { border-bottom: 1px solid var(--line); }
+  button { width: 100%; display: flex; align-items: center; gap: 1.2rem; padding: 1rem 0; min-height: 76px; border: 0; background: none; color: var(--text); text-align: left; cursor: pointer; transition: color 200ms; }
+  button:hover { color: var(--accent); }
+  .is-current button { color: var(--accent); background: var(--bg-sunk); padding-inline: 0.5rem; }
+  .number { color: var(--text-muted); font-size: var(--step--1); font-variant-numeric: tabular-nums; }
+  .song { flex: 1; display: grid; gap: 0.2rem; }
+  .song > span { font-family: var(--font-display); font-size: var(--step-2); line-height: 1.1; }
+  small { color: var(--text-muted); }
+  button :global(svg) { width: 18px; height: 18px; }
+  @media(max-width: 899px) { .listening-grid { grid-template-columns: minmax(0, 1fr); } }
+</style>

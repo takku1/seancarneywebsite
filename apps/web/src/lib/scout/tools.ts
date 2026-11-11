@@ -29,6 +29,9 @@ export const SITE_PAGES: Record<string, string> = {
   '/planners': 'For planners',
   '/venues': 'Venues',
   '/about': 'About Sean',
+  '/the-scene': 'Meet The Scene',
+  '/custom-song': 'Your custom wedding song',
+  '/videos': 'Watch SCE live',
   '/contact': 'Contact',
 };
 

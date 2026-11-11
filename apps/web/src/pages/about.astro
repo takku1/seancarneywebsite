@@ -6,8 +6,10 @@ import InquireLabel from '../components/ui/InquireLabel.astro';
 import { creditsBy, rooms } from '../lib/content';
 import { site } from '../config/site';
 import { graph, breadcrumbSchema, personSchema } from '../lib/seo/schema';
-import portrait from '../assets/photos/canyon-suit-laugh.jpg';
-import hall from '../assets/photos/corporate-stage.jpg';
+import { photoFor } from '../lib/media/library';
+const {image:portrait,alt:portraitAlt}=photoFor('about.portrait');
+const {image:hall}=photoFor('about.closing');
+import WritingCredits from '../components/media/WritingCredits.astro';
 
 const roomList = await rooms();
 const clients = await creditsBy('client');
@@ -15,23 +17,26 @@ const og = await getImage({ src: portrait, width: 1200, height: 630, fit: 'cover
 const jsonLd = graph(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'About', path: '/about' }]), personSchema());
 ---
 
-<BaseLayout pageType="about" image={og.src} imageAlt="Sean Carney in a dark suit with an acoustic guitar" title="About Sean Carney" description="Sean Carney leads a live-music house for luxury weddings and private events in Los Angeles and beyond: solo, duo or trio, and his full band, The Hustlers." type="profile" jsonLd={jsonLd}>
+<BaseLayout pageType="about" image={og.src} imageAlt="Sean Carney in a dark suit with an acoustic guitar" title="About Sean Carney" description="Sean Carney leads a live-music house for luxury weddings and private events in Los Angeles and beyond: solo, duo, and his full band, The Scene." type="profile" jsonLd={jsonLd}>
   <section class="intro" data-section="about_intro">
     <div class="container grid">
       <div>
-        <h1>About</h1>
+        <h1>The songwriter<br />behind SCE.</h1>
         <div class="prose">
-          <p class="first">Sean Carney has played more than {site.stats.events.replace('+', '')} weddings and private events across {site.stats.years.replace('+', '')} years, from candlelit ceremonies to full dance floors.</p>
-          <p>He leads a small house of musicians: alone with a guitar for the aisle and the dinner, as a duo or trio for cocktails, and with his band, The Hustlers, once the dancing starts. Couples book once, and the music follows the day.</p>
+          <p class="first">A songwriter, performer and bandleader. Sean Carney brings the experience of more than 700 sync placements to music made for the people in the room.</p>
+          <p>He leads a small house of musicians: alone with a guitar for the aisle and the dinner, as a duo for cocktails, and with his band, The Scene, once the dancing starts. Couples book once, and the music follows the day.</p>
           <p>Planners know him for the details. The timeline is built with the venue, ceremony sound runs separately from the reception, must-play and do-not-play lists are honored, and a certificate of insurance is ready on request.</p>
-          <p class="aside">Outside the wedding season, his music has been heard in the Paris Olympics coverage, the NFL Playoffs and on Netflix.</p>
+          <p>His work has appeared on NBC’s Songland and in Paris Olympics coverage, the NFL Playoffs and Netflix productions. A Recording Academy voting member, he brings that writing practice to SCE’s custom wedding songs: a couple’s own story, written and recorded for them.</p>
+          <a class="link-arrow" href="/custom-song">A song written for you</a>
         </div>
       </div>
       <div class="photo">
-        <Image src={portrait} alt="Sean Carney smiling in a dark suit with an acoustic guitar" widths={[480, 800, 1200]} sizes="(min-width: 900px) 40vw, 92vw" loading="eager" fetchpriority="high" />
+        <Image src={portrait} alt={portraitAlt} widths={[480, 800, 1200]} sizes="(min-width: 900px) 40vw, 92vw" loading="eager" fetchpriority="high" />
       </div>
     </div>
   </section>
+
+  <div class="container"><WritingCredits /></div>
 
   <section class="section places" data-section="about_rooms" aria-labelledby="rooms-title">
     <div class="container cols">
@@ -53,10 +58,11 @@ const jsonLd = graph(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Abo
     <Image src={hall} alt="" widths={[768, 1280, 1920]} sizes="100vw" class="bg" />
     <div class="container inner">
       <h2>On the dance floor, he is rarely alone.</h2>
-      <p class="lede">The Hustlers scale from a trio to a full ensemble for receptions and galas.</p>
+      <p class="lede">The Scene brings together SCE’s players for receptions and galas.</p>
       <div class="acts">
         <a href="/inquire" class="btn" data-track="cta_click" data-track-location="about_band"><InquireLabel /></a>
         <a class="link-arrow" href="/weddings">How the day sounds <Icon name="arrow-right" /></a>
+        <a class="link-arrow" href="/the-scene">Meet The Scene <Icon name="arrow-right" /></a>
       </div>
     </div>
   </section>

@@ -26,13 +26,13 @@ const others = all.filter((x) => x.id !== r.id);
 
 const moments = [
   { when: 'Ceremony', fmt: 'Solo', body: 'Voice and acoustic guitar for the processional, the vows and the recessional.' },
-  { when: 'Cocktail hour and dinner', fmt: 'Duo or trio', body: 'Harmony and rhythm, quiet enough to talk over.' },
-  { when: 'Reception', fmt: 'Full band', body: 'Sean Carney and The Hustlers, once the dancing starts.' },
+  { when: 'Cocktail hour and dinner', fmt: 'Duo', body: 'Harmony and rhythm, quiet enough to talk over.' },
+  { when: 'Reception', fmt: 'Full band', body: 'Sean Carney and The Scene, once the dancing starts.' },
 ];
 const faqs = [
   { id: `${r.id}-played`, data: { q: `Has Sean performed at ${name}?`, a: `Yes. ${name}${place ? ` in ${place}` : ''} is one of the rooms Sean has played.` } },
   { id: `${r.id}-coi`, data: { q: `Can Sean provide a certificate of insurance naming ${name}?`, a: 'Yes, on request, along with a W-9, a stage plot and a tech rider.' } },
-  { id: `${r.id}-formats`, data: { q: `Which format suits a wedding at ${name}?`, a: "Solo, duo or trio, or the full band. The right one depends on the space you've booked within the venue, the guest count and the moment of the day; many couples combine them." } },
+  { id: `${r.id}-formats`, data: { q: `Which format suits a wedding at ${name}?`, a: "Solo, duo, or the full band. The right one depends on the space you've booked within the venue, the guest count and the moment of the day; many couples combine them." } },
   { id: `${r.id}-sound`, data: { q: "Do you bring sound or use the venue's AV?", a: "Either. A self-contained system for smaller spaces, or plugged into the venue's or your production team's setup for larger ones." } },
 ];
 const title = `Live Wedding Music at ${name} | Sean Carney`;

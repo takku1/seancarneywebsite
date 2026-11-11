@@ -1,0 +1,12 @@
+---
+interface Props { footer?: boolean; }
+const {footer = false} = Astro.props;
+---
+<a href="/" class:list={['brand',{footer}]} aria-label="SCE — Sean Carney Entertainment, home"><span class="initials">SCE</span><span class="name">Sean Carney<br />Entertainment</span></a>
+<style>
+  .brand { display:inline-flex; align-items:center; gap:0.85rem; text-decoration:none; color:inherit; white-space:nowrap; }
+  .initials { font-family:var(--font-display); font-weight:500; font-size:2.1rem; line-height:1; letter-spacing:0.12em; }
+  .name { font-size:0.62rem; letter-spacing:0.12em; line-height:1.5; text-transform:uppercase; border-left:1px solid currentColor; padding-left:0.85rem; }
+  .footer .initials { font-size:2.8rem; }
+  @media(max-width:420px) { .name { font-size:0.52rem; } .brand { gap:0.6rem; } .name { padding-left:0.6rem; } }
+</style>

@@ -3,10 +3,12 @@
  * Anything marked CONFIRM needs Sean's sign-off before launch.
  */
 export const site = {
-  name: 'Sean Carney',
+  name: 'SCE',
+  fullName: 'Sean Carney Entertainment',
+  performerName: 'Sean Carney',
   url: 'https://seancarneymusic.com',
-  tagline: 'Live music for weddings and private events.',
-  role: 'Singer and guitarist; solo, trio and full band',
+  tagline: 'Bespoke music. One team. The whole celebration.',
+  role: 'Luxury wedding entertainment; solo, duo and band',
   home: 'Los Angeles, California',
   email: {
     bookings: 'sean@seancarneymusic.com', // CONFIRM: dedicated bookings@ alias

@@ -1,5 +1,7 @@
 # Security baseline: seancarneymusic.com
 
+November 10 music-planning addition: `sc_music_plan` stores only validated repertoire IDs (favorites and Do Not Play, at most twelve each), per tab through `lib/storage.ts`. The existing clear-data control evicts it. Titles/artists are resolved into an editable inquiry message only when the visitor chooses Share; normal review and submission remain required. No new service, tracker or credential is introduced. Disclosed on `/privacy`.
+
 Hardening pass and gap analysis against **OWASP ASVS 5.0** and the **OWASP Top 10 2025**, using AuditForge's control catalog (`Z:\auditforge`, 442 ASVS requirements) and its `audit_repo.py` scanner. Date: 2026-11-01. Re-run on every release (see "How to re-verify").
 
 Scope: Astro static site plus on-demand Cloudflare Worker API routes. **No user accounts or logins**, so ASVS V6 (authentication), V7 (sessions), V9 (self-contained tokens), V10 (OAuth/OIDC), V5 (file upload) and V17 (WebRTC) are not applicable, along with GraphQL, WebSocket, SQL/LDAP/XPath and deserialization requirements (no such components).

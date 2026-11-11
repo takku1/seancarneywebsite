@@ -1,26 +1,23 @@
+# Dependencies and build output
 node_modules/
 apps/web/dist/
 apps/web/.astro/
-reference/current-site/media/
+
+# Secrets (only the documented template is tracked)
 .dev.vars
 .env
 .env.*
 !.env.example
 
-# Tool output (e.g. AuditForge universal_audit writes reports/ into the target)
-reports/
-
-# Local tool and runtime state (never commit)
-.wrangler/
-apps/web/.wrangler/
-.claude-flow/
-apps/web/.claude-flow/
-.claude/
-.tunic/
-graphify-out/
-*.log
+# Private source media: the untouched Drive archive, briefs and contracts.
+# Web derivatives are tracked under apps/web.
+/resources/
+# Raw video masters never belong in git, wherever they land.
+*.mov
+*.MOV
 
 # Third-party reference captures: keep screenshots, raw HTML and media local
+reference/current-site/media/
 reference/competitors/*/media/
 reference/competitors/*/shots/
 reference/competitors/*/pages/*.html
@@ -28,6 +25,22 @@ reference/inspiration/*/shots/
 reference/inspiration/*/media/
 reference/inspiration/*/pages/*.html
 
-# Local agent run artifacts
+# Tool output (e.g. AuditForge universal_audit writes reports/ into the target)
+reports/
+
+# Local tool and runtime state (never commit)
+.wrangler/
+.claude-flow/
+.claude/
+.tunic/
+graphify-out/
+*.log
+*.log.lock
 session.jsonl
 policy.json
+
+# Language and OS caches
+__pycache__/
+*.py[cod]
+.DS_Store
+Thumbs.db

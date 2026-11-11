@@ -1,0 +1,9 @@
+---
+import { Image } from 'astro:assets';
+import { photoFor } from '../../lib/media/library';
+const {image:photo,alt}=photoFor('home.custom-song');
+---
+<section class="section custom" data-section="custom_song"><div class="container grid"><div><h2>A song that could<br />only be yours.</h2><p>Your stories, set to music. Written and recorded by Sean, then performed live for the people who know you best.</p><a class="link-arrow" href="/custom-song">Discover your custom song</a></div><Image src={photo} alt={alt} widths={[480,800,1200]} sizes="(min-width:900px) 45vw,92vw" /></div></section>
+<style>
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2rem,8vw,8rem);align-items:center;}h2{font-size:var(--step-4);line-height:1.05;}p{max-width:38ch;color:var(--text-muted);margin-block:1.5rem 2rem;}.grid :global(img){width:100%;height:auto;aspect-ratio:5/4;object-fit:cover;}@media(max-width:899px){.grid{grid-template-columns:minmax(0,1fr);}}
+</style>

@@ -1,0 +1,92 @@
+[
+  {
+    "id": "lose-control",
+    "title": "Lose Control",
+    "artist": "Teddy Swims",
+    "src": "/media/audio/lose-control.mp3"
+  },
+  {
+    "id": "ordinary",
+    "title": "Ordinary",
+    "artist": "Alex Warren",
+    "src": "/media/audio/ordinary.mp3"
+  },
+  {
+    "id": "at-last",
+    "title": "At Last",
+    "artist": "Etta James",
+    "src": "/media/audio/at-last.mp3"
+  },
+  {
+    "id": "lover",
+    "title": "Lover",
+    "artist": "Taylor Swift",
+    "src": "/media/audio/lover.mp3"
+  },
+  {
+    "id": "cant-help-falling-in-love",
+    "title": "Can’t Help Falling in Love",
+    "artist": "Elvis Presley",
+    "src": "/media/audio/cant-help-falling-in-love.mp3"
+  },
+  {
+    "id": "tipsy",
+    "title": "A Bar Song (Tipsy)",
+    "artist": "Shaboozey",
+    "src": "/media/audio/tipsy.mp3"
+  },
+  {
+    "id": "cruel-summer",
+    "title": "Cruel Summer",
+    "artist": "Taylor Swift",
+    "src": "/media/audio/cruel-summer.mp3"
+  },
+  {
+    "id": "shape-of-you",
+    "title": "Shape of You",
+    "artist": "Ed Sheeran",
+    "src": "/media/audio/shape-of-you.mp3"
+  },
+  {
+    "id": "closer",
+    "title": "Closer",
+    "artist": "The Chainsmokers",
+    "src": "/media/audio/closer.mp3"
+  },
+  {
+    "id": "feel-it-still",
+    "title": "Feel It Still",
+    "artist": "Portugal. The Man",
+    "src": "/media/audio/feel-it-still.mp3"
+  },
+  {
+    "id": "shut-up-and-dance",
+    "title": "Shut Up and Dance",
+    "artist": "WALK THE MOON",
+    "src": "/media/audio/shut-up-and-dance.mp3"
+  },
+  {
+    "id": "fast-car",
+    "title": "Fast Car",
+    "artist": "Tracy Chapman",
+    "src": "/media/audio/fast-car.mp3"
+  },
+  {
+    "id": "cant-stop-the-feeling",
+    "title": "Can’t Stop the Feeling",
+    "artist": "Justin Timberlake",
+    "src": "/media/audio/cant-stop-the-feeling.mp3"
+  },
+  {
+    "id": "flowers",
+    "title": "Flowers",
+    "artist": "Miley Cyrus",
+    "src": "/media/audio/flowers.mp3"
+  },
+  {
+    "id": "shallow",
+    "title": "Shallow",
+    "artist": "Lady Gaga & Bradley Cooper",
+    "src": "/media/audio/shallow.mp3"
+  }
+]

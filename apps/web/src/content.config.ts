@@ -74,6 +74,8 @@ const events = defineCollection({
           type: z.enum(['timeline', 'columns', 'program', 'steps', 'feature', 'film', 'repertoire', 'clients', 'specs', 'checklist', 'statement', 'testimonials', 'stages', 'reach', 'faq']),
           title: z.string().optional(),
           body: z.string().optional(),
+          href: z.string().regex(/^\/(?!\/)/).optional(),
+          linkLabel: z.string().optional(),
           note: z.string().optional(),
           story: z.string().optional(),
           caption: z.string().optional(),
@@ -104,6 +106,11 @@ const repertoire = defineCollection({
   }),
 });
 
+const songbook = defineCollection({
+  loader: file('src/data/songbook.json'),
+  schema: z.object({ genre: z.string(), order: z.number(), songs: z.array(z.object({ title: z.string(), artist: z.string() })) }),
+});
+
 const faqs = defineCollection({
   loader: file('src/data/faqs.json'),
   schema: z.object({
@@ -113,4 +120,4 @@ const faqs = defineCollection({
   }),
 });
 
-export const collections = { credits, testimonials, videos, events, repertoire, faqs };
+export const collections = { credits, testimonials, videos, events, repertoire, songbook, faqs };

@@ -1,0 +1,37 @@
+---
+---
+<section class="section music-plan" data-music-plan aria-labelledby="plan-title"><div class="container"><div class="plan-head"><div><h2 id="plan-title">Your music notes</h2><p>Keep up to twelve favorites and twelve Do Not Play choices. Saved in this tab, ready to include with your inquiry.</p></div><a href="/inquire?music=1" class="btn" data-plan-inquire>Share with SCE</a></div><p role="status" aria-live="polite" data-plan-status>No songs selected yet.</p><div class="lists"><div><h3>Songs we love</h3><ul data-plan-must></ul></div><div><h3>Do Not Play</h3><ul data-plan-avoid></ul></div></div><button type="button" class="link-arrow" data-plan-clear>Clear my music notes</button></div></section>
+<script>
+  import { onPage } from '../../lib/lifecycle';
+  import { catalogFrom,readPlan,chooseSong, type MusicPlan } from '../../lib/music-plan';
+  import { getItem,setItem } from '../../lib/storage';
+  import groups from '../../data/songbook.json';
+  onPage(()=>{
+    const root=document.querySelector<HTMLElement>('[data-music-plan]')!;const songs=catalogFrom(groups);
+    let plan:MusicPlan=readPlan(getItem('sc_music_plan'),songs);
+    const status=root.querySelector<HTMLElement>('[data-plan-status]')!;
+    const render=()=>{
+      for(const kind of ['must','avoid'] as const){
+        const ul=root.querySelector<HTMLElement>(`[data-plan-${kind}]`)!;ul.replaceChildren();
+        if(!plan[kind].length){const li=document.createElement('li');li.textContent=kind==='must'?'Choose songs you would love to hear.':'Any songs you would prefer to skip?';ul.append(li);}
+        for(const id of plan[kind]){const song=songs.find(s=>s.id===id);if(!song)continue;const li=document.createElement('li');const label=document.createElement('span');label.textContent=`${song.title}${song.artist?` · ${song.artist}`:''}`;const b=document.createElement('button');b.type='button';b.textContent='Remove';b.dataset.songChoice=kind;b.dataset.songId=id;b.setAttribute('aria-label',`Remove ${song.title} from ${kind==='must'?'favorites':'Do Not Play'}`);li.append(label,b);ul.append(li);}
+      }
+      document.querySelectorAll<HTMLButtonElement>('[data-song-choice]').forEach(b=>b.setAttribute('aria-pressed',String(plan[b.dataset.songChoice==='avoid'?'avoid':'must'].includes(b.dataset.songId||''))));
+      status.textContent=plan.must.length||plan.avoid.length?`${plan.must.length} favorites · ${plan.avoid.length} Do Not Play choices`:'No songs selected yet.';
+    };
+    const click=(e:Event)=>{
+      const b=(e.target as Element|null)?.closest<HTMLButtonElement>('[data-song-choice]');if(!b)return;
+      const id=b.dataset.songId!;if(!songs.some(s=>s.id===id))return;
+      const kind=b.dataset.songChoice==='avoid'?'avoid':'must';
+      const next=chooseSong(plan,id,kind);
+      if(next===plan){status.textContent='Each list holds twelve songs. Remove one to make room for another.';return;}
+      plan=next;setItem('sc_music_plan',JSON.stringify(plan));render();
+    };
+    document.addEventListener('click',click);document.addEventListener('sc:music-plan-render',render);
+    root.querySelector('[data-plan-clear]')!.addEventListener('click',()=>{plan={must:[],avoid:[]};setItem('sc_music_plan',JSON.stringify(plan));render();});render();
+    return()=>{document.removeEventListener('click',click);document.removeEventListener('sc:music-plan-render',render);};
+  },'[data-music-plan]');
+</script>
+<style>
+  .music-plan{background:var(--bg-raised);border-block:1px solid var(--line);}.plan-head{display:flex;align-items:center;justify-content:space-between;gap:2rem;}h2{font-size:var(--step-3);}p{color:var(--text-muted);max-width:50ch;margin-top:1rem;}.lists{display:grid;grid-template-columns:1fr 1fr;gap:3rem;margin-top:2rem;}h3{font-size:var(--step-2);margin-bottom:1rem;}ul{list-style:none;margin:0;padding:0;}ul :global(li){display:flex;align-items:center;justify-content:space-between;gap:1rem;border-top:1px solid var(--line);padding-block:0.8rem;color:var(--text-muted);}ul :global(button){border:0;background:none;color:var(--text);text-decoration:underline;cursor:pointer;min-height:44px;}.music-plan>.container>button{margin-top:2rem;}@media(max-width:767px){.plan-head{align-items:start;flex-direction:column;}.lists{grid-template-columns:minmax(0,1fr);}}
+</style>

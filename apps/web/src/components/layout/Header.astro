@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Icon from '../ui/Icon.astro';
 import InquireLabel from '../ui/InquireLabel.astro';
+import Brand from './Brand.astro';
 
 interface Props {
   overlay?: boolean;
@@ -17,6 +18,9 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
 const primary = [
   { href: '/weddings', label: 'Weddings' },
   { href: '/repertoire', label: 'Repertoire' },
+  { href: '/custom-song', label: 'Your song' },
+  { href: '/the-scene', label: 'Our players' },
+  { href: '/videos', label: 'Films' },
   { href: '/about', label: 'About' },
 ];
 const norm = path.replace(/\/$/, '') || '/';
@@ -27,7 +31,7 @@ const eventsCurrent = norm === '/private-events' ? 'page' : events.some((e) => o
 
 <header class:list={['site-header', { overlay }]} data-header>
   <div class="container bar">
-    <a href="/" class="wordmark" aria-label="Sean Carney, home">Sean Carney</a>
+    <Brand />
 
     <nav class="nav" aria-label="Primary">
       <ul>
@@ -159,25 +163,16 @@ const eventsCurrent = norm === '/private-events' ? 'page' : events.some((e) => o
   .bar {
     display: flex;
     align-items: center;
-    gap: 2rem;
+    gap: 1rem;
     height: var(--header-h);
   }
-  .wordmark {
-    font-family: var(--font-display);
-    font-size: 1.6rem;
-    font-weight: 600;
-    letter-spacing: 0.01em;
-    text-decoration: none;
-    white-space: nowrap;
-  }
-
   .nav { margin-left: auto; }
   .nav > ul { display: flex; gap: 0.25rem; list-style: none; margin: 0; padding: 0; }
   .nav a {
     display: inline-flex;
     align-items: center;
     min-height: 44px;
-    padding-inline: 0.8rem;
+    padding-inline: 0.6rem;
     font-size: var(--step--1);
     letter-spacing: 0.04em;
     text-decoration: none;
@@ -189,6 +184,11 @@ const eventsCurrent = norm === '/private-events' ? 'page' : events.some((e) => o
 
   .has-menu { position: relative; }
   .menu {
+    /* The dropdown is paper even when its parent overlays the hero film. */
+    --text: #24201b;
+    --text-muted: #5f574d;
+    --line: rgb(36 32 27 / 0.12);
+    color: var(--text);
     position: absolute;
     top: 100%;
     left: 0;
@@ -204,7 +204,8 @@ const eventsCurrent = norm === '/private-events' ? 'page' : events.some((e) => o
   .has-menu:hover .menu,
   .has-menu:focus-within .menu { opacity: 1; visibility: visible; transform: none; }
   .menu ul { list-style: none; margin: 0; padding: 0; }
-  .menu a { display: flex; width: 100%; padding-inline: 1.1rem; }
+  .menu a { display: flex; width: 100%; padding-inline: 1.1rem; color: var(--text); transition: background 0.2s, color 0.2s; }
+  .menu a:hover, .menu a:focus-visible { color: var(--text); background: var(--bg-sunk); }
 
   .header-cta { min-height: 42px; }
 
@@ -255,7 +256,7 @@ const eventsCurrent = norm === '/private-events' ? 'page' : events.some((e) => o
     text-decoration: none;
   }
 
-  @media (max-width: 1023px) {
+  @media (max-width: 1199px) {
     .nav, .header-cta { display: none; }
     .menu-toggle { display: inline-flex; }
   }

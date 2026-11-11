@@ -1,0 +1,27 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import InquireLabel from '../components/ui/InquireLabel.astro';
+import WritingCredits from '../components/media/WritingCredits.astro';
+import { photoFor } from '../lib/media/library';
+const {image:portrait}=photoFor('custom-song.writer');
+const {image:guitar}=photoFor('custom-song.hero');
+import { graph, breadcrumbSchema } from '../lib/seo/schema';
+const stages=[
+  {title:'A conversation',body:'An hour with Sean to talk about your story, your musical tastes, and the things you want to remember.'},
+  {title:'Your story, written',body:'Sean turns those details into an original song. A piece of music written for your relationship, rather than a name added to a familiar lyric.'},
+  {title:'A recording to keep',body:'Your song is recorded in Sean’s studio, giving you a way to return to the moment long after the wedding.'},
+  {title:'A moment, live',body:'If you would like, Sean performs the song at your wedding. The timing and arrangement are planned together.'},
+];
+const jsonLd=graph(breadcrumbSchema([{name:'Home',path:'/'},{name:'Your custom song',path:'/custom-song'}]));
+---
+<BaseLayout pageType="custom_song" title="A Wedding Song Written for You | SCE" description="Your story, written and recorded as an original song by Sean Carney. A personal consultation, a studio recording, and the option of a live wedding performance." jsonLd={jsonLd}>
+  <section class="section intro"><div class="container split"><div><h1>Some stories<br />deserve a song.</h1><p class="lede">Not a song that reminds you of someone else. A song written for the two of you.</p><p>How you met. What you have lived through. The little things only you know. Sean takes the time to listen, then gives your story a melody of its own.</p><a href="/inquire?type=wedding&interest=custom-song" class="btn">Talk about your song</a></div><Image src={guitar} alt="A close view of Sean Carney playing acoustic guitar" widths={[640,960,1440]} sizes="(min-width:900px) 45vw,92vw" loading="eager" /></div></section>
+  <section class="section process"><div class="container split"><div><h2>From your first conversation<br />to your first listen.</h2><p>Created with the same care as the rest of your celebration.</p></div><ol>{stages.map((s,i)=><li><span class="number">0{i+1}</span><div><h3>{s.title}</h3><p>{s.body}</p></div></li>)}</ol></div></section>
+  <section class="section writer"><div class="container split"><Image src={portrait} alt="Sean Carney, songwriter and founder of SCE" widths={[480,800,1200]} sizes="(min-width:900px) 40vw,92vw" /><div><h2>A songwriter<br />before anything else.</h2><p>Sean’s work spans more than 700 sync placements, an appearance on NBC’s Songland, and membership in the Recording Academy as a voting member. His writing has reached screens and audiences around the world. Here, the audience begins with two people.</p><a href="/about" class="link-arrow">Meet Sean</a></div></div></section>
+  <div class="container"><WritingCredits /></div>
+  <section class="section invitation"><div class="container"><h2>Tell us where your story begins.</h2><p>The custom song is part of SCE’s full-service wedding experience. Sean will walk you through the possibilities, timing and investment in your consultation.</p><a href="/inquire?type=wedding&interest=custom-song" class="btn"><InquireLabel /></a></div></section>
+</BaseLayout>
+<style>
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(2rem,7vw,7rem);align-items:center;}h1{font-size:var(--step-5);line-height:1.02;}h2{font-size:var(--step-3);line-height:1.08;}p{max-width:45ch;color:var(--text-muted);margin-top:1.5rem;line-height:1.8;}.lede{font-family:var(--font-display);font-size:var(--step-2);line-height:1.35;color:var(--text);}.btn,.link-arrow{margin-top:2rem;}.intro :global(img),.writer :global(img){width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;}.process{background:var(--bg-raised);border-block:1px solid var(--line);}ol{list-style:none;margin:0;padding:0;}li{display:flex;gap:1.5rem;border-top:1px solid var(--line);padding-block:1.75rem;}.number{color:var(--accent);font-size:var(--step--1);padding-top:0.35rem;}h3{font-size:var(--step-2);}li p{margin-top:0.6rem;}.invitation{border-top:1px solid var(--line);}.invitation p{max-width:55ch;}@media(max-width:899px){.split{grid-template-columns:minmax(0,1fr);}}
+</style>

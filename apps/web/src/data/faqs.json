@@ -2,7 +2,7 @@
   {
     "id": "formats",
     "q": "What formats are available?",
-    "a": "Solo acoustic, duo, trio, or Sean Carney and The Hustlers as a full band. Many events combine them, for example solo for a reception and the band once the dancing starts.",
+    "a": "Solo acoustic, duo, trio, or Sean Carney and The Scene as a full band. Many events combine them, for example solo for a reception and the band once the dancing starts.",
     "scope": [
       "scout"
     ]
@@ -36,7 +36,7 @@
   {
     "id": "w-ceremony-reception",
     "q": "Can you play both the ceremony and the reception?",
-    "a": "Yes. A common plan is solo acoustic for the ceremony and cocktail hour, then The Hustlers for the reception. Ceremony sound can run separately so nothing is heard being set up.",
+    "a": "Yes. A common plan is solo acoustic for the ceremony and cocktail hour, then The Scene for the reception. Ceremony sound can run separately so nothing is heard being set up.",
     "scope": [
       "weddings",
       "planners"

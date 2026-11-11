@@ -1,0 +1,22 @@
+---
+import NativeFilm from '../media/NativeFilm.astro';
+import { photoFor, publicFile, placement } from '../../lib/media/library';
+const {image:poster}=photoFor('film.live.poster');
+const film=placement('film.live.video');
+interface Props { location?: string; }
+const { location = 'home' } = Astro.props;
+---
+<section class="section supplied-film" data-section="supplied_live_film" aria-labelledby={`live-film-${location}`}>
+  <div class="container">
+    <div class="head"><h2 id={`live-film-${location}`}>From a single guitar<br />to a room on its feet.</h2><p>Sean, the band, and the people they play for. Watch the live performance film.</p></div>
+    <NativeFilm id="sce-live-film" src={publicFile('film.live.video')} title={film.label} poster={poster} location={location} />
+    <p class="caption">Solo, duo and full band · Sean Carney Entertainment</p>
+  </div>
+</section>
+<style>
+  .head { display: grid; grid-template-columns: 3fr 2fr; gap: 2rem 4rem; align-items: end; margin-bottom: 2.5rem; }
+  h2 { font-size: var(--step-4); line-height: 1.05; }
+  .head p { color: var(--text-muted); max-width: 35ch; }
+  .caption { font-size: var(--step--1); margin-top: 1rem; color: var(--text-muted); }
+  @media(max-width: 767px) { .head { grid-template-columns: minmax(0,1fr); } }
+</style>

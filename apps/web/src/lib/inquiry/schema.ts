@@ -18,8 +18,8 @@ export const GUESTS = ['Under 50', '50 to 150', '150 to 300', '300 to 1,000', 'O
 
 export const FORMATS = [
   { value: 'solo', label: 'Solo acoustic' },
-  { value: 'small', label: 'Duo or trio' },
-  { value: 'band', label: 'Full band, The Hustlers' },
+  { value: 'small', label: 'Duo' },
+  { value: 'band', label: 'Full band, The Scene' },
   { value: 'unsure', label: 'Not sure yet' },
 ] as const;
 

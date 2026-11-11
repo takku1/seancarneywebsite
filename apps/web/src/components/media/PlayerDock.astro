@@ -40,7 +40,9 @@ import Icon from '../ui/Icon.astro';
   .dock.in { opacity: 1; transform: none; }
   @media (prefers-reduced-motion: reduce) { .dock { transform: none; } }
   .frame { position: relative; aspect-ratio: 16 / 9; background: #000; }
-  .frame :global(iframe) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .frame :global(iframe), .frame :global(video) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .audio-only .frame { aspect-ratio: auto; padding: 0.75rem; background: var(--bg-sunk); }
+  .frame :global(audio) { display: block; width: 100%; height: 44px; }
   .bar { display: flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.25rem 0.25rem 0.9rem; }
   .title { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-family: var(--font-display); font-size: var(--step-1); }
   .ctl { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: none; border: 0; color: var(--text-muted); cursor: pointer; }

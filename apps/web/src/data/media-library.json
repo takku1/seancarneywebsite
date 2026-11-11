@@ -1,0 +1,654 @@
+{
+  "version": 1,
+  "sourceRoot": "resources",
+  "archiveManifest": "resources/originals/drive-2026-11-10/drive-manifest.json",
+  "profiles": {
+    "photo": {
+      "width": 1800,
+      "quality": 88
+    },
+    "portrait": {
+      "width": 1000,
+      "quality": 88
+    },
+    "poster": {
+      "width": 1920,
+      "quality": 88
+    },
+    "hero": {
+      "desktopWidth": 1280,
+      "mobileWidth": 640,
+      "desktopBitrate": "700k",
+      "mobileBitrate": "220k",
+      "fps": 24
+    },
+    "film": {
+      "width": 960,
+      "videoBitrate": "650k",
+      "maxVideoBitrate": "850k",
+      "audioBitrate": "96k"
+    },
+    "audio": {
+      "bitrate": "160k",
+      "sampleRate": 44100
+    }
+  },
+  "placements": {
+    "home.hero.poster": "hero-poster",
+    "home.hero.video": "hero-loop",
+    "home.intro": "beach-portrait",
+    "home.format.solo": "wedding-garden",
+    "home.format.duo": "sce-film-poster",
+    "home.format.band": "wedding-evening",
+    "home.custom-song": "suit-hands-guitar",
+    "home.private-events": "event-acoustic-garden",
+    "film.live.poster": "sce-film-poster",
+    "film.live.video": "sce-live-film",
+    "about.portrait": "canyon-suit-laugh",
+    "about.closing": "wedding-evening",
+    "scene.hero": "sce-film-poster",
+    "custom-song.hero": "suit-hands-guitar",
+    "custom-song.writer": "portrait-woods"
+  },
+  "assets": {
+    "acoustic-outdoor": {
+      "kind": "image",
+      "label": "Acoustic Outdoor",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/acoustic-outdoor.jpg"
+      ],
+      "alt": "",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "arena": {
+      "kind": "image",
+      "label": "Arena",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/arena.jpg"
+      ],
+      "alt": "",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "beach-portrait": {
+      "kind": "image",
+      "label": "Beach Portrait",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/beach-portrait.jpg"
+      ],
+      "alt": "Sean Carney smiling beside the ocean at sunset",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "beach-sunset": {
+      "kind": "image",
+      "label": "Beach Sunset",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/beach-sunset.jpg"
+      ],
+      "alt": "",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "beach-walk": {
+      "kind": "image",
+      "label": "Beach Walk",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/beach-walk.jpg"
+      ],
+      "alt": "",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "canyon-suit-laugh": {
+      "kind": "image",
+      "label": "Canyon Suit Laugh",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/canyon-suit-laugh.jpg"
+      ],
+      "alt": "Sean Carney smiling in a dark suit with an acoustic guitar",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "canyon-suit-play": {
+      "kind": "image",
+      "label": "Canyon Suit Play",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/canyon-suit-play.jpg"
+      ],
+      "alt": "",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "canyon-suit-portrait": {
+      "kind": "image",
+      "label": "Canyon Suit Portrait",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/canyon-suit-portrait.jpg"
+      ],
+      "alt": "",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "canyon-suit-wide": {
+      "kind": "image",
+      "label": "Canyon Suit Wide",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/canyon-suit-wide.jpg"
+      ],
+      "alt": "",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "concert-hall": {
+      "kind": "image",
+      "label": "Concert Hall",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/concert-hall.jpg"
+      ],
+      "alt": "",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "corporate-stage": {
+      "kind": "image",
+      "label": "Corporate Stage",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/corporate-stage.jpg"
+      ],
+      "alt": "",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "desert-guitar": {
+      "kind": "image",
+      "label": "Desert Guitar",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/desert-guitar.jpg"
+      ],
+      "alt": "",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "diego-moran": {
+      "kind": "image",
+      "label": "Diego Moran",
+      "source": "originals/drive-2026-11-10/THE SCENE BAND PICS/Diego Moran.png",
+      "profile": "portrait",
+      "outputs": [
+        "apps/web/src/assets/photos/diego-moran.jpg"
+      ],
+      "alt": "Diego Moran",
+      "notes": ""
+    },
+    "event-acoustic-garden": {
+      "kind": "image",
+      "label": "Event Acoustic Garden",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/event-acoustic-garden.jpg"
+      ],
+      "alt": "Sean Carney performing at a garden event",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "graffiti-tunnel": {
+      "kind": "image",
+      "label": "Graffiti Tunnel",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/graffiti-tunnel.jpg"
+      ],
+      "alt": "",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "hero-desert": {
+      "kind": "image",
+      "label": "Hero Desert",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/hero-desert.jpg"
+      ],
+      "alt": "",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "hero-poster": {
+      "kind": "image",
+      "label": "Hero Poster",
+      "source": "originals/drive-2026-11-10/SCE SIZZLE V.1.mov",
+      "profile": "poster",
+      "outputs": [
+        "apps/web/src/assets/photos/hero-poster.jpg"
+      ],
+      "alt": "Sean Carney on electric guitar alongside a vocalist at a garden performance",
+      "notes": "Extracted from the live film; poster time can be changed independently.",
+      "posterTime": 10
+    },
+    "johnathon-rodriguez": {
+      "kind": "image",
+      "label": "Johnathon Rodriguez",
+      "source": "originals/drive-2026-11-10/THE SCENE BAND PICS/Johnathon Rodriguez.png",
+      "profile": "portrait",
+      "outputs": [
+        "apps/web/src/assets/photos/johnathon-rodriguez.jpg"
+      ],
+      "alt": "Johnathon Rodriguez",
+      "notes": ""
+    },
+    "live-bandshell-2": {
+      "kind": "image",
+      "label": "Live Bandshell 2",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/live-bandshell-2.jpg"
+      ],
+      "alt": "",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "live-bandshell": {
+      "kind": "image",
+      "label": "Live Bandshell",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/live-bandshell.jpg"
+      ],
+      "alt": "",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "live-stage": {
+      "kind": "image",
+      "label": "Live Stage",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/live-stage.jpg"
+      ],
+      "alt": "",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "melody-ebner": {
+      "kind": "image",
+      "label": "Melody Ebner",
+      "source": "originals/drive-2026-11-10/THE SCENE BAND PICS/Melody Ebner.jpeg",
+      "profile": "portrait",
+      "outputs": [
+        "apps/web/src/assets/photos/melody-ebner.jpg"
+      ],
+      "alt": "Melody Ebner",
+      "notes": ""
+    },
+    "merv-douglas": {
+      "kind": "image",
+      "label": "Merv Douglas",
+      "source": "originals/drive-2026-11-10/THE SCENE BAND PICS/Merv Douglas.jpg",
+      "profile": "portrait",
+      "outputs": [
+        "apps/web/src/assets/photos/merv-douglas.jpg"
+      ],
+      "alt": "Merv Douglas",
+      "notes": ""
+    },
+    "portrait-desert-hat": {
+      "kind": "image",
+      "label": "Portrait Desert Hat",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/portrait-desert-hat.jpg"
+      ],
+      "alt": "",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "portrait-fringe": {
+      "kind": "image",
+      "label": "Portrait Fringe",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/portrait-fringe.jpg"
+      ],
+      "alt": "",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "portrait-sky": {
+      "kind": "image",
+      "label": "Portrait Sky",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/portrait-sky.jpg"
+      ],
+      "alt": "",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "portrait-woods": {
+      "kind": "image",
+      "label": "Portrait Woods",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/portrait-woods.jpg"
+      ],
+      "alt": "Sean Carney, songwriter and founder of SCE",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "sce-film-poster": {
+      "kind": "image",
+      "label": "Sce Film Poster",
+      "source": "originals/drive-2026-11-10/SCE SIZZLE V.1.mov",
+      "profile": "poster",
+      "outputs": [
+        "apps/web/src/assets/photos/sce-film-poster.jpg"
+      ],
+      "alt": "Sean Carney on electric guitar alongside a vocalist at a garden performance",
+      "notes": "Extracted from the live film; poster time can be changed independently.",
+      "posterTime": 10
+    },
+    "suit-hands-guitar": {
+      "kind": "image",
+      "label": "Suit Hands Guitar",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/suit-hands-guitar.jpg"
+      ],
+      "alt": "A close view of Sean Carney playing acoustic guitar",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "tunnel-bw": {
+      "kind": "image",
+      "label": "Tunnel Bw",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/tunnel-bw.jpg"
+      ],
+      "alt": "",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "tyler-van-dam": {
+      "kind": "image",
+      "label": "Tyler Van Dam",
+      "source": "originals/drive-2026-11-10/THE SCENE BAND PICS/Tyler Van Dam.JPG",
+      "profile": "portrait",
+      "outputs": [
+        "apps/web/src/assets/photos/tyler-van-dam.jpg"
+      ],
+      "alt": "Tyler Van Dam",
+      "notes": ""
+    },
+    "wedding-duo": {
+      "kind": "image",
+      "label": "Wedding Duo",
+      "source": "originals/drive-2026-11-10/WEBSITE ASSETS/05-04-25_Kris_Shuman_Wedding_1369.jpg",
+      "profile": "photo",
+      "outputs": [
+        "apps/web/src/assets/photos/wedding-duo.jpg"
+      ],
+      "alt": "A couple smiling together on the dance floor while Sean performs",
+      "notes": ""
+    },
+    "wedding-evening": {
+      "kind": "image",
+      "label": "Wedding Evening",
+      "source": "originals/drive-2026-11-10/WEBSITE ASSETS/05-04-25_Kris_Shuman_Wedding_1350.jpg",
+      "profile": "photo",
+      "outputs": [
+        "apps/web/src/assets/photos/wedding-evening.jpg"
+      ],
+      "alt": "A couple dancing beneath string lights while Sean Carney performs",
+      "notes": ""
+    },
+    "wedding-first-dance": {
+      "kind": "image",
+      "label": "Wedding First Dance",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/photos/wedding-first-dance.jpg"
+      ],
+      "alt": "",
+      "notes": "Existing curated image. Supply a new source with the replace command to make it reproducible."
+    },
+    "wedding-garden": {
+      "kind": "image",
+      "label": "Wedding Garden",
+      "source": "originals/drive-2026-11-10/WEBSITE ASSETS/05-04-25_Kris_Shuman_Wedding_0306.jpg",
+      "profile": "photo",
+      "outputs": [
+        "apps/web/src/assets/photos/wedding-garden.jpg"
+      ],
+      "alt": "Sean Carney performing acoustic guitar in a garden at a wedding",
+      "notes": ""
+    },
+    "hero-loop": {
+      "kind": "video",
+      "label": "Home hero loop",
+      "source": "originals/drive-2026-11-10/SCE WEBSITE HERO FINAL.mov",
+      "profile": "hero",
+      "start": 0,
+      "duration": 40,
+      "outputs": [
+        "apps/web/public/media/hero-loop.mp4",
+        "apps/web/public/media/hero-loop.webm",
+        "apps/web/public/media/hero-loop-sm.mp4",
+        "apps/web/public/media/hero-loop-sm.webm"
+      ]
+    },
+    "sce-live-film": {
+      "kind": "video",
+      "label": "SCE live performance film",
+      "source": "originals/drive-2026-11-10/SCE SIZZLE V.1.mov",
+      "profile": "film",
+      "outputs": [
+        "apps/web/public/media/sce-live-film.mp4"
+      ]
+    },
+    "audio-lose-control": {
+      "kind": "audio",
+      "label": "Lose Control",
+      "trackId": "lose-control",
+      "artist": "Teddy Swims",
+      "source": "originals/drive-2026-11-10/NEW ACOUSTIC COVERS/Lose Control V.1.wav",
+      "profile": "audio",
+      "order": 1,
+      "outputs": [
+        "apps/web/public/media/audio/lose-control.mp3"
+      ]
+    },
+    "audio-ordinary": {
+      "kind": "audio",
+      "label": "Ordinary",
+      "trackId": "ordinary",
+      "artist": "Alex Warren",
+      "source": "originals/drive-2026-11-10/NEW ACOUSTIC COVERS/Ordinary V.1.wav",
+      "profile": "audio",
+      "order": 2,
+      "outputs": [
+        "apps/web/public/media/audio/ordinary.mp3"
+      ]
+    },
+    "audio-at-last": {
+      "kind": "audio",
+      "label": "At Last",
+      "trackId": "at-last",
+      "artist": "Etta James",
+      "source": "originals/drive-2026-11-10/NEW ACOUSTIC COVERS/At Last V.1.wav",
+      "profile": "audio",
+      "order": 3,
+      "outputs": [
+        "apps/web/public/media/audio/at-last.mp3"
+      ]
+    },
+    "audio-lover": {
+      "kind": "audio",
+      "label": "Lover",
+      "trackId": "lover",
+      "artist": "Taylor Swift",
+      "source": "originals/drive-2026-11-10/NEW ACOUSTIC COVERS/Lover V.1.wav",
+      "profile": "audio",
+      "order": 4,
+      "outputs": [
+        "apps/web/public/media/audio/lover.mp3"
+      ]
+    },
+    "audio-cant-help-falling-in-love": {
+      "kind": "audio",
+      "label": "Can’t Help Falling in Love",
+      "trackId": "cant-help-falling-in-love",
+      "artist": "Elvis Presley",
+      "source": "originals/drive-2026-11-10/NEW ACOUSTIC COVERS/I Can't Help V.1.wav",
+      "profile": "audio",
+      "order": 5,
+      "outputs": [
+        "apps/web/public/media/audio/cant-help-falling-in-love.mp3"
+      ]
+    },
+    "audio-tipsy": {
+      "kind": "audio",
+      "label": "A Bar Song (Tipsy)",
+      "trackId": "tipsy",
+      "artist": "Shaboozey",
+      "source": "originals/drive-2026-11-10/NEW ACOUSTIC COVERS/Tipsy V.1.wav",
+      "profile": "audio",
+      "order": 6,
+      "outputs": [
+        "apps/web/public/media/audio/tipsy.mp3"
+      ]
+    },
+    "audio-cruel-summer": {
+      "kind": "audio",
+      "label": "Cruel Summer",
+      "trackId": "cruel-summer",
+      "artist": "Taylor Swift",
+      "source": "originals/drive-2026-11-10/ACOUSTIC COVERS/Cruel Summer V.3.wav",
+      "profile": "audio",
+      "order": 7,
+      "outputs": [
+        "apps/web/public/media/audio/cruel-summer.mp3"
+      ]
+    },
+    "audio-shape-of-you": {
+      "kind": "audio",
+      "label": "Shape of You",
+      "trackId": "shape-of-you",
+      "artist": "Ed Sheeran",
+      "source": "originals/drive-2026-11-10/ACOUSTIC COVERS/Shape Of You MASTER V.2.wav",
+      "profile": "audio",
+      "order": 8,
+      "outputs": [
+        "apps/web/public/media/audio/shape-of-you.mp3"
+      ]
+    },
+    "audio-closer": {
+      "kind": "audio",
+      "label": "Closer",
+      "trackId": "closer",
+      "artist": "The Chainsmokers",
+      "source": "originals/drive-2026-11-10/ACOUSTIC COVERS/Closer MASTER V2.wav",
+      "profile": "audio",
+      "order": 9,
+      "outputs": [
+        "apps/web/public/media/audio/closer.mp3"
+      ]
+    },
+    "audio-feel-it-still": {
+      "kind": "audio",
+      "label": "Feel It Still",
+      "trackId": "feel-it-still",
+      "artist": "Portugal. The Man",
+      "source": "originals/drive-2026-11-10/ACOUSTIC COVERS/Feel It Still (Acoustic) V.2.wav",
+      "profile": "audio",
+      "order": 10,
+      "outputs": [
+        "apps/web/public/media/audio/feel-it-still.mp3"
+      ]
+    },
+    "audio-shut-up-and-dance": {
+      "kind": "audio",
+      "label": "Shut Up and Dance",
+      "trackId": "shut-up-and-dance",
+      "artist": "WALK THE MOON",
+      "source": "originals/drive-2026-11-10/ACOUSTIC COVERS/Shut Up And Dance (Acoustic) V.2.wav",
+      "profile": "audio",
+      "order": 11,
+      "outputs": [
+        "apps/web/public/media/audio/shut-up-and-dance.mp3"
+      ]
+    },
+    "audio-fast-car": {
+      "kind": "audio",
+      "label": "Fast Car",
+      "trackId": "fast-car",
+      "artist": "Tracy Chapman",
+      "source": "originals/drive-2026-11-10/ACOUSTIC COVERS/Fast Car MASTER V.2.wav",
+      "profile": "audio",
+      "order": 12,
+      "outputs": [
+        "apps/web/public/media/audio/fast-car.mp3"
+      ]
+    },
+    "audio-cant-stop-the-feeling": {
+      "kind": "audio",
+      "label": "Can’t Stop the Feeling",
+      "trackId": "cant-stop-the-feeling",
+      "artist": "Justin Timberlake",
+      "source": "originals/drive-2026-11-10/ACOUSTIC COVERS/Can't Stop The Feeling Acoustic V.2.wav",
+      "profile": "audio",
+      "order": 13,
+      "outputs": [
+        "apps/web/public/media/audio/cant-stop-the-feeling.mp3"
+      ]
+    },
+    "audio-flowers": {
+      "kind": "audio",
+      "label": "Flowers",
+      "trackId": "flowers",
+      "artist": "Miley Cyrus",
+      "source": "originals/drive-2026-11-10/ACOUSTIC COVERS/Flowers Acoustic V.1.wav",
+      "profile": "audio",
+      "order": 14,
+      "outputs": [
+        "apps/web/public/media/audio/flowers.mp3"
+      ]
+    },
+    "audio-shallow": {
+      "kind": "audio",
+      "label": "Shallow",
+      "trackId": "shallow",
+      "artist": "Lady Gaga & Bradley Cooper",
+      "source": "originals/drive-2026-11-10/ACOUSTIC COVERS/Shallow Acoustic V.1.wav",
+      "profile": "audio",
+      "order": 15,
+      "outputs": [
+        "apps/web/public/media/audio/shallow.mp3"
+      ]
+    },
+    "song-list-download": {
+      "kind": "document",
+      "label": "Full song list 2026–2027",
+      "source": "originals/drive-2026-11-10/Sean Carney Entertainment_Full_Song_List 2026-2027.docx",
+      "profile": "copy",
+      "outputs": [
+        "apps/web/public/downloads/sean-carney-song-list-2026-2027.docx"
+      ]
+    }
+  }
+}

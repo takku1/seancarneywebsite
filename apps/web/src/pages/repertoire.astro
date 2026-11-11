@@ -1,78 +1,87 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/ui/PageHeader.astro';
-import SpotifyFacade from '../components/media/SpotifyFacade.astro';
+import AcousticListening from '../components/media/AcousticListening.astro';
 import InquireLabel from '../components/ui/InquireLabel.astro';
-import { repertoire } from '../lib/content';
+import MusicQuiz from '../components/media/MusicQuiz.astro';
+import MusicPlan from '../components/media/MusicPlan.astro';
 import { graph, breadcrumbSchema } from '../lib/seo/schema';
-
-const moments = await repertoire();
-const jsonLd = graph(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Repertoire', path: '/repertoire' }]));
+const groups = (await getCollection('songbook')).sort((a,b) => a.data.order - b.data.order);
+const count = groups.reduce((n,g) => n + g.data.songs.length, 0);
+const jsonLd = graph(breadcrumbSchema([{name:'Home',path:'/'},{name:'Repertoire',path:'/repertoire'}]));
 ---
-
-<BaseLayout
-  pageType="repertoire"
-  title="Wedding Repertoire | Sean Carney"
-  description="The songs couples ask for most, from the ceremony and first dance to the dance floor, arranged live by Sean Carney solo, as a trio or with the full band."
-  jsonLd={jsonLd}
->
-  <PageHeader title="Repertoire" intro="The songs couples ask for most, arranged for the moment they're played. A sample: full lists, and your own requests, come with the proposal." />
-
-  <section class="section" data-section="repertoire" aria-label="Songs by moment">
+<BaseLayout pageType="repertoire" title="Wedding Song List & Acoustic Recordings | Sean Carney" description={`Explore ${count} songs across nine genres, listen to Sean’s acoustic recordings, and find music for your ceremony, first dance and reception.`} jsonLd={jsonLd}>
+  <PageHeader title="The songs you know. A sound that’s yours." intro="Standards over cocktails. Your song at the aisle. A familiar chorus that fills the floor. Explore the repertoire, or ask Sean to arrange something personal." />
+  <MusicQuiz />
+  <MusicPlan />
+  <section class="section songbook" data-songbook data-section="repertoire" aria-labelledby="songbook-title">
     <div class="container">
-      {moments.map((m) => (
-        <article class="moment">
-          <div class="lead">
-            <h2>{m.data.moment}</h2>
-            <p>{m.data.note}</p>
-          </div>
-          <ul>
-            {m.data.songs.map((s) => (
-              <li><span class="t">{s.title}</span><span class="a">{s.artist}</span></li>
-            ))}
-          </ul>
-        </article>
-      ))}
+      <div class="book-head"><h2 id="songbook-title">Find your song</h2><a href="/downloads/sean-carney-song-list-2026-2027.docx" download class="link-arrow">Download the full list</a></div>
+      <div class="tools">
+        <div><label for="song-search">Song or artist</label><input type="search" id="song-search" placeholder="Try At Last or Teddy Swims" autocomplete="off" data-song-search /></div>
+        <div><label for="song-genre">Browse by style</label><select id="song-genre" data-song-genre><option value="all">All styles</option>{groups.map(g => <option value={g.id}>{g.data.genre}</option>)}</select></div>
+      </div>
+      <p class="count" role="status" aria-live="polite" data-song-count>{count} songs · Solo, duo and full band arrangements</p>
+      <p data-song-empty hidden class="empty">No songs match that search. Try another title or artist, or ask Sean about a custom request.</p>
+      {groups.map(g => <article class="genre" data-song-group={g.id}>
+        <h3>{g.data.genre}</h3><ul>{g.data.songs.map((s,i) => <li data-song data-search={`${s.title} ${s.artist}`}><span class="song-info"><span>{s.title}</span><small>{s.artist}</small></span><span class="song-actions"><button type="button" data-song-choice="must" data-song-id={`${g.id}:${i}`} aria-pressed="false" aria-label={`Love it: ${s.title}`}>Love it</button><button type="button" data-song-choice="avoid" data-song-id={`${g.id}:${i}`} aria-pressed="false" aria-label={`Do not play: ${s.title}`}>Do not play</button></span></li>)}</ul>
+      </article>)}
+      <noscript><p>All songs are listed by style. Search and filtering require JavaScript.</p></noscript>
     </div>
   </section>
-
-  <section class="section listen" data-section="repertoire_listen" aria-labelledby="listen-title">
-    <div class="container cols">
-      <div>
-        <h2 id="listen-title">Hear the acoustic arrangements</h2>
-        <p>A playlist of the covers Sean plays for ceremonies and cocktail hours.</p>
-      </div>
-      <SpotifyFacade uri="playlist/6rKY5Yzd33JAzxDwVttojd" title="Sean Carney, Acoustic Covers" location="repertoire" />
-    </div>
-  </section>
-
-  <section class="section request" data-section="repertoire_request" aria-labelledby="request-title">
-    <div class="container request-row">
-      <div>
-        <h2 id="request-title">Your song, arranged for you</h2>
-        <p>An aisle song, a first dance, a family favorite: Sean arranges requests as part of the proposal.</p>
-      </div>
-      <a href="/inquire" class="btn" data-track="cta_click" data-track-location="repertoire"><InquireLabel /></a>
-    </div>
+  <div id="listen"><AcousticListening location="repertoire" /></div>
+  <section class="section request" data-section="repertoire_request">
+    <div class="container request-row"><div><h2>Your song, arranged for you</h2><p>Don’t see it here? Tell Sean what the song means to you. Custom requests are welcome for the moments that matter.</p></div><a href="/inquire" class="btn"><InquireLabel /></a></div>
   </section>
 </BaseLayout>
-
+<script>
+  import { onPage } from '../lib/lifecycle';
+  onPage(() => {
+    const root = document.querySelector<HTMLElement>('[data-songbook]')!;
+    const search = root.querySelector<HTMLInputElement>('[data-song-search]')!;
+    const genre = root.querySelector<HTMLSelectElement>('[data-song-genre]')!;
+    const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[’']/g, '');
+    const update = () => {
+      const terms = normalize(search.value.trim()).split(/\s+/).filter(Boolean);
+      let total = 0;
+      root.querySelectorAll<HTMLElement>('[data-song-group]').forEach(group => {
+        let visible = 0;
+        group.querySelectorAll<HTMLElement>('[data-song]').forEach(song => {
+          const match = (genre.value === 'all' || genre.value === group.dataset.songGroup) && terms.every(t => normalize(song.dataset.search || '').includes(t));
+          song.hidden = !match;
+          if (match) visible++;
+        });
+        group.hidden = visible === 0;
+        total += visible;
+      });
+      root.querySelector('[data-song-count]')!.textContent = `${total} ${total === 1 ? 'song' : 'songs'}${search.value || genre.value !== 'all' ? ' found' : ' · Solo, duo and full band arrangements'}`;
+      root.querySelector<HTMLElement>('[data-song-empty]')!.hidden = total !== 0;
+    };
+    search.addEventListener('input', update); genre.addEventListener('change', update);
+  }, '[data-songbook]');
+</script>
 <style>
-  .moment { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 1.5rem clamp(2rem, 6vw, 6rem); padding-block: clamp(2.5rem, 5vw, 4rem); border-top: 1px solid var(--line); }
-  .moment:first-child { border-top: 0; padding-top: 0; }
-  .lead h2 { font-size: var(--step-3); line-height: 1.05; }
-  .lead p { margin-top: 0.9rem; color: var(--text-muted); max-width: 38ch; }
-  ul { list-style: none; margin: 0; padding: 0; }
-  li { display: flex; justify-content: space-between; align-items: baseline; gap: 1.5rem; padding-block: 0.9rem; border-bottom: 1px solid var(--line); }
-  li:first-child { border-top: 1px solid var(--line); }
-  .t { font-family: var(--font-display); font-size: var(--step-2); line-height: 1.15; }
-  .a { color: var(--text-muted); font-size: var(--step--1); text-align: right; }
-
-  .listen { background: var(--bg-raised); border-block: 1px solid var(--line); }
-  .cols { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(2rem, 6vw, 6rem); align-items: center; }
-  .listen h2, .request h2 { font-size: var(--step-3); line-height: 1.05; }
-  .listen p, .request p { margin-top: 0.75rem; color: var(--text-muted); max-width: 40ch; }
-  .request-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem 3rem; }
-
-  @media (max-width: 899px) { .moment, .cols { grid-template-columns: minmax(0, 1fr); } }
+  .book-head { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 2rem; }
+  h2 { font-size: var(--step-3); line-height: 1.08; }
+  .tools { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+  label { display: block; font-size: var(--step--1); margin-bottom: 0.5rem; }
+  input, select { width: 100%; min-height: 52px; background: var(--bg-raised); color: var(--text); border: 1px solid var(--line-strong); border-radius: 0; padding: 0.85rem; font: inherit; }
+  .count { margin-block: 1rem 3rem; color: var(--text-muted); font-size: var(--step--1); }
+  .genre { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 2rem 4rem; border-top: 1px solid var(--line-strong); padding-block: 2.5rem 3.5rem; }
+  h3 { font-size: var(--step-2); line-height: 1.15; }
+  ul { list-style: none; padding: 0; margin: 0; }
+  li { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding-block: 0.8rem; border-bottom: 1px solid var(--line); }
+  li span { font-family: var(--font-display); font-size: var(--step-1); }
+  .song-info { display:grid; gap:0.25rem; }
+  .song-info small { text-align:left; font-family:var(--font-body); font-size:var(--step--1); }
+  .song-actions { display:flex; gap:0.5rem; flex-shrink:0; }
+  .song-actions button { min-height:44px; background:none; color:var(--text); border:1px solid var(--line-strong); padding:0.4rem 0.6rem; font-family:var(--font-body); font-size:var(--step--1); cursor:pointer; }
+  .song-actions button[aria-pressed='true'] { background:var(--text); color:var(--bg-raised); }
+  small { color: var(--text-muted); text-align: right; }
+  .genre[hidden], li[hidden] { display: none; }
+  .request-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2rem; }
+  .request p { max-width: 48ch; margin-top: 1rem; color: var(--text-muted); }
+  .empty { padding: 2rem 0 4rem; max-width: 48ch; }
+  @media(max-width: 767px) { .tools, .genre { grid-template-columns: minmax(0,1fr); } .genre { gap: 1.5rem; } li {align-items:start;flex-direction:column;gap:0.75rem;} }
 </style>

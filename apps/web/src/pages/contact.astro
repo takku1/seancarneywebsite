@@ -4,6 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/ui/PageHeader.astro';
 import Icon from '../components/ui/Icon.astro';
 import InquireLabel from '../components/ui/InquireLabel.astro';
+import ScoutInvite from '../components/scout/ScoutInvite.astro';
 import { site } from '../config/site';
 import { graph, breadcrumbSchema } from '../lib/seo/schema';
 
@@ -39,6 +40,7 @@ const jsonLd = graph(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Con
       </ul>
     </div>
   </section>
+  <div class="container concierge"><ScoutInvite source="contact" text="Start with Scout, Sean’s AI assistant, for a date check, a question about the music, or help choosing a format." prompts={['Check a date', 'Help me choose a format']} /></div>
 </BaseLayout>
 
 <style>
@@ -53,4 +55,5 @@ const jsonLd = graph(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Con
     .routes li:nth-child(n) { border-right: 0; padding-left: 0; }
   }
   .toolkit { margin-left: 1.5rem; }
+  .concierge { padding-bottom: var(--space-section); }
 </style>

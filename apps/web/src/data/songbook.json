@@ -1,0 +1,833 @@
+[
+  {
+    "id": "jazz-standards",
+    "genre": "Jazz & Standards",
+    "order": 1,
+    "songs": [
+      {
+        "title": "Fly Me To The Moon",
+        "artist": "Frank Sinatra"
+      },
+      {
+        "title": "I've Got You Under My Skin",
+        "artist": "Frank Sinatra"
+      },
+      {
+        "title": "My Way",
+        "artist": "Frank Sinatra"
+      },
+      {
+        "title": "The Way You Look Tonight",
+        "artist": "Frank Sinatra"
+      },
+      {
+        "title": "Come Fly With Me",
+        "artist": "Frank Sinatra"
+      },
+      {
+        "title": "All Of Me",
+        "artist": "Frank Sinatra"
+      },
+      {
+        "title": "Unforgettable",
+        "artist": "Nat King Cole"
+      },
+      {
+        "title": "What A Wonderful World",
+        "artist": "Louis Armstrong"
+      },
+      {
+        "title": "Moondance",
+        "artist": "Van Morrison"
+      },
+      {
+        "title": "Sway",
+        "artist": "Michael Bublé"
+      },
+      {
+        "title": "Feeling Good",
+        "artist": "Michael Bublé"
+      },
+      {
+        "title": "Save The Last Dance For Me",
+        "artist": "Michael Bublé"
+      },
+      {
+        "title": "Besame Mucho",
+        "artist": "Dean Martin"
+      },
+      {
+        "title": "My Funny Valentine",
+        "artist": "Chet Baker"
+      },
+      {
+        "title": "The Nearness Of You",
+        "artist": ""
+      },
+      {
+        "title": "Stolen Moments",
+        "artist": "Oliver Nelson"
+      },
+      {
+        "title": "At Last",
+        "artist": "Etta James"
+      },
+      {
+        "title": "This Will Be (An Everlasting Love)",
+        "artist": "Natalie Cole"
+      }
+    ]
+  },
+  {
+    "id": "motown-soul-r-b",
+    "genre": "Motown, Soul & R&B",
+    "order": 2,
+    "songs": [
+      {
+        "title": "My Girl",
+        "artist": "The Temptations"
+      },
+      {
+        "title": "Ain't No Sunshine",
+        "artist": "Bill Withers"
+      },
+      {
+        "title": "Lovely Day",
+        "artist": "Bill Withers"
+      },
+      {
+        "title": "Just The Two Of Us",
+        "artist": "Grover Washington Jr."
+      },
+      {
+        "title": "Son Of A Preacher Man",
+        "artist": "Dusty Springfield"
+      },
+      {
+        "title": "Human",
+        "artist": "Rag'n'Bone Man"
+      },
+      {
+        "title": "Lose Control",
+        "artist": "Teddy Swims"
+      },
+      {
+        "title": "The Door",
+        "artist": "Teddy Swims"
+      },
+      {
+        "title": "Best Part",
+        "artist": "H.E.R. & Daniel Caesar"
+      },
+      {
+        "title": "Love On Top",
+        "artist": "Beyoncé"
+      },
+      {
+        "title": "No Diggity",
+        "artist": "Blackstreet"
+      },
+      {
+        "title": "Needed Me",
+        "artist": "Rihanna"
+      },
+      {
+        "title": "What You Won't Do For Love",
+        "artist": "Bobby Caldwell"
+      },
+      {
+        "title": "Mustang Sally",
+        "artist": "The Commitments"
+      }
+    ]
+  },
+  {
+    "id": "funk-disco",
+    "genre": "Funk & Disco",
+    "order": 3,
+    "songs": [
+      {
+        "title": "Superstition",
+        "artist": "Stevie Wonder"
+      },
+      {
+        "title": "September",
+        "artist": "Earth, Wind & Fire"
+      },
+      {
+        "title": "Uptown Funk",
+        "artist": "Bruno Mars"
+      },
+      {
+        "title": "24K Magic",
+        "artist": "Bruno Mars"
+      },
+      {
+        "title": "Play That Funky Music",
+        "artist": "Wild Cherry"
+      },
+      {
+        "title": "Get Lucky",
+        "artist": "Daft Punk"
+      },
+      {
+        "title": "Dancing Queen",
+        "artist": "ABBA"
+      },
+      {
+        "title": "I Will Survive",
+        "artist": "Gloria Gaynor"
+      },
+      {
+        "title": "Get Down Tonight",
+        "artist": "KC & The Sunshine Band"
+      },
+      {
+        "title": "Funkytown",
+        "artist": "Lipps Inc."
+      },
+      {
+        "title": "Give It To Me Baby",
+        "artist": "Rick James"
+      },
+      {
+        "title": "Super Freak",
+        "artist": "Rick James"
+      },
+      {
+        "title": "Jungle Boogie",
+        "artist": ""
+      },
+      {
+        "title": "Give Me The Night",
+        "artist": "George Benson"
+      },
+      {
+        "title": "We Are Family",
+        "artist": "Sister Sledge"
+      },
+      {
+        "title": "Ain't No Stoppin' Us Now",
+        "artist": "McFadden & Whitehead"
+      },
+      {
+        "title": "Y.M.C.A.",
+        "artist": "Village People"
+      }
+    ]
+  },
+  {
+    "id": "pop-classic-current",
+    "genre": "Pop (Classic & Current)",
+    "order": 4,
+    "songs": [
+      {
+        "title": "As It Was",
+        "artist": "Harry Styles (also Yacht Rock version)"
+      },
+      {
+        "title": "Watermelon Sugar",
+        "artist": "Harry Styles"
+      },
+      {
+        "title": "Flowers",
+        "artist": "Miley Cyrus"
+      },
+      {
+        "title": "Espresso",
+        "artist": "Sabrina Carpenter"
+      },
+      {
+        "title": "Levitating",
+        "artist": "Dua Lipa"
+      },
+      {
+        "title": "Cruel Summer",
+        "artist": "Taylor Swift"
+      },
+      {
+        "title": "Lover",
+        "artist": "Taylor Swift"
+      },
+      {
+        "title": "Shake It Off",
+        "artist": "Taylor Swift"
+      },
+      {
+        "title": "Anti-Hero",
+        "artist": "Taylor Swift"
+      },
+      {
+        "title": "Drivers License",
+        "artist": "Olivia Rodrigo"
+      },
+      {
+        "title": "Pink Pony Club",
+        "artist": "Chappell Roan"
+      },
+      {
+        "title": "Ordinary",
+        "artist": "Alex Warren"
+      },
+      {
+        "title": "Stargazing",
+        "artist": "Myles Smith"
+      },
+      {
+        "title": "Can't Stop The Feeling",
+        "artist": "Justin Timberlake"
+      },
+      {
+        "title": "Happy",
+        "artist": "Pharrell Williams"
+      },
+      {
+        "title": "Firework",
+        "artist": "Katy Perry"
+      },
+      {
+        "title": "Can't Help Falling In Love",
+        "artist": "Elvis Presley"
+      },
+      {
+        "title": "All Of Me",
+        "artist": "John Legend"
+      },
+      {
+        "title": "Thinking Out Loud",
+        "artist": "Ed Sheeran"
+      },
+      {
+        "title": "Perfect",
+        "artist": "Ed Sheeran"
+      },
+      {
+        "title": "I'm Yours",
+        "artist": "Jason Mraz"
+      },
+      {
+        "title": "When I Was Your Man",
+        "artist": "Bruno Mars"
+      },
+      {
+        "title": "Marry You",
+        "artist": "Bruno Mars"
+      },
+      {
+        "title": "Locked Out Of Heaven",
+        "artist": "Bruno Mars"
+      },
+      {
+        "title": "Save Your Tears",
+        "artist": "The Weeknd"
+      },
+      {
+        "title": "Blinding Lights",
+        "artist": "The Weeknd"
+      },
+      {
+        "title": "Uptown Girl",
+        "artist": "Billy Joel"
+      },
+      {
+        "title": "You Make My Dreams Come True",
+        "artist": "Hall & Oates"
+      },
+      {
+        "title": "Rocket Man",
+        "artist": "Elton John"
+      },
+      {
+        "title": "God Only Knows",
+        "artist": "The Beach Boys"
+      },
+      {
+        "title": "Rolling In The Deep",
+        "artist": "Adele"
+      },
+      {
+        "title": "Shallow",
+        "artist": "Lady Gaga & Bradley Cooper"
+      },
+      {
+        "title": "This Is Me",
+        "artist": "Keala Settle"
+      },
+      {
+        "title": "I Want It That Way",
+        "artist": "Backstreet Boys"
+      },
+      {
+        "title": "Everybody",
+        "artist": "Backstreet Boys"
+      },
+      {
+        "title": "I Gotta Feeling",
+        "artist": "Black Eyed Peas"
+      }
+    ]
+  },
+  {
+    "id": "rock-classic-rock",
+    "genre": "Rock & Classic Rock",
+    "order": 5,
+    "songs": [
+      {
+        "title": "Don't Stop Believin'",
+        "artist": "Journey"
+      },
+      {
+        "title": "Hotel California",
+        "artist": "Eagles"
+      },
+      {
+        "title": "Take It Easy",
+        "artist": "Eagles"
+      },
+      {
+        "title": "Free Fallin'",
+        "artist": "Tom Petty"
+      },
+      {
+        "title": "I Won't Back Down",
+        "artist": "Tom Petty"
+      },
+      {
+        "title": "Brown Eyed Girl",
+        "artist": "Van Morrison"
+      },
+      {
+        "title": "Sweet Child O' Mine",
+        "artist": "Guns N' Roses"
+      },
+      {
+        "title": "Sweet Home Alabama",
+        "artist": "Lynyrd Skynyrd"
+      },
+      {
+        "title": "Free Bird",
+        "artist": "Lynyrd Skynyrd"
+      },
+      {
+        "title": "I Don't Want To Miss A Thing",
+        "artist": "Aerosmith"
+      },
+      {
+        "title": "Wonderful Tonight",
+        "artist": "Eric Clapton"
+      },
+      {
+        "title": "Change The World",
+        "artist": "Eric Clapton"
+      },
+      {
+        "title": "Come Together",
+        "artist": "The Beatles"
+      },
+      {
+        "title": "Blackbird",
+        "artist": "The Beatles"
+      },
+      {
+        "title": "Hey Jude",
+        "artist": "The Beatles"
+      },
+      {
+        "title": "Purple Rain",
+        "artist": "Prince"
+      },
+      {
+        "title": "Purple Haze",
+        "artist": "Jimi Hendrix"
+      },
+      {
+        "title": "Thunderstruck",
+        "artist": "AC/DC"
+      },
+      {
+        "title": "Mr. Brightside",
+        "artist": "The Killers"
+      },
+      {
+        "title": "Wonderwall",
+        "artist": "Oasis"
+      },
+      {
+        "title": "Iris",
+        "artist": "Goo Goo Dolls"
+      },
+      {
+        "title": "Everlong",
+        "artist": "Foo Fighters"
+      },
+      {
+        "title": "Say It Ain't So",
+        "artist": "Weezer"
+      },
+      {
+        "title": "More Than Words",
+        "artist": "Extreme"
+      },
+      {
+        "title": "Jack & Diane",
+        "artist": "John Mellencamp"
+      },
+      {
+        "title": "All Star",
+        "artist": "Smash Mouth"
+      },
+      {
+        "title": "Baker Street",
+        "artist": "Gerry Rafferty"
+      },
+      {
+        "title": "Fly Like An Eagle",
+        "artist": "Steve Miller Band"
+      },
+      {
+        "title": "People Are Strange",
+        "artist": "The Doors"
+      },
+      {
+        "title": "Crazy Little Thing Called Love",
+        "artist": "Queen"
+      },
+      {
+        "title": "White Wedding",
+        "artist": "Billy Idol"
+      },
+      {
+        "title": "Shut Up And Dance",
+        "artist": "WALK THE MOON"
+      }
+    ]
+  },
+  {
+    "id": "country",
+    "genre": "Country",
+    "order": 6,
+    "songs": [
+      {
+        "title": "Tennessee Whiskey",
+        "artist": "Chris Stapleton"
+      },
+      {
+        "title": "I Think I'm In Love With You",
+        "artist": "Chris Stapleton"
+      },
+      {
+        "title": "You Should Probably Leave",
+        "artist": "Chris Stapleton"
+      },
+      {
+        "title": "Chicken Fried",
+        "artist": "Zac Brown Band"
+      },
+      {
+        "title": "Wagon Wheel",
+        "artist": "Old Crow Medicine Show"
+      },
+      {
+        "title": "Take Me Home, Country Roads",
+        "artist": "John Denver"
+      },
+      {
+        "title": "Ring Of Fire",
+        "artist": "Johnny Cash"
+      },
+      {
+        "title": "Folsom Prison Blues",
+        "artist": "Johnny Cash"
+      },
+      {
+        "title": "I Walk The Line",
+        "artist": "Johnny Cash"
+      },
+      {
+        "title": "God's Gonna Cut You Down",
+        "artist": "Johnny Cash"
+      },
+      {
+        "title": "Jolene",
+        "artist": "Dolly Parton"
+      },
+      {
+        "title": "Bless The Broken Road",
+        "artist": "Rascal Flatts"
+      },
+      {
+        "title": "Last Night",
+        "artist": "Morgan Wallen"
+      },
+      {
+        "title": "Love Somebody",
+        "artist": "Morgan Wallen"
+      },
+      {
+        "title": "I Had Some Help",
+        "artist": "Morgan Wallen & Post Malone"
+      },
+      {
+        "title": "I Remember Everything",
+        "artist": "Zach Bryan"
+      },
+      {
+        "title": "Something In The Orange",
+        "artist": "Zach Bryan"
+      },
+      {
+        "title": "Why Don't We Just Dance",
+        "artist": "Josh Turner"
+      },
+      {
+        "title": "Long Black Train",
+        "artist": "Josh Turner"
+      },
+      {
+        "title": "The Gambler",
+        "artist": "Kenny Rogers"
+      },
+      {
+        "title": "Save A Horse (Ride A Cowboy)",
+        "artist": "Big & Rich"
+      },
+      {
+        "title": "Before He Cheats",
+        "artist": "Carrie Underwood"
+      },
+      {
+        "title": "Man! I Feel Like A Woman",
+        "artist": "Shania Twain"
+      },
+      {
+        "title": "All My Exes Live In Texas",
+        "artist": "George Strait"
+      },
+      {
+        "title": "Guitars, Cadillacs",
+        "artist": "Dwight Yoakam"
+      },
+      {
+        "title": "Achy Breaky Heart",
+        "artist": "Billy Ray Cyrus"
+      },
+      {
+        "title": "A Bar Song (Tipsy)",
+        "artist": "Shaboozey"
+      },
+      {
+        "title": "Old Town Road",
+        "artist": "Lil Nas X"
+      },
+      {
+        "title": "Bye Bye Bye (Country Rock Version)",
+        "artist": "NSYNC"
+      }
+    ]
+  },
+  {
+    "id": "beach-yacht-rock-soft-rock",
+    "genre": "Beach, Yacht Rock & Soft Rock",
+    "order": 7,
+    "songs": [
+      {
+        "title": "Kokomo",
+        "artist": "The Beach Boys"
+      },
+      {
+        "title": "California Girls",
+        "artist": "The Beach Boys"
+      },
+      {
+        "title": "Surfin' USA",
+        "artist": "The Beach Boys"
+      },
+      {
+        "title": "Margaritaville",
+        "artist": "Jimmy Buffett"
+      },
+      {
+        "title": "Sailing",
+        "artist": "Christopher Cross"
+      },
+      {
+        "title": "Ride Like The Wind",
+        "artist": "Christopher Cross"
+      },
+      {
+        "title": "Steal Away",
+        "artist": "Robbie Dupree"
+      },
+      {
+        "title": "Escape (The Piña Colada Song)",
+        "artist": "Rupert Holmes"
+      },
+      {
+        "title": "Love Will Find A Way",
+        "artist": "Pablo Cruise"
+      },
+      {
+        "title": "What A Fool Believes",
+        "artist": "The Doobie Brothers"
+      },
+      {
+        "title": "Baby Come Back",
+        "artist": "Player"
+      },
+      {
+        "title": "I Keep Forgettin'",
+        "artist": "Michael McDonald"
+      },
+      {
+        "title": "Don't Worry, Be Happy",
+        "artist": "Bobby McFerrin"
+      },
+      {
+        "title": "Santeria",
+        "artist": "Sublime"
+      }
+    ]
+  },
+  {
+    "id": "blues-acoustic",
+    "genre": "Blues & Acoustic",
+    "order": 8,
+    "songs": [
+      {
+        "title": "Gravity",
+        "artist": "John Mayer"
+      },
+      {
+        "title": "Slow Dancing In A Burning Room",
+        "artist": "John Mayer"
+      },
+      {
+        "title": "Pride And Joy",
+        "artist": "Stevie Ray Vaughan"
+      },
+      {
+        "title": "Fast Car",
+        "artist": "Tracy Chapman"
+      },
+      {
+        "title": "Ho Hey",
+        "artist": "The Lumineers"
+      },
+      {
+        "title": "I Will Wait",
+        "artist": "Mumford & Sons"
+      },
+      {
+        "title": "How Sweet It Is",
+        "artist": "James Taylor"
+      },
+      {
+        "title": "Dreams",
+        "artist": "Fleetwood Mac"
+      },
+      {
+        "title": "Time In A Bottle",
+        "artist": "Jim Croce"
+      },
+      {
+        "title": "100 Years",
+        "artist": "Five For Fighting"
+      },
+      {
+        "title": "How Long Will I Love You (Acoustic)",
+        "artist": "Ellie Goulding"
+      },
+      {
+        "title": "Under The Bridge",
+        "artist": "Red Hot Chili Peppers"
+      },
+      {
+        "title": "Yellow",
+        "artist": "Coldplay"
+      },
+      {
+        "title": "Creep",
+        "artist": "Radiohead"
+      },
+      {
+        "title": "Valerie",
+        "artist": "Amy Winehouse"
+      },
+      {
+        "title": "Smooth",
+        "artist": "Santana ft. Rob Thomas"
+      }
+    ]
+  },
+  {
+    "id": "alt-new-wave-modern",
+    "genre": "Alt, New Wave & Modern",
+    "order": 9,
+    "songs": [
+      {
+        "title": "Feel It Still",
+        "artist": "Portugal. The Man"
+      },
+      {
+        "title": "Lovesong",
+        "artist": "The Cure"
+      },
+      {
+        "title": "I Melt With You",
+        "artist": "Modern English"
+      },
+      {
+        "title": "Don't Speak",
+        "artist": "No Doubt"
+      },
+      {
+        "title": "Hella Good",
+        "artist": "No Doubt"
+      },
+      {
+        "title": "I Miss You",
+        "artist": "Blink-182"
+      },
+      {
+        "title": "All The Small Things",
+        "artist": "Blink-182"
+      },
+      {
+        "title": "Bad Guy",
+        "artist": "Billie Eilish"
+      },
+      {
+        "title": "Circles",
+        "artist": "Post Malone"
+      },
+      {
+        "title": "Sunflower",
+        "artist": "Post Malone & Swae Lee"
+      },
+      {
+        "title": "Closer",
+        "artist": "The Chainsmokers"
+      },
+      {
+        "title": "Happier",
+        "artist": "Marshmello & Bastille"
+      },
+      {
+        "title": "Wake Me Up",
+        "artist": "Avicii"
+      },
+      {
+        "title": "Abracadabra",
+        "artist": "Lady Gaga"
+      },
+      {
+        "title": "Rude",
+        "artist": "MAGIC"
+      },
+      {
+        "title": "Superman",
+        "artist": "Goldfinger"
+      }
+    ]
+  }
+]

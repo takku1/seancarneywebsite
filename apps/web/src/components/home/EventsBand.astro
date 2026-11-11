@@ -1,7 +1,8 @@
 ---
 /** Private events, quietly: the one band on the home page for non-wedding occasions. */
 import { Image } from 'astro:assets';
-import bg from '../../assets/photos/event-acoustic-garden.jpg';
+import { photoFor } from '../../lib/media/library';
+const {image:bg}=photoFor('home.private-events');
 import { privateEventTypes } from '../../lib/content';
 import { site } from '../../config/site';
 import Icon from '../ui/Icon.astro';

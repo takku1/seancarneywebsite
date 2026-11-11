@@ -1,0 +1,29 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Icon from '../ui/Icon.astro';
+interface Props { id: string; src: string; title: string; poster: ImageMetadata; location: string; }
+const { id, src, title, poster, location } = Astro.props;
+---
+<div class="native-film" data-media-id={id} data-media-src={src} data-media-type="video" data-title={title} data-location={location} data-poster={poster.src}>
+  <Image src={poster} alt="" widths={[640, 960, 1440]} sizes="(min-width: 900px) 80vw, 92vw" loading="lazy" />
+  <button type="button" data-native-play aria-label={`Play film: ${title}`}><span><Icon name="play" /></span><span>Play film</span></button>
+</div>
+<script>
+  import { playNative } from '../../lib/media/player';
+  document.addEventListener('click', (e) => {
+    const button = (e.target as Element | null)?.closest('[data-native-play]');
+    const tile = button?.closest<HTMLElement>('[data-media-id]');
+    if (tile) playNative(tile);
+  });
+</script>
+<style>
+  .native-film { position: relative; aspect-ratio: 16 / 9; background: var(--ink, #24201b); }
+  .native-film :global(img), .native-film :global(video) { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .native-film :global(video) { object-fit: contain; }
+  button { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.9rem; color: var(--on-image); background: rgb(20 17 14 / 0.2); border: 0; cursor: pointer; transition: background 250ms; }
+  button:hover { background: rgb(20 17 14 / 0.4); }
+  button span:first-child { width: 64px; height: 64px; border: 1px solid currentColor; border-radius: 50%; display: grid; place-items: center; }
+  button :global(svg) { width: 22px; height: 22px; margin-left: 3px; }
+  .native-film :global(.media-error) { padding: 1rem; background: var(--bg-raised); color: var(--text); }
+</style>

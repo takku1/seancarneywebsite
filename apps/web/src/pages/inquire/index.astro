@@ -165,6 +165,8 @@ const steps = ['Occasion', 'Date and place', 'The event', 'Investment', 'Your de
   import { getExperimentProps } from '../../lib/analytics/experiments';
   import { onPage } from '../../lib/lifecycle';
   import { navigate } from 'astro:transitions/client';
+  import { catalogFrom,readPlan,planMessage } from '../../lib/music-plan';
+  import songbook from '../../data/songbook.json';
 
   onPage(() => {
     const form = document.querySelector<HTMLFormElement>('[data-inquiry]')!;
@@ -255,6 +257,8 @@ const steps = ['Occasion', 'Date and place', 'The event', 'Investment', 'Your de
       try { draft = JSON.parse(getItem(DRAFT) || '{}'); } catch { /* noop */ }
       const qp = new URLSearchParams(location.search);
       const qType = qp.get('type');
+      const qFormat = qp.get('format');
+      if (qFormat && ['solo','small','band','unsure'].includes(qFormat) && !draft.format) draft.format = qFormat;
       if (qType && !draft.event_type) draft.event_type = qType;
       const qDate = qp.get('date');
       if (qDate && /^\d{4}-\d{2}-\d{2}$/.test(qDate) && !draft.event_date) draft.event_date = qDate;
@@ -266,6 +270,12 @@ const steps = ['Occasion', 'Date and place', 'The event', 'Investment', 'Your de
         else el.value = String(v ?? '');
       }
       if (qType) track('inquiry_prefill', { event_type: qType });
+      const message=form.querySelector<HTMLTextAreaElement>('[name="message"]');
+      if(message && !message.value){
+        const music=qp.get('music')==='1'?planMessage(readPlan(getItem('sc_music_plan'),catalogFrom(songbook)),catalogFrom(songbook)):'';
+        const custom=qp.get('interest')==='custom-song'?'We would like to discuss a custom wedding song.':'';
+        message.value=[custom,music].filter(Boolean).join('\n\n');
+      }
     }
 
     // ---------- Turnstile (only when configured, loaded on the last step) ----------

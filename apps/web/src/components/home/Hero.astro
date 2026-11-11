@@ -1,16 +1,16 @@
 ---
 /**
  * Full-bleed hero. The poster <img> is the LCP element (preloaded, high
- * priority). The 2.5MB loop only loads after first paint, never under
+ * priority). The compressed loop only loads after first paint, never under
  * reduced-motion or Save-Data, and has a visible pause control (WCAG 2.2.2).
  */
 import { Image } from 'astro:assets';
-import poster from '../../assets/photos/hero-poster.jpg';
+import { photoFor, heroSources, publicFile } from '../../lib/media/library';
+const {image:poster,alt:posterAlt}=photoFor('home.hero.poster');
+const sources=heroSources();
+const reelSrc=publicFile('film.live.video');
 import Icon from '../ui/Icon.astro';
-import { loadMedia, pick } from '../../lib/feeds/media';
-
-// "Watch live": the best live-event clip from the media pipeline (pinned: 2025 reel).
-const [reel] = pick(await loadMedia(), 'hero', 1, ['for_events']);
+const reel = { video: { title: 'Sean Carney · Live weddings and events', note: 'Solo, duo and full band' } };
 import InquireLabel from '../ui/InquireLabel.astro';
 ---
 
@@ -18,7 +18,7 @@ import InquireLabel from '../ui/InquireLabel.astro';
   <div class="media">
     <Image
       src={poster}
-      alt="Sean Carney singing with an acoustic guitar in a sunlit drawing room"
+      alt={posterAlt}
       widths={[640, 960, 1280, 1920]}
       sizes="100vw"
       loading="eager"
@@ -26,26 +26,23 @@ import InquireLabel from '../ui/InquireLabel.astro';
       class="poster"
     />
     <video class="loop" muted loop playsinline preload="none" aria-hidden="true" data-hero-video>
-      <!-- Phones get a ~0.6MB 640px loop; larger screens the 720p one. -->
-      <source data-src="/media/hero-loop-sm.webm" type="video/webm" data-size="sm" />
-      <source data-src="/media/hero-loop-sm.mp4" type="video/mp4" data-size="sm" />
-      <source data-src="/media/hero-loop.webm" type="video/webm" data-size="lg" />
-      <source data-src="/media/hero-loop.mp4" type="video/mp4" data-size="lg" />
+      <!-- Phones get the 640px edit; larger screens get the 720p edit. -->
+      {sources.map(s=><source data-src={s.src} type={s.type} data-size={s.size} />)}
     </video>
     <div class="scrim"></div>
   </div>
 
   <div class="container content">
-    <h1 id="hero-title">Live music for your wedding</h1>
+    <h1 id="hero-title">One team.<br />Your whole celebration.</h1>
     <p class="sub">
-      <span class="exp" data-exp="hero_sub" data-variant="arc">From the first note of the ceremony to the last song of the night.</span>
-      <span class="exp" data-exp="hero_sub" data-variant="rooms">Fifteen years of weddings, from Hotel del Coronado to The Beverly Hills Hotel.</span>
+      <span class="exp" data-exp="hero_sub" data-variant="arc">Bespoke wedding entertainment, from acoustic cocktail sets to a full-band reception.</span>
+      <span class="exp" data-exp="hero_sub" data-variant="rooms">Your people. Your music. A celebration shaped around the two of you.</span>
     </p>
-    <p class="formats" aria-label="Formats">Solo <span aria-hidden="true">·</span> Trio <span aria-hidden="true">·</span> Full band</p>
+    <p class="formats" aria-label="Formats">Solo <span aria-hidden="true">·</span> Duo <span aria-hidden="true">·</span> Band</p>
     <div class="ctas">
       <a href="/inquire" class="btn" data-track="cta_click" data-track-location="hero"><InquireLabel /></a>
       {reel && (
-        <button type="button" class="watch" data-reel-open data-track="watch_live_click" data-track-location="hero"><Icon name="play" /> Watch a wedding</button>
+        <button type="button" class="watch" data-reel-open data-track="watch_live_click" data-track-location="hero"><Icon name="play" /> Watch the live film</button>
       )}
     </div>
   </div>
@@ -57,7 +54,7 @@ import InquireLabel from '../ui/InquireLabel.astro';
 </section>
 
 {reel && (
-  <dialog class="reel" aria-label={`${reel.video.title}, video`} data-reel data-yt={reel.video.youtubeId}>
+  <dialog class="reel" aria-label={`${reel.video.title}, video`} data-reel data-src={reelSrc}>
     <button type="button" class="reel-x" data-reel-close aria-label="Close video"><Icon name="x" /></button>
     <div class="reel-frame" data-reel-frame></div>
     <p class="reel-cap">{reel.video.title}{reel.video.note && <span>{reel.video.note}</span>}</p>
@@ -75,22 +72,23 @@ import InquireLabel from '../ui/InquireLabel.astro';
     const reelFrame = reelDlg?.querySelector<HTMLElement>('[data-reel-frame]');
     document.querySelector('[data-reel-open]')?.addEventListener('click', () => {
       if (!reelDlg || !reelFrame) return;
-      const id = reelDlg.dataset.yt!;
-      const frame = document.createElement('iframe');
-      frame.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
-      frame.title = 'Sean Carney live';
-      frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
-      frame.allowFullscreen = true;
+      const frame = document.createElement('video');
+      frame.src = reelDlg.dataset.src!;
+      frame.controls = true;
+      frame.playsInline = true;
+      frame.setAttribute('aria-label', 'Sean Carney live weddings and events');
       reelFrame.replaceChildren(frame);
       reelDlg.showModal();
       pausePlayer(); // one thing playing at a time
       document.querySelector<HTMLVideoElement>('[data-hero-video]')?.pause();
-      track('video_play', { video_id: id, location: 'hero_lightbox' });
+      void frame.play().catch(() => {});
+      track('video_play', { video_id: 'sce-live-film', location: 'hero_lightbox' });
     });
     const closeReel = () => {
       if (!reelDlg) return;
       reelDlg.close();
-      reelFrame?.replaceChildren(); // removing the iframe stops playback
+      reelFrame?.querySelector('video')?.pause();
+      reelFrame?.replaceChildren();
     };
     reelDlg?.querySelector('[data-reel-close]')?.addEventListener('click', closeReel);
     reelDlg?.addEventListener('click', (e) => { if (e.target === reelDlg) closeReel(); });
@@ -231,7 +229,7 @@ import InquireLabel from '../ui/InquireLabel.astro';
   .reel { width: min(1200px, 94vw); max-width: none; padding: 0; margin: auto; background: #000; border: 0; color: var(--on-image); overflow: visible; }
   .reel::backdrop { background: rgb(5 4 3 / 0.88); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
   .reel-frame { aspect-ratio: 16 / 9; }
-  .reel-frame :global(iframe) { width: 100%; height: 100%; border: 0; display: block; }
+  .reel-frame :global(video) { width: 100%; height: 100%; border: 0; display: block; }
   .reel-x { position: absolute; top: -52px; right: 0; width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 1px solid rgb(241 235 224 / 0.35); color: var(--on-image); cursor: pointer; }
   .reel-x :global(svg) { width: 20px; height: 20px; }
   .reel-cap { position: absolute; left: 0; bottom: -40px; font-family: var(--font-display); font-size: 1.2rem; }

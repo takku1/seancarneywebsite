@@ -11,6 +11,7 @@ import FilmGrid from '../home/FilmGrid.astro';
 import Testimonials from '../home/Testimonials.astro';
 import FaqList from './FaqList.astro';
 import SpotifyFacade from '../media/SpotifyFacade.astro';
+import SuppliedFilm from '../home/SuppliedFilm.astro';
 import Icon from '../ui/Icon.astro';
 import { creditsBy, rooms, faqsFor } from '../../lib/content';
 import { site } from '../../config/site';
@@ -104,7 +105,7 @@ const split = (s: string) => {
         </figure>
       ) : null;
     case 'film':
-      return <div id="film"><FilmGrid placement={`event_${slug}`} ids={b.ids} count={b.ids?.length ?? 3} heading={b.title} mix={['for_events', 'most_watched', 'newest']} /></div>;
+      return <div id="film">{slug === 'weddings' ? <SuppliedFilm location="weddings" /> : <FilmGrid placement={`event_${slug}`} ids={b.ids} count={b.ids?.length ?? 3} heading={b.title} mix={['for_events', 'most_watched', 'newest']} />}</div>;
     case 'repertoire':
       return (
         <section class="section repertoire" data-section="event_repertoire" aria-labelledby={id}>
@@ -120,7 +121,7 @@ const split = (s: string) => {
                 <ul>{(b.solo ?? []).map((s) => <li><span>{split(s).song}</span><small>{split(s).artist}</small></li>)}</ul>
               </div>
               <div>
-                <h3>With The Hustlers</h3>
+                <h3>With The Scene</h3>
                 <ul>{(b.band ?? []).map((s) => <li><span>{split(s).song}</span><small>{split(s).artist}</small></li>)}</ul>
               </div>
             </div>
@@ -163,6 +164,7 @@ const split = (s: string) => {
           <div class="container">
             <h2 id={id}>{b.title}</h2>
             <p>{b.body}</p>
+              {b.href && <a href={b.href} class="link-arrow">{b.linkLabel ?? 'Explore more'}</a>}
           </div>
         </section>
       );

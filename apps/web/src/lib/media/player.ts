@@ -31,7 +31,7 @@ interface Session {
   tile: HTMLElement | null;
   /** The tile's thumbnail + play button, restored when the video leaves the tile. */
   original: Node[];
-  iframe: HTMLIFrameElement;
+  iframe: HTMLIFrameElement | HTMLMediaElement;
   stop: () => void;
   t: number;
   playing: boolean;
@@ -48,9 +48,11 @@ let wantBack = false; // "Back to video" pressed on another page: re-attach afte
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function move(parent: Element, node: Element): void {
+  const resume = node instanceof HTMLMediaElement && !node.paused;
   const p = parent as MoveCapable;
   if (canMove && node.isConnected) p.moveBefore!(node, null);
   else parent.append(node);
+  if (resume && node instanceof HTMLMediaElement && node.paused) void node.play().catch(() => {});
 }
 
 const dock = () => {
@@ -63,7 +65,15 @@ const dock = () => {
   };
 };
 
-const signal = (s: Session) => dispatchEvent(new CustomEvent('sc:video-state', { detail: { id: s.id, playing: s.playing && !s.ended } }));
+const signal = (s: Session) => {
+  const playing = s.playing && !s.ended;
+  for (const tile of document.querySelectorAll<HTMLElement>('[data-media-id]')) {
+    const active = tile.dataset.mediaId === s.id && playing;
+    tile.classList.toggle('is-current', active);
+    tile.querySelector('[data-audio-play]')?.setAttribute('aria-pressed', String(active));
+  }
+  dispatchEvent(new CustomEvent('sc:video-state', { detail: { id: s.id, playing } }));
+};
 
 function flush(s: Session): void {
   if (s.seconds >= 3) track('video_watch', { video_id: s.id, title: s.title, location: s.location, seconds: Math.round(s.seconds), max_percent: s.max, completed: s.ended });
@@ -87,6 +97,7 @@ function showDock(s: Session): void {
   d.title.textContent = s.title;
   d.back.hidden = !s.tile?.isConnected && s.sourcePath === location.pathname;
   d.el.hidden = false;
+  d.el.classList.toggle('audio-only', s.iframe instanceof HTMLAudioElement);
   requestAnimationFrame(() => d.el.classList.add('in'));
 }
 
@@ -100,7 +111,7 @@ function hideDock(): void {
 function dockSession(s: Session, reason: 'scroll' | 'navigate'): void {
   const d = dock();
   if (!d || s.docked || s.ended) return;
-  const reload = !canMove;
+  const reload = !canMove && s.iframe instanceof HTMLIFrameElement;
   move(d.slot, s.iframe);
   if (reload) s.iframe.src = embedUrl(s.id, s.t); // re-attached iframes reload: resume where it was
   s.docked = true;
@@ -110,10 +121,11 @@ function dockSession(s: Session, reason: 'scroll' | 'navigate'): void {
 }
 
 function undock(s: Session): void {
+  if (s.iframe instanceof HTMLAudioElement) return; // recordings stay in the listening dock
   if (!s.docked || !s.tile?.isConnected) return;
   for (const n of [...s.tile.childNodes]) n.remove();
   move(s.tile, s.iframe);
-  if (!canMove) s.iframe.src = embedUrl(s.id, s.t); // re-attached iframes reload: resume where it was
+  if (!canMove && s.iframe instanceof HTMLIFrameElement) s.iframe.src = embedUrl(s.id, s.t);
   s.tile.classList.add('is-playing');
   s.tile.classList.remove('is-docked');
   s.docked = false;
@@ -128,6 +140,7 @@ export function close(reason = 'close'): void {
   cur = null;
   flush(s);
   s.stop();
+  if (s.iframe instanceof HTMLMediaElement) { s.iframe.pause(); s.iframe.removeAttribute('src'); s.iframe.load(); }
   s.io?.disconnect();
   s.iframe.remove();
   s.playing = false;
@@ -138,12 +151,13 @@ export function close(reason = 'close'): void {
 }
 
 export function pause(): void {
-  if (cur) command(cur.iframe, 'pauseVideo');
+  if (cur?.iframe instanceof HTMLMediaElement) cur.iframe.pause();
+  else if (cur) command(cur.iframe, 'pauseVideo');
 }
 
 function observeTile(s: Session): void {
   s.io?.disconnect();
-  if (!s.tile || !canMove) return; // scroll-docking only where it is seamless
+  if (!s.tile || s.iframe instanceof HTMLAudioElement || (!canMove && s.iframe instanceof HTMLIFrameElement)) return;
   s.io = new IntersectionObserver(
     ([en]) => {
       if (cur !== s) return;
@@ -252,6 +266,7 @@ function play_(tile: HTMLElement, intoDock = false): void {
     return;
   }
   if (cur) close('replaced');
+  document.querySelector<HTMLVideoElement>('[data-hero-video]')?.pause();
 
   const iframe = document.createElement('iframe');
   iframe.src = embedUrl(id);
@@ -322,13 +337,70 @@ function play_(tile: HTMLElement, intoDock = false): void {
 }
 export const play = (tile: HTMLElement) => play_(tile);
 
+/** Native films and acoustic recordings share the existing persistent session. */
+export function playNative(tile: HTMLElement, intoDock = false): void {
+  const src = tile.dataset.mediaSrc;
+  const id = tile.dataset.mediaId;
+  if (!src?.startsWith('/media/') || !id) return;
+  if (cur?.tile === tile && !cur.ended) {
+    if (cur.iframe instanceof HTMLMediaElement) void cur.iframe.play().catch(() => {});
+    return;
+  }
+  if (cur) close('replaced');
+  document.querySelector<HTMLVideoElement>('[data-hero-video]')?.pause();
+  const audio = tile.dataset.mediaType === 'audio';
+  const media = document.createElement(audio ? 'audio' : 'video');
+  media.src = src;
+  media.controls = true;
+  media.preload = 'metadata';
+  media.setAttribute('aria-label', tile.dataset.title || 'Sean Carney live');
+  if (media instanceof HTMLVideoElement) { media.playsInline = true; media.poster = tile.dataset.poster || ''; }
+  const s: Session = {
+    id, title: tile.dataset.title || 'Sean Carney live', location: tile.dataset.location || '',
+    sourcePath: location.pathname, tile, original: [...tile.childNodes], iframe: media,
+    stop: () => undefined, t: 0, playing: false, ended: false, docked: false, seconds: 0, max: 0, hit: new Set(),
+  };
+  cur = s;
+  const d = dock();
+  if ((audio || intoDock) && d) { d.slot.replaceChildren(media); s.docked = true; showDock(s); }
+  else { tile.replaceChildren(media); tile.classList.add('is-playing'); }
+  const events = new AbortController();
+  const options = { signal: events.signal };
+  s.stop = () => events.abort();
+  const state = () => { s.playing = !media.paused; if(s.playing) s.ended = false; signal(s); };
+  media.addEventListener('play', state, options);
+  media.addEventListener('pause', state, options);
+  media.addEventListener('ended', () => { s.ended = true; s.playing = false; signal(s); track('video_complete', {video_id: id, location: s.location}); }, options);
+  media.addEventListener('timeupdate', () => {
+    const t = media.currentTime;
+    if(s.playing && t > s.t && t - s.t < 2) s.seconds += t - s.t;
+    s.t = t;
+    if(!Number.isFinite(media.duration) || media.duration <= 0) return;
+    const percent = Math.floor(t / media.duration * 100);
+    s.max = Math.max(s.max, percent);
+    for(const milestone of MILESTONES) if(percent >= milestone && !s.hit.has(milestone)) {
+      s.hit.add(milestone); track('video_progress', {video_id: id, location: s.location, percent: milestone});
+    }
+  }, options);
+  media.addEventListener('error', () => {
+    close('error');
+    const message = document.createElement('p');
+    message.className = 'media-error'; message.setAttribute('role', 'status');
+    message.textContent = 'This recording could not load. Please try playing it again.';
+    tile.append(message);
+  }, { once: true, signal: events.signal });
+  observeTile(s);
+  void media.play().catch(() => { /* Native controls remain available when autoplay is blocked. */ });
+  track('video_play', { video_id: id, title: s.title, location: s.location, kind: audio ? 'audio' : 'video' });
+}
+
 /** Dock control: back to the video in its tile (scrolling or navigating there). */
 export async function back(): Promise<void> {
   const s = cur;
   if (!s) return;
   if (s.tile?.isConnected) {
     s.tile.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'center' });
-    if (canMove) window.setTimeout(() => cur === s && undock(s), reduceMotion() ? 0 : 450);
+    if (!(s.iframe instanceof HTMLAudioElement) && (canMove || s.iframe instanceof HTMLVideoElement)) window.setTimeout(() => cur === s && undock(s), reduceMotion() ? 0 : 450);
     return;
   }
   if (s.sourcePath !== location.pathname) {
@@ -348,7 +420,7 @@ document.addEventListener('astro:before-swap', () => {
 document.addEventListener('astro:page-load', () => {
   const s = cur;
   if (!s) return;
-  const tile = [...document.querySelectorAll<HTMLElement>('[data-yt]')].find((t) => t.dataset.yt === s.id) ?? null;
+  const tile = [...document.querySelectorAll<HTMLElement>('[data-yt], [data-media-id]')].find((t) => (t.dataset.yt || t.dataset.mediaId) === s.id) ?? null;
   s.tile = tile;
   if (tile) {
     s.original = [...tile.childNodes];
@@ -356,6 +428,7 @@ document.addEventListener('astro:page-load', () => {
     observeTile(s);
   } else s.io?.disconnect();
   if (s.docked) showDock(s);
+  signal(s);
   if (wantBack && tile) {
     wantBack = false;
     tile.scrollIntoView({ block: 'center' });

@@ -17,7 +17,7 @@ export const INTENTS: Intent[] = [
   { id: 'price', question: 'How is pricing set?', re: /\b(price|pricing|cost|rate|quote|how much|budget|fee|charge|afford)\b/i, faq: 'pricing' },
   { id: 'availability', question: 'Is my date available?', re: /\b(available|availability|free on|open on|booked|date)\b/i },
   { id: 'lead_time', question: 'How far ahead should we book?', re: /\b(how (far|early|soon)|advance|lead time|last minute|short notice)\b/i, faq: 'lead-time' },
-  { id: 'formats', question: 'Solo, trio or full band?', re: /\b(solo|duo|trio|full band|band size|how many (musicians|people)|hustlers|format)\b/i, faq: 'formats' },
+  { id: 'formats', question: 'Solo, duo or full band?', re: /\b(solo|duo|trio|full band|band size|how many (musicians|people)|hustlers|the scene|format)\b/i, faq: 'formats' },
   { id: 'next_steps', question: 'What happens after I inquire?', re: /\b(after (i|we) (inquire|submit|send)|next steps?|what happens|deposit|contract|hold (the|my|our) date)\b/i, faq: 'after-inquiry' },
   { id: 'first_dance', question: 'Can you learn our first dance song?', re: /\b(first dance|our song|learn (a|our|the) song|special song)\b/i, faq: 'w-first-dance', pages: ['/weddings'] },
   { id: 'ceremony', question: 'Can you play the ceremony and reception?', re: /\b(ceremony|processional|aisle|recessional|vows|reception)\b/i, faq: 'w-ceremony-reception', pages: ['/weddings'] },

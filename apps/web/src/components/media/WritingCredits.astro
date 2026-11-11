@@ -1,0 +1,8 @@
+---
+import { siNetflix,siNbc,siHyundai } from 'simple-icons';
+const brands=[{icon:siNbc,label:'NBC · Songland'},{icon:siNetflix,label:'Netflix · sync placement'},{icon:siHyundai,label:'Hyundai · campaign music'}];
+---
+<div class="writing-credits" aria-label="Sean’s songwriting credentials"><div class="record"><strong>700+</strong><span>sync placements</span></div>{brands.map(b=><div class="credit"><svg viewBox="0 0 24 24" role="img" aria-label={b.label}><path d={b.icon.path} /></svg><span>{b.label}</span></div>)}<div class="academy"><strong>Recording Academy</strong><span>Voting member</span></div></div>
+<style>
+  .writing-credits{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:2rem;border-block:1px solid var(--line);padding-block:2rem;margin-block:3rem;}.record,.academy,.credit{display:grid;gap:0.4rem;}.record strong{font-family:var(--font-display);font-size:var(--step-3);line-height:1;}.writing-credits span{font-size:var(--step--1);color:var(--text-muted);}.credit svg{width:3rem;height:2rem;fill:currentColor;}.academy strong{font-family:var(--font-display);font-size:var(--step-1);font-weight:500;}@media(max-width:767px){.writing-credits{display:grid;grid-template-columns:1fr 1fr;}.record{grid-column:span 2;}}
+</style>

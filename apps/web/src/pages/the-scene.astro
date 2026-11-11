@@ -1,0 +1,44 @@
+---
+import { Image, getImage } from 'astro:assets';
+import { photoFor, imageAsset } from '../lib/media/library';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SuppliedFilm from '../components/home/SuppliedFilm.astro';
+import InquireLabel from '../components/ui/InquireLabel.astro';
+import musicians from '../data/musicians.json';
+const {image:bandPhoto}=photoFor('scene.hero');
+import { graph, breadcrumbSchema } from '../lib/seo/schema';
+const og = await getImage({src:bandPhoto,width:1200,height:630,fit:'cover',format:'jpg'});
+const jsonLd = graph(breadcrumbSchema([{name:'Home',path:'/'},{name:'The Scene',path:'/the-scene'}]));
+---
+<BaseLayout pageType="the_scene" title="Meet The Scene | Sean Carney’s Wedding & Event Band" description="Meet the vocalists and musicians behind The Scene, Sean Carney’s live band for wedding receptions, private celebrations and corporate events." image={og.src} jsonLd={jsonLd}>
+  <section class="section intro"><div class="container intro-grid"><div><h1>Meet The Scene</h1><p class="lede">The musicians behind<br />the moments you remember.</p><p>A voice you know. A rhythm you feel. Sean brings together a house of experienced musicians, with the ensemble shaped around your room and your day.</p><a href="/inquire?format=band" class="btn"><InquireLabel /></a></div><Image src={bandPhoto} alt="Sean Carney on electric guitar alongside a vocalist at a garden performance" widths={[640,960,1440]} sizes="(min-width:900px) 55vw, 92vw" loading="eager" /></div></section>
+  <section class="section roster" aria-label="Meet the musicians"><div class="container">
+    {musicians.map((m,i) => <article id={m.id} class:list={['member',{reverse:i%2===1}]}>
+      <div class="portrait"><Image src={imageAsset(m.image.replace('.jpg',''))} alt={m.name} widths={[400,640,960]} sizes="(min-width:900px) 35vw, 92vw" /></div>
+      <div class="bio"><p class="role">{m.role}</p><h2>{m.name}</h2><p>{m.bio}</p></div>
+    </article>)}
+    <p class="roster-note">The lineup is tailored to each event. Sean confirms the musicians and instrumentation with your proposal.</p>
+  </div></section>
+  <SuppliedFilm location="the_scene" />
+  <section class="section closing"><div class="container"><h2>One house. Your kind of celebration.</h2><p>Begin with a single guitar, add a second voice, or bring the full band to the floor.</p><a href="/weddings" class="link-arrow">Plan the music for your day</a></div></section>
+</BaseLayout>
+<style>
+  .intro-grid { display:grid; grid-template-columns: 4fr 6fr; gap:clamp(2rem,6vw,6rem); align-items:center; }
+  h1 { font-size:var(--step-5); line-height:1; }
+  .lede { font-family:var(--font-display); font-size:var(--step-2); margin-block:1.5rem; }
+  .intro p:not(.lede) { max-width:38ch; color:var(--text-muted); }
+  .intro .btn { margin-top:2rem; }
+  .intro :global(img) { width:100%; height:auto; aspect-ratio:4/5; object-fit:cover; }
+  .roster { background:var(--bg-raised); border-block:1px solid var(--line); }
+  .member { display:grid; grid-template-columns:minmax(0,4fr) minmax(0,5fr); gap:clamp(2rem,8vw,8rem); align-items:center; padding-block:clamp(2rem,6vw,5rem); }
+  .member + .member { border-top:1px solid var(--line); }
+  .member.reverse { grid-template-columns:minmax(0,5fr) minmax(0,4fr); }
+  .reverse .portrait { order:2; }
+  .portrait :global(img) { width:100%; height:auto; aspect-ratio:4/5; object-fit:cover; object-position:50% 25%; }
+  .role { color:var(--accent); font-size:var(--step--1); margin-bottom:0.75rem; }
+  h2 { font-size:var(--step-3); line-height:1.05; }
+  .bio > p:last-child { margin-top:1.5rem; max-width:48ch; color:var(--text-muted); line-height:1.8; }
+  .roster-note { margin-top:2rem; color:var(--text-muted); max-width:55ch; }
+  .closing p { margin-block:1.5rem; color:var(--text-muted); }
+  @media(max-width:899px) { .intro-grid,.member,.member.reverse { grid-template-columns:minmax(0,1fr); } .reverse .portrait { order:0; } .portrait { max-width:30rem; } }
+</style>

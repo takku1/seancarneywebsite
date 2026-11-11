@@ -8,8 +8,8 @@ import { getEntry } from 'astro:content';
 
 const FORMAT: Record<string, string> = {
   Ceremony: 'Solo',
-  'Cocktail hour': 'Duo or trio',
-  Dinner: 'Solo or trio',
+  'Cocktail hour': 'Duo or jazz ensemble',
+  Dinner: 'Solo or duo',
   'First dance': 'Solo',
   Reception: 'Full band',
 };
@@ -24,7 +24,7 @@ const moments = (timeline?.items ?? []).map((i) => (typeof i === 'string' ? { ti
     <div class="container">
       <div class="head">
         <h2 id="arc-title">One booking, the whole day</h2>
-        <p>The music changes with the day: a single guitar at the aisle, harmony over cocktails, the full band when the dancing starts.</p>
+        <p>Acoustic music for the ceremony. A duo or jazz ensemble over cocktails. A full band, sound and lighting for the reception. One team brings it all together.</p>
       </div>
       <ol>
         {moments.map((m) => (

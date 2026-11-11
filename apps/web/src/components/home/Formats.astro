@@ -1,20 +1,21 @@
 ---
 /** The three formats, from a single guitar to the full band. */
 import { Image } from 'astro:assets';
-import solo from '../../assets/photos/suit-hands-guitar.jpg';
-import trio from '../../assets/photos/event-acoustic-garden.jpg';
-import band from '../../assets/photos/wedding-first-dance.jpg';
+import { photoFor } from '../../lib/media/library';
+const solo=photoFor('home.format.solo');
+const trio=photoFor('home.format.duo');
+const band=photoFor('home.format.band');
 
 const formats = [
-  { name: 'Solo', when: 'Ceremonies, cocktail hours, dinners and intimate estates.', body: 'Voice and acoustic guitar. The most-requested format, and the quietest luxury in the room.', img: solo, alt: 'Close view of Sean Carney in a dark suit playing an acoustic guitar' },
-  { name: 'Duo or trio', when: 'Cocktail hours, welcome dinners and mid-size receptions.', body: 'Added harmony and rhythm, still quiet enough to talk over.', img: trio, alt: 'Sean Carney performing with an acoustic guitar at a garden event' },
-  { name: 'Sean Carney and The Hustlers', when: 'Receptions, dance floors and galas.', body: 'The full band, for the part of the night everyone remembers.', img: band, alt: "A couple's first dance under string lights while Sean Carney and the band perform" },
+  { name: 'Solo', when: 'Ceremonies, cocktail hours, dinners and intimate estates.', body: 'Voice and acoustic guitar. A personal arrangement, with room for every word.', img: solo.image, alt: solo.alt },
+  { name: 'Duo', when: 'Cocktail hours, welcome dinners and intimate receptions.', body: 'A second voice, another texture. An intimate set with a little more movement.', img: trio.image, alt: trio.alt },
+  { name: 'Band', when: 'Receptions, dance floors and galas.', body: 'The Scene, brought together for the songs that get your people on their feet.', img: band.image, alt: band.alt },
 ];
 ---
 
 <section class="section formats" data-section="formats" aria-labelledby="formats-title">
   <div class="container">
-    <h2 id="formats-title">Three formats, one house</h2>
+    <h2 id="formats-title">Customize your experience</h2>
     <ul>
       {formats.map((f) => (
         <li>
@@ -22,6 +23,7 @@ const formats = [
           <h3>{f.name}</h3>
           <p class="when">{f.when}</p>
           <p class="body">{f.body}</p>
+          <a class="format-link link-arrow" href={f.name === 'Solo' ? '/repertoire#listen' : f.name === 'Duo' ? '/the-scene#melody-ebner' : '/the-scene'}>{f.name === 'Solo' ? 'Hear the acoustic recordings' : f.name === 'Duo' ? 'Meet the voices' : 'Explore our players'}</a>
         </li>
       ))}
     </ul>
@@ -36,5 +38,6 @@ const formats = [
   h3 { margin-top: 1.25rem; font-size: var(--step-2); line-height: 1.1; }
   .when { margin-top: 0.5rem; font-size: var(--step--1); color: var(--accent); }
   .body { margin-top: 0.75rem; color: var(--text-muted); max-width: 38ch; }
+  .format-link { margin-top: 1.25rem; }
   @media (max-width: 899px) { ul { grid-template-columns: minmax(0, 1fr); } li :global(img) { aspect-ratio: 3 / 2; } }
 </style>

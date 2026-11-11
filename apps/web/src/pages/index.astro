@@ -4,7 +4,11 @@ import Hero from '../components/home/Hero.astro';
 import Rooms from '../components/home/Rooms.astro';
 import DayArc from '../components/home/DayArc.astro';
 import Formats from '../components/home/Formats.astro';
-import FilmGrid from '../components/home/FilmGrid.astro';
+import SuppliedFilm from '../components/home/SuppliedFilm.astro';
+import AcousticListening from '../components/media/AcousticListening.astro';
+import MeetSean from '../components/home/MeetSean.astro';
+import PlayersPreview from '../components/home/PlayersPreview.astro';
+import CustomSongTeaser from '../components/home/CustomSongTeaser.astro';
 import Testimonials from '../components/home/Testimonials.astro';
 import EventsBand from '../components/home/EventsBand.astro';
 import ScoutInvite from '../components/scout/ScoutInvite.astro';
@@ -15,15 +19,19 @@ const jsonLd = graph(personSchema(), websiteSchema(), serviceSchema());
 <BaseLayout
   pageType="home"
   overlayHeader
-  title="Live Wedding Music in Los Angeles | Sean Carney"
-  description="Live music for luxury weddings and private events in Los Angeles and beyond: solo guitar for the ceremony, a trio for cocktails, the full band for the reception."
+  title="Luxury Wedding Entertainment | SCE"
+  description="Sean Carney Entertainment: one team for your whole celebration. Solo, duo and band, full production, and a custom song written for the two of you."
   jsonLd={jsonLd}
 >
   <Hero />
   <Rooms />
-  <DayArc />
+  <MeetSean />
   <Formats />
-  <FilmGrid placement="home" heading="A wedding, live" />
+  <DayArc />
+  <CustomSongTeaser />
+  <PlayersPreview />
+  <SuppliedFilm />
+  <AcousticListening compact location="home" />
   <Testimonials ids={['jordan-isabela', 'timea-kris', 'olivia-john']} />
   <div class="container scout-row"><ScoutInvite source="home" text="Have a date in mind? Scout, Sean's AI assistant, can check it and answer questions in a minute." prompts={['Check a date', 'Which format suits our day?']} /></div>
   <EventsBand />
