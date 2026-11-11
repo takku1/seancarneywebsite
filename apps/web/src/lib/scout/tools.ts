@@ -7,7 +7,9 @@ import { z } from 'astro/zod';
 import { GOOGLE_SA_EMAIL, GOOGLE_SA_PRIVATE_KEY, GOOGLE_CALENDAR_IDS, AVAILABILITY_TIMEZONE } from 'astro:env/server';
 import { checkDay } from '../integrations/google-calendar';
 import { inquirySchema, EVENT_TYPES, BUDGETS, ROLES, FORMATS, GUESTS } from '../inquiry/schema';
-import { processInquiry } from '../inquiry/process';
+import { labelOf } from '../inquiry/process';
+import { signDraft } from './draft';
+import { draftSecret } from './draft-secret';
 import { loadKnowledge, type CatalogItem } from './knowledge';
 import { errorCode } from '../security/errors';
 
@@ -40,7 +42,9 @@ export type Card =
   | { kind: 'link'; href: string; label: string }
   | { kind: 'availability'; date: string; status: string }
   | { kind: 'media'; items: CatalogItem[] }
-  | { kind: 'inquiry'; leadId: string; tier: string };
+  | { kind: 'inquiry'; leadId: string; tier: string }
+  /** A prepared inquiry the visitor sends with a click (lib/scout/draft.ts). Nothing is sent until then. */
+  | { kind: 'inquiry_confirm'; token: string; summary: { name: string; email: string; event: string; date: string; location: string } };
 
 export interface ToolContext {
   attribution: Record<string, string>;
@@ -48,8 +52,6 @@ export interface ToolContext {
   page?: string;
   /** Everything the visitor typed this conversation (for grounding checks). */
   visitorText?: string;
-  /** Request-scoped background work (Cloudflare's waitUntil): lets an inquiry deliver after the reply. */
-  defer?: (work: Promise<unknown>) => void;
 }
 
 export interface ToolOutcome {
@@ -96,7 +98,7 @@ export const TOOL_SPECS: ToolSpec[] = [
   {
     name: 'submit_inquiry',
     description:
-      'Send a booking inquiry to Sean. Only call after reading the details back to the visitor and getting a clear yes; set visitor_confirmed to true. Returns a lead id, or the fields that need fixing.',
+      'Prepare a booking inquiry for the visitor to send. Only call after reading the details back and getting a clear yes; set visitor_confirmed to true. It does NOT send anything: the visitor sees the details with a Send button and the inquiry goes to Sean only when they press it. Returns prepared: true, or the fields that need fixing. Never say the inquiry has been sent.',
     input_schema: {
       type: 'object',
       properties: {
@@ -180,9 +182,16 @@ export async function executeTool(name: string, input: unknown, ctx: ToolContext
         if (!parsed.success) {
           return { result: JSON.stringify({ error: 'Some details need fixing', fields: z.flattenError(parsed.error).fieldErrors }), isError: true };
         }
-        const { accepted, leadId, tier } = await processInquiry(parsed.data, 'scout', { defer: ctx.defer });
-        if (!accepted) return { result: JSON.stringify({ error: 'The inquiry could not be sent right now. Ask the visitor to email the bookings address directly.' }), isError: true };
-        return { result: JSON.stringify({ ok: true, leadId }), card: { kind: 'inquiry', leadId, tier } };
+        // The model prepares; the visitor sends. Nothing is submitted here: the panel shows
+        // this signed draft with a Send button, and only that click reaches POST /api/scout/inquire.
+        const secret = draftSecret();
+        if (!secret) return { result: JSON.stringify({ error: 'Inquiries cannot be prepared in chat right now. Point the visitor to the inquiry form.' }), isError: true };
+        const d = parsed.data;
+        const token = await signDraft(d, secret);
+        return {
+          result: JSON.stringify({ prepared: true, note: 'Shown to the visitor with a Send button. Nothing is sent until they press it. Tell them to press Send when ready; do not say it has been sent.' }),
+          card: { kind: 'inquiry_confirm', token, summary: { name: d.name, email: d.email, event: labelOf(EVENT_TYPES, d.event_type), date: d.event_date || 'Flexible', location: d.location } },
+        };
       }
       default:
         return { result: JSON.stringify({ error: `Unknown tool ${name}` }), isError: true };

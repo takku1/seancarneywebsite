@@ -195,7 +195,7 @@ function deps(db: LeadDB | null): DeliveryDeps<InquiryRecord> {
 export async function processInquiry(
   i: Inquiry,
   channel: 'form' | 'scout',
-  opts: { defer?: (work: Promise<unknown>) => void } = {},
+  opts: { defer?: (work: Promise<unknown>) => void; idempotencyKey?: string } = {},
 ): Promise<{ accepted: boolean; leadId: string; tier: 'A' | 'B' | 'C'; duplicate?: boolean }> {
   const lead = scoreLead(i);
   const record: InquiryRecord = {
@@ -207,7 +207,7 @@ export async function processInquiry(
   };
   const db = await leadDB();
   const d = deps(db);
-  const result = await acceptLead(record, { ...d, defer: opts.defer }, i.event_id);
+  const result = await acceptLead(record, { ...d, defer: opts.defer }, opts.idempotencyKey ?? i.event_id);
   // Retention also runs on every cron; here it keeps the 90-day promise even if the cron is not registered.
   if (db && opts.defer) opts.defer(purgeExpired(db, d.log).catch((e) => d.log('lead_purge_failed', { error: errorCode(e) })));
   return { accepted: result.accepted, leadId: result.leadId, tier: lead.tier, duplicate: result.duplicate };

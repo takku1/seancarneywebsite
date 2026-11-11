@@ -108,7 +108,8 @@ const data = enabled
     | { kind: 'link'; href: string; label: string }
     | { kind: 'availability'; date: string; status: string }
     | { kind: 'media'; items: { type: string; id: string; title: string; note?: string; youtubeId?: string; url?: string }[] }
-    | { kind: 'inquiry'; leadId: string; tier: string };
+    | { kind: 'inquiry'; leadId: string; tier: string }
+    | { kind: 'inquiry_confirm'; token: string; summary: { name: string; email: string; event: string; date: string; location: string }; error?: string };
   interface Entry { who: 'scout' | 'you'; text?: string; cards?: Card[] }
   interface Data {
     videos: { id: string; youtubeId: string; title: string; note?: string }[];
@@ -190,7 +191,43 @@ const data = enabled
           return h('a', { class: 'm-item rel', href: safeUrl(i.url), target: '_blank', rel: 'noopener' }, label);
         }));
       }
+      if (c.kind === 'inquiry_confirm') {
+        // Scout prepared this; nothing is sent until the visitor presses Send (lib/scout/draft.ts).
+        const s = c.summary;
+        const send = h('button', { type: 'button', class: 'btn c-send', 'data-track': 'scout_inquiry_send' }, 'Send inquiry') as HTMLButtonElement;
+        send.addEventListener('click', () => sendDraft(c, send));
+        return h('div', { class: 'card confirm' },
+          h('strong', {}, 'Ready to send to Sean'),
+          h('span', {}, `${s.event}, ${s.date}, ${s.location}`),
+          h('span', {}, `${s.name} · ${s.email}`),
+          c.error && h('span', { class: 'c-err', role: 'alert' }, c.error),
+          send);
+      }
       return h('div', { class: 'card done' }, h('strong', {}, 'Inquiry sent'), h('span', {}, `Sean replies personally ${D.responseTime}. Reference ${c.leadId}.`));
+    }
+
+    /** The visitor's Send click: the only way a Scout inquiry becomes a lead. Same token, same lead, however often it is pressed. */
+    async function sendDraft(c: Extract<Card, { kind: 'inquiry_confirm' }>, btn: HTMLButtonElement) {
+      btn.disabled = true;
+      btn.setAttribute('aria-busy', 'true');
+      try {
+        const res = await fetch('/api/scout/inquire', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token: c.token }) });
+        const out = (await res.json()) as { ok: boolean; leadId?: string; tier?: string; error?: string };
+        if (!res.ok || !out.ok || !out.leadId) throw new Error(out.error || `http_${res.status}`);
+        // Becomes the "Inquiry sent" card in place (and in saved state), so a reload never offers Send again.
+        const sent = c as unknown as Record<string, unknown>;
+        for (const k of Object.keys(sent)) delete sent[k];
+        Object.assign(sent, { kind: 'inquiry', leadId: out.leadId, tier: out.tier ?? '' });
+        track('inquiry_submit', { via: 'scout', lead_tier: out.tier ?? '' });
+      } catch (err) {
+        const code = (err as Error).message;
+        c.error = code === 'expired'
+          ? 'This draft has expired. Ask Scout to prepare it again, or use the inquiry form.'
+          : `It didn't go through. Please try again, or email ${D.bookings}.`;
+        track('scout_error', { stage: 'inquiry_send', reason: code });
+      }
+      save();
+      render();
     }
 
     function render() {
@@ -310,7 +347,6 @@ const data = enabled
         state.lastPage = page;
         say('scout', out.reply || '', out.cards ?? []);
         track('scout_reply', { ms: Math.round(performance.now() - t0), tools: (out.toolCalls ?? []).join(',') || 'none', turn: state.entries.filter((e) => e.who === 'you').length });
-        for (const c of out.cards ?? []) if (c.kind === 'inquiry') track('inquiry_submit', { via: 'scout', lead_tier: c.tier });
         if (out.handoff) setChips([{ label: 'Open the inquiry form', action: 'form' }]);
         else defaultChips();
       } catch {
@@ -578,6 +614,10 @@ const data = enabled
   .s-log :global(.card.go) { display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: var(--text); border-color: var(--accent); }
   .s-log :global(.card.go:hover) { background: rgb(201 159 110 / 0.12); }
   .s-log :global(.card.media) { padding: 0; border: 0; gap: 0.5rem; }
+  .s-log :global(.card.confirm) { border-left: 2px solid var(--accent); }
+  .s-log :global(.card.confirm .c-send) { justify-self: start; margin-top: 0.35rem; }
+  .s-log :global(.card.confirm .c-send[aria-busy='true']) { opacity: 0.6; }
+  .s-log :global(.card .c-err) { color: var(--text); }
   .s-log :global(.m-item) { display: grid; grid-template-columns: 96px 1fr; gap: 0.6rem; align-items: center; padding: 0; background: none; border: 1px solid var(--line); color: inherit; text-align: left; font: inherit; font-size: 0.9rem; cursor: pointer; text-decoration: none; }
   .s-log :global(.m-item.rel) { grid-template-columns: minmax(0, 1fr); padding: 0.6rem 0.75rem; }
   .s-log :global(.m-item img) { width: 96px; height: 54px; object-fit: cover; }

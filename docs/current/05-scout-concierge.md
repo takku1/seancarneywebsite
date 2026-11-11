@@ -62,7 +62,7 @@ The source of truth is the system prompt in `lib/scout/knowledge.ts`, generated 
 | Working memory | The current conversation | Visitor's tab (`sessionStorage`) | Until the tab closes or "Clear chat" | Tampering: **HMAC-signed by the server**; forged history is rejected (`lib/scout/integrity.ts`) |
 | Knowledge | Bio, rooms, formats, event types, FAQs, repertoire, films | Built from `src/data/*.json` at build time | Versioned in git | Read-only at runtime; changes only via reviewed commits or the CMS. No RAG or vector store, so no runtime injection path |
 | Aggregate signals | Topic counts, checked dates, scrubbed unmatched questions | Cloudflare KV `SCOUT_KV` | 120 days (TTL) | **Never fed back into the model.** Trending chips show only canonical, pre-written questions, so one visitor's text can't reach another's session |
-| Long-term record | An inquiry the visitor confirmed | GoHighLevel CRM | Per Sean's CRM policy | Created only by `submit_inquiry` with grounding checks (§6) |
+| Long-term record | An inquiry the visitor sent | GoHighLevel CRM | Per Sean's CRM policy | Created only when the visitor presses Send on a draft `submit_inquiry` prepared (§6) |
 | Provider-side | Request processing by Anthropic | Anthropic | Per Anthropic's API data policy (no training on API data by default; check current terms) | Disclosed on `/privacy#scout` |
 
 **No cross-session memory or user profiles.** Adding any would trigger a re-review (SB 243 scope, CCPA notice, ASI06).
@@ -74,7 +74,7 @@ The source of truth is the system prompt in `lib/scout/knowledge.ts`, generated 
 | `check_availability(date)` | None (read-only free/busy) | Low | Date format check; free/busy-only calendar share (the site can never read event details); answers worded as indicative |
 | `show_media(ids)` | None | Low | IDs must exist in the build-time catalog; max 3; the UI renders only known YouTube IDs and site URLs |
 | `open_page(page)` | None (renders a button) | Low | Enum of site routes only; the client renders only allowlisted routes, so it can never link off-site |
-| `submit_inquiry(...)` | Creates a CRM lead and sends emails | Medium | `visitor_confirmed` required; **the email and first name must appear in text the visitor typed** (blocks injected or hallucinated submissions); full schema validation (same as the form); `sms_consent` forced false; tagged `via:scout` |
+| `submit_inquiry(...)` | **Prepares** an inquiry; sends nothing | Low | `visitor_confirmed` required; **the email and first name must appear in text the visitor typed** (blocks injected or hallucinated drafts); full schema validation (same as the form); `sms_consent` forced false. Returns a signed draft (HMAC with `SCOUT_SIGNING_KEY`, 30-minute expiry, `lib/scout/draft.ts`) that the panel shows with a **Send inquiry** button. Only that click, `POST /api/scout/inquire` (same-origin, strict rate tier), verifies the draft, re-validates it and creates the lead, tagged `via:scout`. The draft carries a stable key derived from the inquiry itself (keyed hash of email, event type, date, location), so repeated clicks, retries or the model preparing the same inquiry twice create one lead |
 
 Principles: least privilege (no tool can read CRM data, send arbitrary email, browse the web or run code); every tool is idempotent or confirmation-gated; tool results are data, never instructions. Adding a tool requires a row here plus eval cases.
 
@@ -91,7 +91,7 @@ Principles: least privilege (no tool can read CRM data, send arbitrary email, br
 | LLM03 | Supply chain | Official `@anthropic-ai/sdk`; lockfile pinned; `npm audit` in CI (to add) |
 | LLM04 | Data/model poisoning | No fine-tuning; knowledge only from reviewed repo content |
 | LLM05 | Improper output handling | All model text HTML-escaped; only allowlisted site routes and mailto become links (tested against `javascript:`, `//evil`, and `<img onerror>`) |
-| LLM06 | Excessive agency | Three narrow tools; confirmation plus grounding on the only write action; max 4 tool rounds per turn |
+| LLM06 | Excessive agency | Narrow tools; the model has **no** write action: `submit_inquiry` only prepares a signed draft, and the visitor's own Send click submits it (server-verifiable confirmation, not the model's `visitor_confirmed` claim); grounding checks; max 4 tool rounds per turn |
 | LLM07 | System prompt leakage | The prompt is treated as public: nothing secret in it; instruction not to reveal it anyway |
 | LLM08 | Vector/embedding weaknesses | No vector store |
 | LLM09 | Misinformation | Grounded in site content; refuse unknowns; availability is indicative; prices never stated |

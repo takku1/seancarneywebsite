@@ -39,6 +39,8 @@ const JSON_ONLY = ['application/json'];
 const RULES: [RegExp, RouteRule][] = [
   [/^\/api\/inquire$/, { methods: ['POST'], types: JSON_ONLY, origin: 'required', tier: 'strict' }],
   [/^\/api\/scout$/, { methods: ['GET', 'POST'], types: JSON_ONLY, origin: 'required', maxBodySize: 65536, tier: 'standard' }],
+  // The visitor's Send click on a Scout-prepared inquiry: browser-only, and it creates a lead.
+  [/^\/api\/scout\/inquire$/, { methods: ['POST'], types: JSON_ONLY, origin: 'required', maxBodySize: 32768, tier: 'strict' }],
   [/^\/api\/scout\/trending$/, { methods: ['GET'], tier: 'standard' }],
   [/^\/api\/scout\/insights$/, { methods: ['GET'], tier: 'strict', admin: true }],
   [/^\/api\/leads$/, { methods: ['GET', 'POST'], tier: 'strict', admin: true }],

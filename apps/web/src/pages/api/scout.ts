@@ -53,10 +53,7 @@ function aiProvider() {
 
 export const GET: APIRoute = () => json(200, { mode: aiProvider() ? 'ai' : 'guided' });
 
-export const POST: APIRoute = async ({ request, locals }) => {
-  // Request-scoped background work, so an inquiry taken by Scout delivers after the reply.
-  const cf = (locals as { cfContext?: { waitUntil(p: Promise<unknown>): void } }).cfContext;
-  const defer = cf ? (p: Promise<unknown>) => cf.waitUntil(p) : undefined;
+export const POST: APIRoute = async ({ request }) => {
   // Same rule as GET: no provider, or no signing key in production, means guided mode.
   const provider = aiProvider();
   if (!provider) return json(200, { ok: false, mode: 'guided' });
@@ -107,7 +104,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const signal = recordQuestion(intents, text, page).catch(() => undefined);
 
   try {
-    const out = await provider.run({ transcript, text, contextTag, tools: { attribution: asRecord(body.attribution), experiments: asRecord(body.experiments), page, visitorText: visitorText(transcript, text), defer } });
+    const out = await provider.run({ transcript, text, contextTag, tools: { attribution: asRecord(body.attribution), experiments: asRecord(body.experiments), page, visitorText: visitorText(transcript, text) } });
     for (const c of out.cards) if (c.kind === 'availability') void recordDateCheck(c.date, c.status).catch(() => undefined);
     await signal;
     const sig = await signTranscript(out.transcript, SCOUT_SIGNING_KEY);

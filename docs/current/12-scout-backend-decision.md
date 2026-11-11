@@ -4,7 +4,7 @@ Scout's AI backend is undecided and deliberately deferred, like the SHA-BAM conn
 
 ## What exists now
 - **Provider seam:** `src/lib/scout/providers/types.ts` defines `ScoutProvider.run(input) → { reply, cards, transcript, toolCalls, stop }`. Adapters register in `src/lib/scout/index.ts` (`SCOUT_PROVIDER`). The only adapter is `anthropic`; with no key Scout falls back to guided mode.
-- **Tools are the authority, not the model.** Scout's four tools (`check_availability`, `show_media`, `open_page`, `submit_inquiry`) run in `src/lib/scout/tools.ts` with server-side validation. `submit_inquiry` goes through the same lead pipeline as the form (`lib/inquiry/deliver.ts`) and only runs when the visitor's own words contain the email and name. The model can request an action; the application decides whether it happens. Any new backend must keep this rule.
+- **Tools are the authority, not the model.** Scout's four tools (`check_availability`, `show_media`, `open_page`, `submit_inquiry`) run in `src/lib/scout/tools.ts` with server-side validation. `submit_inquiry` only prepares a signed draft, and only when the visitor's own words contain the email and name; the inquiry is sent by the visitor's Send click (`POST /api/scout/inquire`), through the same lead pipeline as the form. A new backend never gets a write action. The model can request an action; the application decides whether it happens. Any new backend must keep this rule.
 - **Testable without paid AI:** guided mode and the tool layer run with no model, so Scout's workflows can be tested locally at no cost.
 
 ## The three options
