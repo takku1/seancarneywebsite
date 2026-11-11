@@ -7,7 +7,7 @@
 | State | Where it stands |
 |---|---|
 | Implemented | All pages, the inquiry pipeline with durable acceptance, Scout (guided and Claude), media tooling |
-| Locally tested | `npm run verify` (types, 46 unit tests, build, audit); `scripts/test_publish.sh` (11 cases); `npm run test:browser`, a smoke test (21 listed pages at desktop and phone width, API guards in the Workers runtime; not the full inquiry, Scout, availability, player or keyboard journeys); in the built Worker under `wrangler dev`: concurrent duplicate submissions produce one lead, and the cron backfills a pre-CRM lead to a stand-in webhook (2026-11-10) |
+| Locally tested | `npm run verify` (types, 50 unit tests, including upgrades from earlier lead-table schemas; build, audit); `scripts/test_publish.sh` (11 cases); `npm run test:browser`, a smoke test (21 listed pages at desktop and phone width, API guards in the Workers runtime; not the full inquiry, Scout, availability, player or keyboard journeys); in the built Worker under `wrangler dev`: concurrent duplicate submissions produce one lead, and the cron backfills a pre-CRM lead to a stand-in webhook (2026-11-10) |
 | Deployed | Not yet: no Cloudflare staging or production |
 | Production verified | Not yet: needs a real inquiry through Resend and SHA-BAM on staging |
 | Externally approved | Not yet: Sean's claims, venues, testimonials and media rights (`06-launch-checklist.md`) |

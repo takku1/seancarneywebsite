@@ -123,31 +123,49 @@ export class LeaseLost extends Error {
   }
 }
 
-const SCHEMA = [
-  `CREATE TABLE IF NOT EXISTS leads (
-    lead_id TEXT PRIMARY KEY,
-    idem_key TEXT UNIQUE,
-    channel TEXT NOT NULL,
-    created_at TEXT NOT NULL,
-    data TEXT NOT NULL,
-    crm TEXT NOT NULL DEFAULT 'pending', crm_error TEXT, crm_attempts INTEGER NOT NULL DEFAULT 0,
-    crm_lease TEXT, crm_lease_until INTEGER, crm_progress TEXT NOT NULL DEFAULT '{}',
-    notify TEXT NOT NULL DEFAULT 'pending', notify_error TEXT, notify_attempts INTEGER NOT NULL DEFAULT 0,
-    notify_lease TEXT, notify_lease_until INTEGER,
-    confirm TEXT NOT NULL DEFAULT 'pending', confirm_error TEXT, confirm_attempts INTEGER NOT NULL DEFAULT 0,
-    confirm_lease TEXT, confirm_lease_until INTEGER,
-    last_attempt_at INTEGER
-  )`,
-  `CREATE INDEX IF NOT EXISTS leads_created ON leads (created_at, lead_id)`,
+/** The identity columns every version of the table has had. */
+const KEY_COLUMNS = `lead_id TEXT PRIMARY KEY, idem_key TEXT UNIQUE, channel TEXT NOT NULL, created_at TEXT NOT NULL, data TEXT NOT NULL`;
+
+/**
+ * Every other column, in order. Each must be addable with ALTER TABLE ADD
+ * COLUMN (nullable, or NOT NULL with a constant default), because this list
+ * is also the migration: a table created by an earlier version gets the
+ * columns it lacks. To add a column, append it here.
+ */
+const COLUMNS: [name: string, ddl: string][] = [
+  ['crm', `TEXT NOT NULL DEFAULT 'pending'`], ['crm_error', 'TEXT'], ['crm_attempts', 'INTEGER NOT NULL DEFAULT 0'],
+  ['crm_lease', 'TEXT'], ['crm_lease_until', 'INTEGER'], ['crm_progress', `TEXT NOT NULL DEFAULT '{}'`],
+  ['notify', `TEXT NOT NULL DEFAULT 'pending'`], ['notify_error', 'TEXT'], ['notify_attempts', 'INTEGER NOT NULL DEFAULT 0'],
+  ['notify_lease', 'TEXT'], ['notify_lease_until', 'INTEGER'],
+  ['confirm', `TEXT NOT NULL DEFAULT 'pending'`], ['confirm_error', 'TEXT'], ['confirm_attempts', 'INTEGER NOT NULL DEFAULT 0'],
+  ['confirm_lease', 'TEXT'], ['confirm_lease_until', 'INTEGER'],
+  ['last_attempt_at', 'INTEGER'],
 ];
 
 const ready = new WeakMap<LeadDB, Promise<void>>();
-/** Creates the table on first use (idempotent), so no migration step is needed per environment. */
+
+/**
+ * Creates the table on first use and migrates an older one, idempotently: no
+ * separate migration step per environment. Columns missing from an existing
+ * table (PRAGMA table_info) are added; a concurrent isolate adding the same
+ * column first is tolerated. Existing rows are kept and get each new column's default.
+ */
 export function ensureSchema(db: LeadDB): Promise<void> {
   let p = ready.get(db);
   if (!p) {
     p = (async () => {
-      for (const sql of SCHEMA) await db.prepare(sql).bind().run();
+      await db.prepare(`CREATE TABLE IF NOT EXISTS leads (${KEY_COLUMNS}, ${COLUMNS.map(([n, d]) => `${n} ${d}`).join(', ')})`).bind().run();
+      const present = async () => new Set((await db.prepare('PRAGMA table_info(leads)').bind().all<{ name: string }>()).results.map((c) => c.name));
+      const have = await present();
+      for (const [name, ddl] of COLUMNS) {
+        if (have.has(name)) continue;
+        try {
+          await db.prepare(`ALTER TABLE leads ADD COLUMN ${name} ${ddl}`).bind().run();
+        } catch (e) {
+          if (!(await present()).has(name)) throw e; // a real failure, not a concurrent add
+        }
+      }
+      await db.prepare('CREATE INDEX IF NOT EXISTS leads_created ON leads (created_at, lead_id)').bind().run();
     })();
     p.catch(() => ready.delete(db));
     ready.set(db, p);
@@ -360,7 +378,12 @@ async function openRows(db: LeadDB, opts: { limit: number; cursor?: string | nul
   return (await db.prepare(sql).bind(c, c, id, opts.limit).all<Row>()).results;
 }
 
-/** A row is retried at most once per this window, so repeated batches (and runs) move on through a backlog. */
+/**
+ * A row is retried at most once per this window, so repeated batches (and
+ * runs) move on through a backlog. Per lead, not per channel: a channel that
+ * becomes deliverable just after the lead's CRM retry waits for the lead's
+ * next turn. Deliberate; per-channel scheduling isn't worth it at this volume.
+ */
 export const RETRY_SPACING_MS = 10 * 60_000;
 
 /**
