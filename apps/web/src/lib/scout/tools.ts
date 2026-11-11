@@ -177,7 +177,8 @@ export async function executeTool(name: string, input: unknown, ctx: ToolContext
         if (!parsed.success) {
           return { result: JSON.stringify({ error: 'Some details need fixing', fields: z.flattenError(parsed.error).fieldErrors }), isError: true };
         }
-        const { leadId, tier } = await processInquiry(parsed.data, 'scout');
+        const { accepted, leadId, tier } = await processInquiry(parsed.data, 'scout');
+        if (!accepted) return { result: JSON.stringify({ error: 'The inquiry could not be sent right now. Ask the visitor to email the bookings address directly.' }), isError: true };
         return { result: JSON.stringify({ ok: true, leadId }), card: { kind: 'inquiry', leadId, tier } };
       }
       default:

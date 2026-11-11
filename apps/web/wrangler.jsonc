@@ -4,7 +4,8 @@
   "compatibility_date": "2026-11-01",
   "observability": { "enabled": true },
   // Anonymous Scout signals (topic counts, date demand). No id: wrangler provisions it on first deploy.
-  "kv_namespaces": [{ "binding": "SCOUT_KV" }],
+  // LEADS_KV: durable inquiry receipts (90 days) and the pending-CRM index; see src/lib/inquiry/deliver.ts.
+  "kv_namespaces": [{ "binding": "SCOUT_KV" }, { "binding": "LEADS_KV" }],
   // Cloudflare Rate Limiting bindings (periods must be 10 or 60 s). Keys are per route + hashed client.
   // src/middleware.ts picks the tier per route; the in-memory fallback covers dev only.
   "ratelimits": [

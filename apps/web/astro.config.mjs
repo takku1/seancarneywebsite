@@ -108,6 +108,7 @@ export default defineConfig({
       SCOUT_MODEL: envField.string({ context: 'server', access: 'secret', optional: true }),
       SCOUT_ADMIN_TOKEN: envField.string({ context: 'server', access: 'secret', optional: true }),
       SCOUT_SIGNING_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
+      LOG_HASH_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
       SCOUT_DAILY_LIMIT: envField.string({ context: 'server', access: 'secret', optional: true }),
       RESEND_API_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
       INQUIRY_NOTIFY_EMAIL: envField.string({ context: 'server', access: 'secret', optional: true }),

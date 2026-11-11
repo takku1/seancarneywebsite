@@ -55,10 +55,17 @@ export async function recordQuestion(intents: string[], rawText: string, page?: 
   }
 }
 
-/** Returns false once today's AI-turn budget is spent. No storage = no cap (rate limits still apply). */
+/**
+ * Returns false once today's AI-turn budget is spent. A SOFT cap: KV is eventually
+ * consistent and read-increment-write is not atomic, so concurrent turns can
+ * overshoot slightly (bounded by the per-client rate limits). The hard ceiling is
+ * the spend limit on the API key's workspace (Claude Console). Without storage,
+ * production fails closed to guided mode; development is uncapped.
+ */
 export async function consumeDailyBudget(limit: number): Promise<boolean> {
+  if (!limit) return true;
   const store = await kv();
-  if (!store || !limit) return true;
+  if (!store) return import.meta.env.DEV;
   const key = `usage:${day()}`;
   const n = Number((await store.get(key)) ?? 0) + 1;
   await store.put(key, String(n), { expirationTtl: 60 * 60 * 48 });

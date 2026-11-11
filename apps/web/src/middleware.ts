@@ -14,6 +14,7 @@
  */
 import { defineMiddleware } from 'astro:middleware';
 import { clientKey, logSecurity } from './lib/security/log';
+import { exceeds } from './lib/security/body';
 import { requireAuth } from './lib/security/auth';
 
 interface RouteRule {
@@ -35,6 +36,7 @@ const RULES: [RegExp, RouteRule][] = [
   [/^\/api\/scout$/, { methods: ['GET', 'POST'], types: JSON_ONLY, maxBodySize: 65536, limit: { max: 60, windowSec: 600 } }],
   [/^\/api\/scout\/trending$/, { methods: ['GET'], limit: { max: 60, windowSec: 600 } }],
   [/^\/api\/scout\/insights$/, { methods: ['GET'], tier: 'strict', admin: true, limit: { max: 10, windowSec: 600 } }],
+  [/^\/api\/leads$/, { methods: ['GET', 'POST'], tier: 'strict', admin: true, limit: { max: 10, windowSec: 600 } }],
   [/^\/api\/availability$/, { methods: ['GET'], limit: { max: 30, windowSec: 600 } }],
   // sendBeacon posts text/plain; browsers post CSP reports as application/csp-report or reports+json.
   [/^\/api\/signal$/, { methods: ['POST'], types: ['text/plain', 'application/json'], maxBodySize: 4096, limit: { max: 60, windowSec: 600 } }],
@@ -96,10 +98,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
       return problem(415, 'unsupported_media_type');
     }
     // Bound request size before any handler reads the body (OWASP API4).
+    // A declared length is checked up front; an undeclared (streamed) body is
+    // measured on a copy, stopping as soon as it passes the limit.
+    const max = rule.maxBodySize ?? DEFAULT_MAX_BODY;
     const length = req.headers.get('content-length');
-    if (length === null) return problem(411, 'length_required');
-    if (Number(length) > (rule.maxBodySize ?? DEFAULT_MAX_BODY)) {
-      logSecurity('body_too_large', { route: url.pathname, bytes: length, who });
+    const tooLarge = length !== null ? !(Number(length) <= max) : await exceeds(req, max);
+    if (tooLarge) {
+      logSecurity('body_too_large', { route: url.pathname, bytes: length ?? 'streamed', who });
       return problem(413, 'payload_too_large');
     }
   }

@@ -2,7 +2,8 @@
  * POST /api/inquire  (runs on the Cloudflare Worker)
  *
  * validate -> anti-spam (honeypot, min fill time, Turnstile) -> processInquiry
- * (score, GoHighLevel, Resend). The shared pipeline lives in lib/inquiry/process.ts.
+ * (score, durable acceptance, CRM, Resend). 200 only once the lead is held
+ * durably, 503 otherwise. The shared pipeline lives in lib/inquiry/process.ts.
  */
 import { z } from 'astro/zod';
 import type { APIRoute } from 'astro';
@@ -18,7 +19,13 @@ const json = (status: number, body: unknown) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } });
 
 async function verifyTurnstile(token: string | undefined, ip: string | null): Promise<boolean> {
-  if (!TURNSTILE_SECRET_KEY) return true; // not configured: rely on honeypot + timing
+  // Development may run without Turnstile (honeypot + timing still apply).
+  // Production fails closed: a missing secret is a deployment error, logged loudly.
+  if (!TURNSTILE_SECRET_KEY) {
+    if (import.meta.env.DEV) return true;
+    console.error(JSON.stringify({ ts: new Date().toISOString(), kind: 'config', event: 'turnstile_secret_missing', route: '/api/inquire' }));
+    return false;
+  }
   if (!token) return false;
   const body = new FormData();
   body.append('secret', TURNSTILE_SECRET_KEY);
@@ -57,7 +64,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     return json(403, { ok: false, error: 'verification_failed' });
   }
 
-  const { leadId, tier } = await processInquiry(i, 'form');
+  const { accepted, leadId, tier, duplicate } = await processInquiry(i, 'form');
+  // Nothing durable took the lead: say so, so the visitor uses the direct email instead.
+  if (!accepted) return json(503, { ok: false, error: 'delivery_failed' });
+  if (duplicate) return json(200, { ok: true, leadId, tier });
   await sendMetaEvent(request, { name: 'Lead', eventId: i.event_id, adsOk: i.ads_ok, email: i.email, phone: i.phone || undefined, page: i.page, fbclid: i.attribution.last_fbclid ?? i.attribution.first_fbclid, customData: { event_type: i.event_type, lead_tier: tier } });
   return json(200, { ok: true, leadId, tier });
 };

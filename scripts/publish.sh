@@ -4,13 +4,15 @@
 #
 #   bash scripts/publish.sh                 asks for a short description
 #   bash scripts/publish.sh "New show dates"
+#   bash scripts/publish.sh --check         runs every check, saves nothing
 #
 # Steps (stops safely at the first problem, nothing half-done):
 #   1. brings in anything new from GitHub first (never overwrites your work)
-#   2. type check, unit tests and full build: a broken site is never pushed
-#      (this is the release gate; GitHub's CI only runs when started by hand)
-#   3. refuses if a secret (API key, .env file) is about to be published
-#   4. saves (commits) every change with your description, pushes to main
+#   2. npm run verify: type check, unit tests, full build and dependency audit
+#      (the release gate; GitHub's CI only runs when started by hand). Packages
+#      are reinstalled cleanly (npm ci) whenever package-lock.json changed.
+#   3. refuses secrets (API keys, .env files) and files over 25 MB
+#   4. lists exactly what will be saved and asks before committing; pushes to main
 #
 # Written for the bash 3.2 that ships with macOS. Works in Git Bash too.
 # ─────────────────────────────────────────────────────────────────────────────
@@ -27,25 +29,30 @@ cd "$ROOT"
 [ -d .git ] || fail "This isn't a git copy of the project ($ROOT)."
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 LOG="${TMPDIR:-/tmp}/sc-publish.log"
+CHECK_ONLY=0
+if [ "${1:-}" = "--check" ]; then CHECK_ONLY=1; shift; fi
+MAX_FILE_MB=25
 
 # ── 1. what changed, and sync with GitHub ────────────────────────────────────
 step "Your changes"
-if [ -z "$(git status --porcelain)" ]; then
+if [ -z "$(git status --porcelain)" ] && [ "$CHECK_ONLY" = 0 ]; then
   ok "nothing to publish: everything is already on GitHub"
   exit 0
 fi
 git status --short | sed 's/^/  /'
 
-if [ "$BRANCH" != "main" ]; then
+if [ "$BRANCH" != "main" ] && [ "$CHECK_ONLY" = 0 ]; then
   note "you're on branch '$BRANCH', not main"
   printf '  Publish this branch instead of main? [y/N] '
   read -r ans || ans=""
   case "$ans" in y|Y|yes) ;; *) fail "Stopped. Switch with:  git switch main" ;; esac
 fi
 
-step "Getting the latest from GitHub"
-git fetch --quiet origin
-if git rev-parse --verify --quiet "origin/$BRANCH" >/dev/null; then
+if [ "$CHECK_ONLY" = 0 ]; then
+  step "Getting the latest from GitHub"
+  git fetch --quiet origin
+fi
+if [ "$CHECK_ONLY" = 0 ] && git rev-parse --verify --quiet "origin/$BRANCH" >/dev/null; then
   BEHIND="$(git rev-list --count "HEAD..origin/$BRANCH")"
   if [ "$BEHIND" -gt 0 ]; then
     # Bring in others' changes without touching yours (stash, fast-forward, restore).
@@ -63,18 +70,26 @@ if git rev-parse --verify --quiet "origin/$BRANCH" >/dev/null; then
   fi
 fi
 
-# ── 2. the site must still build and pass its tests ──────────────────────────
-step "Checking the site builds"
+# ── 2. the release gate: npm run verify ──────────────────────────────────────
+step "Checking the site (types, tests, build, dependency audit)"
 if [ -n "${FNM_DIR:-}" ] || command -v fnm >/dev/null 2>&1; then eval "$(fnm env --shell bash 2>/dev/null)" >/dev/null 2>&1 || true; fi
 command -v npm >/dev/null 2>&1 || fail "npm not found. Run scripts/setup-mac.sh first, then open a new Terminal window."
 (
   cd apps/web
-  [ -d node_modules ] || npm ci --no-fund --no-audit >"$LOG" 2>&1
-  npx astro check >"$LOG" 2>&1 || { tail -30 "$LOG"; exit 1; }
-  npm test >>"$LOG" 2>&1 || { tail -30 "$LOG"; exit 1; }
-  npx astro build >>"$LOG" 2>&1 || { tail -30 "$LOG"; exit 1; }
-) || fail "The site doesn't build or a test failed with these changes, so nothing was published. The error is above (full log: $LOG)."
-ok "type check, tests and build passed"
+  : >"$LOG"
+  # Clean install when packages are missing or package-lock.json is newer than the install.
+  if [ ! -f node_modules/.package-lock.json ] || [ package-lock.json -nt node_modules/.package-lock.json ]; then
+    echo "  installing packages (npm ci)..."
+    npm ci --no-fund --no-audit >>"$LOG" 2>&1 || { tail -30 "$LOG"; exit 1; }
+  fi
+  npm run verify >>"$LOG" 2>&1 || { tail -30 "$LOG"; exit 1; }
+) || fail "A check failed (type error, test, build or a high-severity dependency advisory), so nothing was published. The error is above (full log: $LOG)."
+ok "type check, tests, build and dependency audit passed"
+
+if [ "$CHECK_ONLY" = 1 ]; then
+  printf '\n%s%sAll checks passed.%s Nothing was saved (--check).\n' "$G" "$B" "$N"
+  exit 0
+fi
 
 # ── 3. never publish secrets ─────────────────────────────────────────────────
 step "Checking for secrets"
@@ -88,6 +103,28 @@ if [ -n "$BAD_FILES" ] || [ -n "$KEY_HITS" ]; then
   fail "Stopped: that looks like a secret. Keys belong in apps/web/.env (never published) or Cloudflare secrets, not in the project."
 fi
 ok "no secrets"
+
+# Large media belongs in resources/ (private, never committed) or as a prepared web-sized version.
+BIG=""
+while IFS= read -r f; do
+  [ -f "$f" ] || continue
+  size=$(wc -c <"$f" | tr -d ' ')
+  if [ "$size" -gt $((MAX_FILE_MB * 1024 * 1024)) ]; then BIG="$BIG  $f"; fi
+done <<EOF_FILES
+$(git diff --cached --name-only --diff-filter=AM)
+EOF_FILES
+if [ -n "$BIG" ]; then
+  git reset --quiet
+  fail "Stopped: over ${MAX_FILE_MB} MB:$BIG. Keep originals in resources/ and add a web-sized version with the media tool (docs/current/11-media-management.md)."
+fi
+
+step "What will be saved"
+git diff --cached --name-status | sed 's/^/  /'
+if [ -t 0 ]; then
+  printf '  Save and publish these %s file(s)? [Y/n] ' "$(git diff --cached --name-only | wc -l | tr -d ' ')"
+  read -r ans || ans=""
+  case "$ans" in ""|y|Y|yes) ;; *) git reset --quiet; fail "Stopped. Nothing was saved; your changes are untouched." ;; esac
+fi
 
 # ── 4. save and push ─────────────────────────────────────────────────────────
 step "Publishing"
