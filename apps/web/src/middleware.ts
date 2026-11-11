@@ -8,9 +8,10 @@
  *   - last-resort error handler, generic response       (ASVS 16.5.1, 16.5.4, OWASP A10)
  *   - structured security event logging                 (ASVS 16.3.3)
  *
- * Rate limiting uses the Cloudflare Rate Limiting bindings `RATE_LIMITER_STRICT` /
- * `RATE_LIMITER` (wrangler.jsonc) in production, otherwise a per-isolate counter. Also add a
- * Cloudflare WAF rate rule on /api/* in production.
+ * Rate limiting: each route has a tier (lib/security/rate-tiers.ts: strict 3/min,
+ * standard 20/min), enforced by the matching Cloudflare Rate Limiting binding in
+ * production and by a per-isolate counter with the same numbers elsewhere. Also
+ * add a Cloudflare WAF rate rule on /api/* in production.
  */
 import { defineMiddleware } from 'astro:middleware';
 import { clientKey, logSecurity } from './lib/security/log';
@@ -18,14 +19,14 @@ import { exceeds } from './lib/security/body';
 import { requireAuth } from './lib/security/auth';
 import { checkOrigin, type OriginPolicy } from './lib/security/origin';
 import { errorCode } from './lib/security/errors';
+import { RATE_TIERS, type RateTier } from './lib/security/rate-tiers';
 
 interface RouteRule {
   methods: string[];
   /** Allowed request content types for bodies (prefix match). */
   types?: string[];
-  limit: { max: number; windowSec: number };
-  /** Which Cloudflare Rate Limiting binding enforces this route in production. */
-  tier?: 'strict';
+  /** Rate-limit tier (lib/security/rate-tiers.ts). */
+  tier: RateTier;
   /** Privileged route: requires the admin bearer token (404 otherwise, so it stays undiscoverable). */
   admin?: true;
   /** maxBodySize in bytes for POST bodies (default 16 KB). */
@@ -36,15 +37,15 @@ interface RouteRule {
 
 const JSON_ONLY = ['application/json'];
 const RULES: [RegExp, RouteRule][] = [
-  [/^\/api\/inquire$/, { methods: ['POST'], types: JSON_ONLY, origin: 'required', tier: 'strict', limit: { max: 5, windowSec: 600 } }],
-  [/^\/api\/scout$/, { methods: ['GET', 'POST'], types: JSON_ONLY, origin: 'required', maxBodySize: 65536, limit: { max: 60, windowSec: 600 } }],
-  [/^\/api\/scout\/trending$/, { methods: ['GET'], limit: { max: 60, windowSec: 600 } }],
-  [/^\/api\/scout\/insights$/, { methods: ['GET'], tier: 'strict', admin: true, limit: { max: 10, windowSec: 600 } }],
-  [/^\/api\/leads$/, { methods: ['GET', 'POST'], tier: 'strict', admin: true, limit: { max: 10, windowSec: 600 } }],
-  [/^\/api\/availability$/, { methods: ['GET'], limit: { max: 30, windowSec: 600 } }],
+  [/^\/api\/inquire$/, { methods: ['POST'], types: JSON_ONLY, origin: 'required', tier: 'strict' }],
+  [/^\/api\/scout$/, { methods: ['GET', 'POST'], types: JSON_ONLY, origin: 'required', maxBodySize: 65536, tier: 'standard' }],
+  [/^\/api\/scout\/trending$/, { methods: ['GET'], tier: 'standard' }],
+  [/^\/api\/scout\/insights$/, { methods: ['GET'], tier: 'strict', admin: true }],
+  [/^\/api\/leads$/, { methods: ['GET', 'POST'], tier: 'strict', admin: true }],
+  [/^\/api\/availability$/, { methods: ['GET'], tier: 'standard' }],
   // sendBeacon posts text/plain; browsers post CSP reports as application/csp-report or reports+json.
-  [/^\/api\/signal$/, { methods: ['POST'], types: ['text/plain', 'application/json'], maxBodySize: 4096, limit: { max: 60, windowSec: 600 } }],
-  [/^\/api\/csp-report$/, { methods: ['POST'], types: ['application/csp-report', 'application/reports+json', 'application/json'], limit: { max: 30, windowSec: 600 } }],
+  [/^\/api\/signal$/, { methods: ['POST'], types: ['text/plain', 'application/json'], maxBodySize: 4096, tier: 'standard' }],
+  [/^\/api\/csp-report$/, { methods: ['POST'], types: ['application/csp-report', 'application/reports+json', 'application/json'], tier: 'standard' }],
 ];
 
 const memory = new Map<string, { n: number; reset: number }>();
@@ -52,7 +53,7 @@ const memory = new Map<string, { n: number; reset: number }>();
 async function allowed(key: string, rule: RouteRule): Promise<boolean> {
   try {
     const mod = (await import('cloudflare:workers')) as { env?: Record<string, unknown> };
-    const rl = mod.env?.[rule.tier === 'strict' ? 'RATE_LIMITER_STRICT' : 'RATE_LIMITER'] as { limit(o: { key: string }): Promise<{ success: boolean }> } | undefined;
+    const rl = mod.env?.[RATE_TIERS[rule.tier].binding] as { limit(o: { key: string }): Promise<{ success: boolean }> } | undefined;
     if (rl) return (await rl.limit({ key })).success;
   } catch {
     /* not on Workers (dev/build): fall through to memory */
@@ -60,12 +61,12 @@ async function allowed(key: string, rule: RouteRule): Promise<boolean> {
   const now = Date.now();
   const h = memory.get(key);
   if (!h || h.reset < now) {
-    memory.set(key, { n: 1, reset: now + rule.limit.windowSec * 1000 });
+    memory.set(key, { n: 1, reset: now + RATE_TIERS[rule.tier].periodSec * 1000 });
     if (memory.size > 5000) memory.clear(); // bound memory per isolate
     return true;
   }
   h.n++;
-  return h.n <= rule.limit.max;
+  return h.n <= RATE_TIERS[rule.tier].max;
 }
 
 const DEFAULT_MAX_BODY = 16 * 1024;
@@ -123,7 +124,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // every request would share one bucket, so limits apply only when it's present.
   if (ip && !(await allowed(`${url.pathname}:${who}`, rule))) {
     logSecurity('rate_limited', { route: url.pathname, who });
-    return problem(429, 'rate_limited', { 'retry-after': String(rule.limit.windowSec) });
+    return problem(429, 'rate_limited', { 'retry-after': String(RATE_TIERS[rule.tier].periodSec) });
   }
 
   try {

@@ -49,6 +49,7 @@ Everything here is confirmed with Sean before the site goes live. Each item is a
 - [ ] SHA-BAM (GoHighLevel) private integration or inbound webhook (`GHL_*`); custom fields: lead_tier, lead_score, event_type, budget, first/last channel. Deferred until Sean supplies the account details. Leads taken before it is connected wait in `LEADS_DB`; once it is, the 15-minute cron backfills them automatically (or run `POST /api/leads` with the admin token, repeating until `processed` is 0), then check `GET /api/leads` shows nothing open.
 - [ ] The call-booking link for the thank-you page (`PUBLIC_CALL_BOOKING_URL`).
 - [ ] Resend (`RESEND_API_KEY`, `INQUIRY_FROM_EMAIL`, `INQUIRY_NOTIFY_EMAIL`) with a verified sending domain. **Required before launch:** while SHA-BAM is deferred, the notification email is the only way Sean hears about a new lead (stored leads alone notify no one).
+- [ ] Scout with AI on: `ANTHROPIC_API_KEY` and `SCOUT_SIGNING_KEY` (`openssl rand -hex 32`) as Worker secrets. Without the signing key, production Scout stays in guided mode (logged as `scout_signing_key_missing`).
 - [ ] Scout with AI on: a monthly spend limit on the API key's workspace in the Claude Console. `SCOUT_DAILY_LIMIT` is a soft cap (KV counters are not atomic); the Console limit is the hard one.
 - [ ] Google Business Profile, and a review request after every event (`04-integrations-and-workflows.md`, Completed stage).
 - [ ] The wedding Instagram bio links to `/links?utm_source=instagram&utm_medium=social&utm_campaign=bio`.

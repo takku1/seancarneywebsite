@@ -13,7 +13,8 @@
   // the table is created on first use.
   "d1_databases": [{ "binding": "LEADS_DB", "database_name": "seancarneymusic-leads" }],
   // Cloudflare Rate Limiting bindings (periods must be 10 or 60 s). Keys are per route + hashed client.
-  // src/middleware.ts picks the tier per route; the in-memory fallback covers dev only.
+  // These numbers are the production limits; they must equal src/lib/security/rate-tiers.ts
+  // (evals/config-guards.test.mjs checks). src/middleware.ts assigns each route a tier.
   "ratelimits": [
     { "name": "RATE_LIMITER_STRICT", "namespace_id": "1001", "simple": { "limit": 3, "period": 60 } },
     { "name": "RATE_LIMITER", "namespace_id": "1002", "simple": { "limit": 20, "period": 60 } }

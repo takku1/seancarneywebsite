@@ -6,7 +6,9 @@
  * history, OWASP LLM01; memory poisoning, OWASP ASI06).
  *
  * SCOUT_SIGNING_KEY: any long random string (e.g. `openssl rand -hex 32`).
- * Without it (local dev), signing is skipped and a warning is logged once.
+ * Required in production: without it /api/scout serves guided mode only (no
+ * AI). In development, signing is skipped and a warning is logged once;
+ * `verifyTranscript` accepts unsigned history only when told it is development.
  */
 let warned = false;
 const enc = new TextEncoder();
@@ -26,8 +28,8 @@ export async function signTranscript(transcript: unknown[], key?: string): Promi
   return hmac(key, JSON.stringify(transcript));
 }
 
-export async function verifyTranscript(transcript: unknown[], sig: string, key?: string): Promise<boolean> {
-  if (!key) return true;
+export async function verifyTranscript(transcript: unknown[], sig: string, key?: string, opts: { allowUnsigned?: boolean } = {}): Promise<boolean> {
+  if (!key) return opts.allowUnsigned === true; // fail closed unless explicitly development
   if (!sig || sig.length !== 64) return false;
   const expected = await hmac(key, JSON.stringify(transcript));
   // Constant-time comparison.

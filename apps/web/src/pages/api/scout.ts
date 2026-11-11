@@ -49,6 +49,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const defer = cf ? (p: Promise<unknown>) => cf.waitUntil(p) : undefined;
   const provider = getScoutProvider();
   if (!provider) return json(200, { ok: false, mode: 'guided' });
+  // Without the signing key, browser-held history can't be trusted: production
+  // serves guided mode only (fail closed); development runs unsigned.
+  if (!SCOUT_SIGNING_KEY && !import.meta.env.DEV) {
+    console.error(JSON.stringify({ ts: new Date().toISOString(), kind: 'config', event: 'scout_signing_key_missing', route: '/api/scout' }));
+    return json(200, { ok: false, mode: 'guided' });
+  }
 
   const ip = request.headers.get('cf-connecting-ip') ?? 'local';
   if (limited(ip)) return json(429, { ok: false, error: 'rate_limited', reply: "I'm getting a lot of questions at once. Give it a minute, or send the details through the inquiry form." });
@@ -65,7 +71,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const transcript = Array.isArray(body.transcript) ? body.transcript : [];
   // Integrity (OWASP LLM01 / ASI06): the browser holds the transcript, so it is
   // HMAC-signed. A forged or edited history is discarded, never sent to the model.
-  if (transcript.length && !(await verifyTranscript(transcript, typeof (body as { sig?: unknown }).sig === 'string' ? (body as { sig: string }).sig : '', SCOUT_SIGNING_KEY))) {
+  if (transcript.length && !(await verifyTranscript(transcript, typeof (body as { sig?: unknown }).sig === 'string' ? (body as { sig: string }).sig : '', SCOUT_SIGNING_KEY, { allowUnsigned: import.meta.env.DEV }))) {
     logSecurity('bad_signature', { route: '/api/scout', turns: transcript.length });
     return json(200, { ok: false, error: 'bad_signature', reset: true, reply: "Let's start fresh. What can I help you with?" });
   }

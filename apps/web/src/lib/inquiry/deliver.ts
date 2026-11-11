@@ -29,10 +29,12 @@
  *   is fenced out.
  * - Every external call times out after 20 s, far inside the lease.
  *
- * Guarantee: at-least-once delivery, with duplicates confined to one window:
- * the Worker dying after a remote call succeeded but before its checkpoint
- * was written. Closing that needs remote idempotency (the contact upsert
- * already is; the opportunity is on the SHA-BAM test list).
+ * Guarantee: at-least-once delivery. A duplicate is possible whenever a remote
+ * service acted but this side never learned it: the call timed out or the
+ * response was lost after the service processed it, or the Worker died before
+ * checkpointing. Retries then repeat that step. Only remote idempotency or
+ * reconciliation closes this (the contact upsert is idempotent; the
+ * opportunity and Resend emails are on the integration test list).
  *
  * A channel that was not configured when the lead arrived is `skipped`; it is
  * delivered once the channel is configured (CRM backfill; Sean is told about
@@ -235,12 +237,11 @@ export async function purgeExpired(db: LeadDB, log: DeliveryDeps['log'], now = D
   const resolved = "crm = 'delivered' AND notify IN ('delivered','skipped') AND confirm NOT IN ('pending','failed')";
   const a = await db.prepare(`DELETE FROM leads WHERE created_at < ? AND ${resolved}`).bind(isoDaysAgo(now, RETENTION_DAYS)).run();
   const cutoff = isoDaysAgo(now, UNRESOLVED_RETENTION_DAYS);
-  const expiring = (await db.prepare('SELECT lead_id FROM leads WHERE created_at < ?').bind(cutoff).all<{ lead_id: string }>()).results;
-  if (expiring.length) {
-    await db.prepare('DELETE FROM leads WHERE created_at < ?').bind(cutoff).run();
-    log('lead_retention_expired_unresolved', { count: expiring.length, leadIds: expiring.slice(0, 20).map((r) => r.lead_id) });
-  }
-  return { resolved: a.meta.changes, unresolved: expiring.length };
+  // A sample of ids for the alert, never the whole set: the DELETE reports the count.
+  const sample = (await db.prepare('SELECT lead_id FROM leads WHERE created_at < ? LIMIT 20').bind(cutoff).all<{ lead_id: string }>()).results;
+  const b = sample.length ? await db.prepare('DELETE FROM leads WHERE created_at < ?').bind(cutoff).run() : { meta: { changes: 0 } };
+  if (b.meta.changes) log('lead_retention_expired_unresolved', { count: b.meta.changes, leadIds: sample.map((r) => r.lead_id) });
+  return { resolved: a.meta.changes, unresolved: b.meta.changes };
 }
 
 export interface AcceptResult {
