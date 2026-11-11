@@ -135,7 +135,8 @@ const SCHEMA = [
     notify TEXT NOT NULL DEFAULT 'pending', notify_error TEXT, notify_attempts INTEGER NOT NULL DEFAULT 0,
     notify_lease TEXT, notify_lease_until INTEGER,
     confirm TEXT NOT NULL DEFAULT 'pending', confirm_error TEXT, confirm_attempts INTEGER NOT NULL DEFAULT 0,
-    confirm_lease TEXT, confirm_lease_until INTEGER
+    confirm_lease TEXT, confirm_lease_until INTEGER,
+    last_attempt_at INTEGER
   )`,
   `CREATE INDEX IF NOT EXISTS leads_created ON leads (created_at, lead_id)`,
 ];
@@ -281,18 +282,22 @@ export async function acceptLead<R extends LeadRecord>(record: R, deps: Delivery
 
   // 2a. Stored: the lead is safe. Deliver after the response when we can.
   if (stored) {
-    const work = (async () => {
-      const results: Results = { crm: await one('crm'), notify: await one('notify'), confirm: await one('confirm') };
-      for (const ch of CHANNELS) {
-        const r = results[ch];
-        if (!r) continue;
-        try {
-          if (!(await finish(db!, record.leadId, ch, tok, r.outcome, r.error))) log('lead_lease_lost', { leadId: record.leadId, channel: ch });
-        } catch (e) {
-          log('lead_state_write_failed', { leadId: record.leadId, channel: ch, error: errorCode(e) });
-        }
+    // The three channels are independent and separately leased: they run concurrently,
+    // and each records its outcome as soon as it completes, so a stalled CRM never holds
+    // back Sean's email or the visitor's confirmation.
+    const settle = async (ch: Channel): Promise<RunResult | null> => {
+      const r = await one(ch);
+      if (!r) return null;
+      try {
+        if (!(await finish(db!, record.leadId, ch, tok, r.outcome, r.error))) log('lead_lease_lost', { leadId: record.leadId, channel: ch });
+      } catch (e) {
+        log('lead_state_write_failed', { leadId: record.leadId, channel: ch, error: errorCode(e) });
       }
-      return report(results, false);
+      return r;
+    };
+    const work = (async () => {
+      const [crm, notify, confirm] = await Promise.all(CHANNELS.map(settle));
+      return report({ crm, notify, confirm }, false);
     })();
     if (deps.defer) {
       deps.defer(work.catch((e) => log('lead_delivery_crashed', { leadId: record.leadId, error: errorCode(e) })));
@@ -343,22 +348,43 @@ function decodeCursor(cursor?: string | null): [string, string] {
 }
 
 /**
- * Open rows, under one of two predicates:
- * - `retry`: only the channels that can be delivered now, so the cron never
- *   spends its batches on a CRM (or email) that isn't configured;
- * - `admin`: everything an operator should see: the CRM until delivered
- *   (including leads waiting for it to be connected), email channels that
- *   are pending or failed.
+ * Admin view rows: everything an operator should see: the CRM until
+ * delivered (including leads waiting for it to be connected), and email
+ * channels that are pending or failed. Keyset-paged by creation time.
  */
-async function openRows(db: LeadDB, opts: { limit: number; cursor?: string | null; retry?: Channel[] }): Promise<Row[]> {
+async function openRows(db: LeadDB, opts: { limit: number; cursor?: string | null }): Promise<Row[]> {
   await ensureSchema(db);
-  const where = opts.retry
-    ? opts.retry.map((ch) => `${ch} IN ${RETRYABLE}`).join(' OR ')
-    : `crm IN ${RETRYABLE} OR notify IN ('pending','failed') OR confirm IN ('pending','failed')`;
-  if (!where) return [];
   const [c, id] = decodeCursor(opts.cursor);
-  const sql = `SELECT * FROM leads WHERE (${where}) AND (created_at > ? OR (created_at = ? AND lead_id > ?)) ORDER BY created_at, lead_id LIMIT ?`;
+  const sql = `SELECT * FROM leads WHERE (crm IN ${RETRYABLE} OR notify IN ('pending','failed') OR confirm IN ('pending','failed'))
+    AND (created_at > ? OR (created_at = ? AND lead_id > ?)) ORDER BY created_at, lead_id LIMIT ?`;
   return (await db.prepare(sql).bind(c, c, id, opts.limit).all<Row>()).results;
+}
+
+/** A row is retried at most once per this window, so repeated batches (and runs) move on through a backlog. */
+export const RETRY_SPACING_MS = 10 * 60_000;
+
+/**
+ * Retry candidates: rows with a channel that is configured, retryable and
+ * not leased right now, not attempted in the last RETRY_SPACING_MS. Never-
+ * attempted rows come first, then the least recently attempted: a large
+ * backlog is worked round-robin, with no cursor state to keep between runs,
+ * and leased rows never take a batch slot.
+ */
+async function claimableRows(db: LeadDB, channels: Channel[], limit: number, now: number): Promise<Row[]> {
+  await ensureSchema(db);
+  const free = channels.map((ch) => `(${ch} IN ${RETRYABLE} AND (${ch}_lease_until IS NULL OR ${ch}_lease_until <= ?))`).join(' OR ');
+  const sql = `SELECT * FROM leads WHERE (${free}) AND (last_attempt_at IS NULL OR last_attempt_at <= ?)
+    ORDER BY last_attempt_at IS NOT NULL, last_attempt_at, created_at, lead_id LIMIT ?`;
+  return (await db.prepare(sql).bind(...channels.map(() => now), now - RETRY_SPACING_MS, limit).all<Row>()).results;
+}
+
+/** Marks a row as taken by this retry round; false if another runner took it first. */
+async function touch(db: LeadDB, leadId: string, now: number): Promise<boolean> {
+  const r = await db
+    .prepare('UPDATE leads SET last_attempt_at = ? WHERE lead_id = ? AND (last_attempt_at IS NULL OR last_attempt_at <= ?)')
+    .bind(now, leadId, now - RETRY_SPACING_MS)
+    .run();
+  return r.meta.changes === 1;
 }
 
 export interface OpenPage { leads: OpenLead[]; nextCursor: string | null; counts: Record<string, number> }
@@ -409,52 +435,56 @@ export async function reopenAbandoned(db: LeadDB): Promise<number> {
   return n;
 }
 
-export interface RetryResult { processed: number; delivered: Record<Channel, number>; abandoned: number; skippedInProgress: number; nextCursor: string | null }
+export interface RetryResult { processed: number; delivered: Record<Channel, number>; abandoned: number; skippedInProgress: number }
 
 /**
  * One bounded batch of retries over the channels that are configured. Call
- * again with `nextCursor` to continue; null means the scan reached the end.
+ * again for the next batch: rows handled in this round are spaced out, so
+ * each call reaches new rows; `processed: 0` means nothing is due.
  */
 export async function retryOpen<R extends LeadRecord>(
   deps: Pick<DeliveryDeps<R>, 'db' | 'sendToCrm' | 'notifyOwner' | 'confirmVisitor' | 'log' | 'now'>,
-  opts: { limit?: number; cursor?: string | null } = {},
+  opts: { limit?: number } = {},
 ): Promise<RetryResult> {
-  const out: RetryResult = { processed: 0, delivered: { crm: 0, notify: 0, confirm: 0 }, abandoned: 0, skippedInProgress: 0, nextCursor: null };
+  const out: RetryResult = { processed: 0, delivered: { crm: 0, notify: 0, confirm: 0 }, abandoned: 0, skippedInProgress: 0 };
   const { db, log } = deps;
   const sinks = { crm: deps.sendToCrm, notify: deps.notifyOwner, confirm: deps.confirmVisitor };
   const active = CHANNELS.filter((ch) => sinks[ch]);
   if (!db || !active.length) return out;
   const limit = Math.min(Math.max(opts.limit ?? 25, 1), 100);
   const clock = () => deps.now?.() ?? Date.now();
-  const rows = await openRows(db, { limit, cursor: opts.cursor, retry: active });
+  const rows = await claimableRows(db, active, limit, clock());
 
   for (const row of rows) {
+    if (!(await touch(db, row.lead_id, clock()))) continue; // another runner took this row
     out.processed++;
     const { inquiry, lead } = JSON.parse(row.data) as { inquiry: R['inquiry']; lead: R['lead'] };
     const record = { leadId: row.lead_id, channel: row.channel, createdAt: row.created_at, inquiry, lead } as R;
 
-    for (const ch of active) {
-      if (!['pending', 'failed', 'skipped'].includes(row[ch])) continue;
+    // Channels are independent and separately leased: retry them concurrently,
+    // so a stalled CRM never holds back this lead's emails.
+    await Promise.all(active.map(async (ch) => {
+      if (!['pending', 'failed', 'skipped'].includes(row[ch])) return;
       const now = clock();
 
       // A confirmation that can no longer be timely is dropped rather than sent late.
       if (ch === 'confirm' && now - Date.parse(row.created_at) > CONFIRM_MAX_AGE_MS) {
         if (await abandon(db, row.lead_id, ch, now, true)) log('lead_confirm_expired', { leadId: row.lead_id });
-        continue;
+        return;
       }
       if (row[`${ch}_attempts`] >= MAX_ATTEMPTS) {
         if (await abandon(db, row.lead_id, ch, now)) {
           out.abandoned++;
           log(`lead_${ch}_abandoned`, { leadId: row.lead_id, attempts: row[`${ch}_attempts`], error: row[`${ch}_error`] });
         }
-        continue;
+        return;
       }
       const tok = await claim(db, row.lead_id, ch, now);
       if (!tok) {
         out.skippedInProgress++;
-        continue;
+        return;
       }
-      // Fresh read under the lease: another runner may have checkpointed CRM steps since the page was loaded.
+      // Fresh read under the lease: another runner may have checkpointed CRM steps since the row was loaded.
       const progress = ch === 'crm'
         ? (JSON.parse((await db.prepare('SELECT crm_progress FROM leads WHERE lead_id = ?').bind(row.lead_id).first<{ crm_progress: string }>())?.crm_progress || '{}') as CrmProgress)
         : {};
@@ -462,13 +492,11 @@ export async function retryOpen<R extends LeadRecord>(
       const kept = await finish(db, row.lead_id, ch, tok, r.outcome, r.error);
       if (!kept || r.leaseLost) {
         log('lead_lease_lost', { leadId: row.lead_id, channel: ch });
-        continue;
+        return;
       }
       if (r.outcome === 'delivered') out.delivered[ch]++;
       log(r.outcome === 'delivered' ? 'lead_retry_delivered' : 'lead_retry_failed', { leadId: row.lead_id, channel: ch, attempts: row[`${ch}_attempts`] + 1, error: r.error });
-    }
+    }));
   }
-  const last = rows.at(-1);
-  out.nextCursor = rows.length === limit && last ? `${last.created_at}|${last.lead_id}` : null;
   return out;
 }

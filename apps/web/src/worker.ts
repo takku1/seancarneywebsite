@@ -14,13 +14,12 @@ export default {
     ctx.waitUntil(
       (async () => {
         await purgeLeads(); // retention: resolved at 90 days, unresolved at 180
-        // Bounded: up to 4 batches of 25 per run; the rest waits for the next run.
-        let cursor: string | null = null;
+        // Bounded: up to 4 batches of 25 per run, least recently attempted first;
+        // the rest waits for the next run (no cursor state between runs).
         for (let i = 0; i < 4; i++) {
-          const r = await retryOpenLeads({ cursor, limit: 25 });
-          if (r.processed) console.info(JSON.stringify({ ts: new Date().toISOString(), kind: 'lead', event: 'lead_retry_batch', ...r }));
-          cursor = r.nextCursor;
-          if (!cursor) break;
+          const r = await retryOpenLeads({ limit: 25 });
+          if (!r.processed) break;
+          console.info(JSON.stringify({ ts: new Date().toISOString(), kind: 'lead', event: 'lead_retry_batch', ...r }));
         }
       })().catch((e) => console.error(JSON.stringify({ ts: new Date().toISOString(), kind: 'lead', event: 'lead_retry_crashed', error: errorCode(e) }))),
     );

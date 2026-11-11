@@ -220,7 +220,7 @@ export async function openLeads(opts: { limit?: number; cursor?: string | null }
 }
 
 /** One bounded retry batch: cron every 15 minutes, or POST /api/leads (e.g. once SHA-BAM is connected). */
-export async function retryOpenLeads(opts: { limit?: number; cursor?: string | null; reopen?: boolean } = {}) {
+export async function retryOpenLeads(opts: { limit?: number; reopen?: boolean } = {}) {
   const db = await leadDB();
   const reopened = db && opts.reopen ? await reopenAbandoned(db) : 0;
   return { reopened, ...(await retryOpen(deps(db), opts)) };

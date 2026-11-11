@@ -21,7 +21,7 @@ async function load(entry) {
   return import(`data:text/javascript;base64,${Buffer.from(out.outputFiles[0].text).toString('base64')}`);
 }
 
-const {acceptLead, retryOpen, listOpen, reopenAbandoned, purgeExpired, MAX_ATTEMPTS, LEASE_MS, CONFIRM_MAX_AGE_MS} = await load('src/lib/inquiry/deliver.ts');
+const {acceptLead, retryOpen, listOpen, reopenAbandoned, purgeExpired, MAX_ATTEMPTS, LEASE_MS, CONFIRM_MAX_AGE_MS, RETRY_SPACING_MS} = await load('src/lib/inquiry/deliver.ts');
 
 /** Cloudflare D1's API over real SQLite; every call yields first, so concurrent callers interleave. */
 function d1({failOn} = {}) {
@@ -52,6 +52,8 @@ const until = async (cond) => { for (let i = 0; i < 200 && !cond(); i++) await n
 
 let clock = Date.UTC(2026, 10, 10, 12);
 const now = () => clock;
+/** Moves past both the lease and the retry spacing: the next run may take the lead again. */
+const later = () => { clock += Math.max(LEASE_MS, RETRY_SPACING_MS) + 1; };
 let seq = 0;
 const record = (id = `SC-${++seq}`, createdAt = new Date(clock).toISOString()) =>
   ({leadId: id, channel: 'form', createdAt, inquiry: {email: 'couple@example.com', name: 'Ada Lovelace'}, lead: {tier: 'A'}});
@@ -117,7 +119,7 @@ test('a retry run cannot pick up a lead while its first delivery is still in fli
   await until(() => crm === 1);
   const r = await retry({db, sendToCrm: slowCrm, notifyOwner: ok()});
   assert.equal(crm, 1, 'the cron did not send the lead a second time');
-  assert.equal(r.skippedInProgress, 2, 'CRM (in flight) and notify (reserved by the accepting request) are both skipped');
+  assert.equal(r.processed, 0, 'a lead whose channels are all leased is not even selected');
   g.open();
   assert.equal((await accepting).accepted, true);
   assert.equal(row(db, 'SC-l1').crm, 'delivered');
@@ -133,9 +135,9 @@ test('a slow retry is not duplicated by the next run; after its lease expires, i
   await until(() => calls === 1);
   const runB = await retry({db, sendToCrm: async () => { calls++; }});
   assert.equal(calls, 1, 'run B skipped the leased lead');
-  assert.equal(runB.skippedInProgress, 1);
+  assert.equal(runB.processed, 0);
 
-  clock += LEASE_MS + 1; // run A is presumed dead
+  later(); // run A is presumed dead, and the lead is due again
   const runC = await retry({db, sendToCrm: boom('still down')});
   assert.equal(runC.processed, 1);
   assert.equal(row(db, 'SC-l2').crm, 'failed');
@@ -158,7 +160,7 @@ test('a runner that lost its lease stops at its next CRM step', {timeout: 10_000
   };
   const runA = retry({db, sendToCrm: crmA});
   await until(() => stepsA.length === 1);
-  clock += LEASE_MS + 1;
+  later();
   const stepsC = [];
   await retry({db, sendToCrm: async (r, p, lease) => {
     if (!p.contactId) { await lease.guard(); stepsC.push('contact'); p.contactId = 'c1'; await lease.save(p); }
@@ -192,6 +194,27 @@ test('a worker that dies mid-CRM leaves its checkpoints; the next run resumes af
   assert.equal(row(db, 'SC-l4').crm, 'delivered');
 });
 
+test('a CRM that never answers does not hold back the email to Sean or the confirmation', {timeout: 10_000}, async () => {
+  const db = d1();
+  const never = gate(); // CRM stalls for good
+  const deferred = [];
+  const {d, calls} = deps({db, sendToCrm: async () => { await never.p; }, notifyOwner: ok(), defer: (p) => deferred.push(p)});
+  assert.equal((await acceptLead(record('SC-stall'), d)).accepted, true);
+  await until(() => row(db, 'SC-stall').notify === 'delivered' && row(db, 'SC-stall').confirm === 'delivered');
+  assert.equal(calls.confirm, 1);
+  assert.equal(row(db, 'SC-stall').crm, 'pending', 'the CRM is still in flight; both emails already recorded');
+});
+
+test('on retry too, a stalled CRM does not hold back a failed email', {timeout: 10_000}, async () => {
+  const db = d1();
+  await acceptLead(record('SC-stall2'), deps({db, sendToCrm: boom(), notifyOwner: boom('resend 500')}).d);
+  later();
+  const never = gate();
+  retry({db, sendToCrm: async () => { await never.p; }, notifyOwner: ok()}); // never settles
+  await until(() => row(db, 'SC-stall2').notify === 'delivered');
+  assert.equal(row(db, 'SC-stall2').crm, 'failed', 'CRM retry still in flight (lease held, outcome not yet recorded)');
+});
+
 // ── Recovery ────────────────────────────────────────────────────────────────
 
 test('a lead whose outcome write failed is still recovered after its lease expires', {timeout: 10_000}, async () => {
@@ -218,10 +241,11 @@ test('a failed notification is retried, then abandoned after the attempt limit w
   const db = d1();
   await acceptLead(record('SC-f'), deps({db, sendToCrm: ok(), notifyOwner: boom('resend 500')}).d);
   const logs = [];
-  for (let i = 0; i < MAX_ATTEMPTS; i++) await retry({db, sendToCrm: ok(), notifyOwner: boom('resend 500'), log: (e, f) => logs.push({e, ...f})});
+  for (let i = 0; i < MAX_ATTEMPTS; i++) { later(); await retry({db, sendToCrm: ok(), notifyOwner: boom('resend 500'), log: (e, f) => logs.push({e, ...f})}); }
   assert.equal(row(db, 'SC-f').notify, 'abandoned');
   assert.ok(logs.some((l) => l.e === 'lead_notify_abandoned'));
   assert.equal(await reopenAbandoned(db), 1);
+  later();
   await retry({db, notifyOwner: ok()});
   assert.equal(row(db, 'SC-f').notify, 'delivered');
 });
@@ -242,19 +266,35 @@ test('a failed confirmation is retried within a day, and dropped once it would b
   assert.ok(logs.some((l) => l.e === 'lead_confirm_expired'));
 });
 
-test('retry pages through a large queue with a cursor, visiting each lead once', {timeout: 10_000}, async () => {
+test('a large backlog is worked round-robin: every lead gets a turn, none twice in a run', {timeout: 20_000}, async () => {
   const db = d1();
-  for (let n = 0; n < 7; n++) await acceptLead(record(`SC-h${n}`), deps({db, notifyOwner: ok()}).d);
-  const seen = [];
-  let cursor = null, batches = 0;
-  do {
-    const r = await retryOpen({db, sendToCrm: async (rec) => { seen.push(rec.leadId); }, notifyOwner: null, confirmVisitor: null, log: quiet, now}, {limit: 3, cursor});
-    cursor = r.nextCursor;
-    batches++;
-  } while (cursor);
-  assert.equal(batches, 3);
-  assert.equal(seen.length, 7);
-  assert.equal(new Set(seen).size, 7);
+  for (let n = 0; n < 120; n++) await acceptLead(record(`SC-b${String(n).padStart(3, '0')}`), deps({db, sendToCrm: boom('crm down'), notifyOwner: ok()}).d);
+  const attempts = new Map();
+  const crm = async (r) => { attempts.set(r.leadId, (attempts.get(r.leadId) ?? 0) + 1); throw new Error('crm down'); };
+  const cronRun = async () => { for (let i = 0; i < 4; i++) { const r = await retry({db, sendToCrm: crm}, {limit: 25}); if (!r.processed) break; } };
+
+  later(); await cronRun();
+  assert.equal(attempts.size, 100, 'one run reaches 4 x 25 distinct leads');
+  assert.ok([...attempts.values()].every((n) => n === 1), 'no lead twice in a run');
+
+  later(); await cronRun();
+  assert.equal(attempts.size, 120, 'the next run starts with the 20 never-attempted leads');
+  const counts = [...attempts.values()];
+  assert.ok(Math.max(...counts) - Math.min(...counts) <= 1, 'turns stay even across the backlog');
+});
+
+test('leased leads do not use up retry batch slots', {timeout: 10_000}, async () => {
+  const db = d1();
+  const g = gate();
+  for (let n = 0; n < 30; n++) acceptLead(record(`SC-busy${n}`), deps({db, sendToCrm: async () => { await g.p; }}).d); // in flight
+  for (let n = 0; n < 5; n++) await acceptLead(record(`SC-due${n}`), deps({db, sendToCrm: boom(), notifyOwner: ok()}).d);
+  await until(() => count(db) === 35);
+  clock += LEASE_MS / 2; // in-flight leases still valid
+  const sent = [];
+  const r = await retry({db, sendToCrm: async (rec) => { sent.push(rec.leadId); }}, {limit: 25});
+  assert.equal(r.processed, 5);
+  assert.deepEqual(sent.sort(), ['SC-due0', 'SC-due1', 'SC-due2', 'SC-due3', 'SC-due4']);
+  g.open();
 });
 
 test('two concurrent retry runs never deliver the same lead twice', {timeout: 10_000}, async () => {
