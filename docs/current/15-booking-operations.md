@@ -15,6 +15,7 @@ The site's job ends when an inquiry reaches Sean, but the business only succeeds
 | Event | Sean and the musicians | Event week | Run of show confirmed; balance invoice |
 | Completed | Sean (SHA-BAM workflows) | Day after | Thank-you; review request; testimonial permission recorded with an approval (`14-decision-register.md`, section 2) |
 | Lost | Sean | Manual | Reason recorded (price, date, chose other, no reply) |
+| Date released or moved | Sean | Cancellation, reschedule, or a hold that lapses | The holds calendar is updated the same day: the old date removed, the new one added |
 
 ## Service levels
 
@@ -44,6 +45,7 @@ When an "act now" alert fires: open `GET /api/leads` (admin token), contact the 
 2. SHA-BAM: every "New inquiry" older than the reply promise has been contacted.
 3. Leads marked `repeat-inquiry` (the same person through the form and Scout, or a follow-up) are merged into one opportunity where they describe one event.
 4. Lost opportunities have a reason.
+5. The holds calendar matches the booked opportunities: every booked date is on it, and nothing else. The site's availability answers are only as accurate as this calendar.
 
 ## Outcome feedback
 
