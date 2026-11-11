@@ -7,6 +7,11 @@ updates:
     open-pull-requests-limit: 5
     groups:
       astro: { patterns: ["astro", "@astrojs/*"] }
+    ignore:
+      # Held: @astrojs/check 0.9.x and @volar/kit require typescript <7 (checked 2026-11-10).
+      # Remove once @astrojs/check supports TypeScript 7.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule: { interval: monthly }
