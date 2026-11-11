@@ -51,7 +51,9 @@ export async function sendMetaEvent(request: Request, e: MetaEvent): Promise<'se
       ...(fbc ? { fbc } : {}),
     };
     const origin = new URL(request.url).origin;
+    // The token travels in the POST body, not the URL: URLs end up in logs and error traces.
     const body = {
+      access_token: META_CAPI_ACCESS_TOKEN,
       data: [
         {
           event_name: e.name,
@@ -64,7 +66,7 @@ export async function sendMetaEvent(request: Request, e: MetaEvent): Promise<'se
         },
       ],
     };
-    const res = await fetch(`https://graph.facebook.com/${GRAPH_VERSION}/${encodeURIComponent(PUBLIC_META_PIXEL_ID)}/events?access_token=${encodeURIComponent(META_CAPI_ACCESS_TOKEN)}`, {
+    const res = await fetch(`https://graph.facebook.com/${GRAPH_VERSION}/${encodeURIComponent(PUBLIC_META_PIXEL_ID)}/events`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(body),

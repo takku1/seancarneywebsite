@@ -10,6 +10,7 @@ import type { APIRoute } from 'astro';
 import { GOOGLE_SA_EMAIL, GOOGLE_SA_PRIVATE_KEY, GOOGLE_CALENDAR_IDS, AVAILABILITY_TIMEZONE } from 'astro:env/server';
 import { checkDay } from '../../lib/integrations/google-calendar';
 import { recordDateCheck } from '../../lib/scout/signals';
+import { errorCode } from '../../lib/security/errors';
 
 export const prerender = false;
 
@@ -39,7 +40,7 @@ export const GET: APIRoute = async ({ url }) => {
     // Short edge cache: repeated checks for popular dates stay fast and cheap.
     return json({ ok: true, status: day.status }, 300);
   } catch (err) {
-    console.warn('[availability]', (err as Error).message);
+    console.warn('[availability]', errorCode(err));
     return json({ ok: true, status: 'unknown' });
   }
 };

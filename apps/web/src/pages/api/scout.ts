@@ -14,6 +14,7 @@ import { recordQuestion, recordDateCheck, consumeDailyBudget } from '../../lib/s
 import { SCOUT_SIGNING_KEY, SCOUT_DAILY_LIMIT } from 'astro:env/server';
 import { signTranscript, verifyTranscript, visitorText } from '../../lib/scout/integrity';
 import { logSecurity } from '../../lib/security/log';
+import { errorCode } from '../../lib/security/errors';
 
 export const prerender = false;
 
@@ -98,7 +99,7 @@ export const POST: APIRoute = async ({ request }) => {
     const sig = await signTranscript(out.transcript, SCOUT_SIGNING_KEY);
     return json(200, { ok: true, reply: out.reply, cards: out.cards, transcript: out.transcript, sig, toolCalls: out.toolCalls, intents, handoff: out.stop === 'limit', model: provider.model });
   } catch (err) {
-    console.warn('[scout]', (err as Error).message);
+    console.warn('[scout]', errorCode(err));
     await signal;
     return json(200, { ok: false, mode: 'guided', error: 'provider_error', reply: "I lost the trail for a second. You can keep going with the quick options below, or use the inquiry form." });
   }

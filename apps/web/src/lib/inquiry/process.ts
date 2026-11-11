@@ -17,7 +17,8 @@ import {
 } from 'astro:env/server';
 import { upsertContact, createOpportunity, addNote, GHL_TIMEOUT_MS } from '../integrations/ghl';
 import { scoreLead, EVENT_TYPES, BUDGETS, ROLES, FORMATS, type Inquiry } from './schema';
-import { acceptLead, listOpen, retryOpen, reopenAbandoned, type Checkpoint, type CrmProgress, type DeliveryDeps, type LeadDB, type LeadRecord } from './deliver';
+import { acceptLead, listOpen, retryOpen, reopenAbandoned, purgeExpired, LeaseLost, type Lease, type CrmProgress, type DeliveryDeps, type LeadDB, type LeadRecord } from './deliver';
+import { errorCode } from '../security/errors';
 
 /** Pipeline value estimate per budget band (midpoints), for GHL forecasting. */
 const BUDGET_VALUE: Record<string, number | undefined> = { under_5k: 3500, '5k_10k': 7500, '10k_20k': 15000, '20k_40k': 30000, '40k_plus': 45000, discuss: undefined };
@@ -102,14 +103,15 @@ async function leadDB(): Promise<LeadDB | null> {
 /**
  * CRM delivery: GoHighLevel/SHA-BAM API v2, then the webhook. Throws unless one
  * of them took the lead. API steps record their result in `progress`, so a
- * retry after a partial success resumes at the next step. Each step is checkpointed
- * as soon as it succeeds, and the lease is re-checked before each remote write:
- * `checkpoint` throws if this runner lost its lease, which stops it there.
+ * retry after a partial success resumes at the next step. Before each remote write
+ * (webhook included) `lease.guard()` requires an unexpired lease and renews it;
+ * after each API step `lease.save()` checkpoints it. Either throws LeaseLost,
+ * which stops this runner there.
  */
-function crmSink(): ((r: InquiryRecord, progress: CrmProgress, checkpoint: Checkpoint) => Promise<void>) | null {
+function crmSink(): ((r: InquiryRecord, progress: CrmProgress, lease: Lease) => Promise<void>) | null {
   const api = GHL_PRIVATE_TOKEN && GHL_LOCATION_ID;
   if (!api && !GHL_WEBHOOK_URL) return null;
-  return async ({ inquiry: i, lead, leadId, channel }, progress, checkpoint) => {
+  return async ({ inquiry: i, lead, leadId, channel }, progress, lease) => {
     const payload = crmPayload(i, lead, leadId, channel);
     let apiError = '';
     if (api) {
@@ -117,7 +119,7 @@ function crmSink(): ((r: InquiryRecord, progress: CrmProgress, checkpoint: Check
         const cfg = { token: GHL_PRIVATE_TOKEN!, locationId: GHL_LOCATION_ID! };
         if (!progress.contactId) {
           // An upsert keyed on email: repeating it after a crash is harmless.
-          await checkpoint(progress); // lease check before the remote write
+          await lease.guard();
           progress.contactId = await upsertContact(cfg, {
             firstName: payload.firstName,
             lastName: payload.lastName,
@@ -127,10 +129,10 @@ function crmSink(): ((r: InquiryRecord, progress: CrmProgress, checkpoint: Check
             source: payload.source,
             tags: payload.tags,
           });
-          await checkpoint(progress);
+          await lease.save(progress);
         }
         if (GHL_PIPELINE_ID && GHL_STAGE_NEW_ID && !progress.opportunityId) {
-          await checkpoint(progress);
+          await lease.guard();
           progress.opportunityId = (await createOpportunity(cfg, {
             contactId: progress.contactId,
             pipelineId: GHL_PIPELINE_ID,
@@ -139,25 +141,26 @@ function crmSink(): ((r: InquiryRecord, progress: CrmProgress, checkpoint: Check
             monetaryValue: BUDGET_VALUE[i.budget],
             source: payload.source,
           })) ?? 'created';
-          await checkpoint(progress);
+          await lease.save(progress);
         }
         if (!progress.noted) {
-          await checkpoint(progress);
+          await lease.guard();
           await addNote(cfg, progress.contactId, Object.entries(payload).filter(([k]) => !['firstName', 'lastName', 'name', 'tags'].includes(k)).map(([k, v]) => `${k}: ${v}`).join('\n'));
           progress.noted = true;
-          await checkpoint(progress);
+          await lease.save(progress);
         }
         return;
       } catch (err) {
-        if ((err as Error).message === 'lease_lost') throw err;
-        apiError = `api: ${(err as Error).message}`;
+        if (err instanceof LeaseLost) throw err;
+        apiError = errorCode(err);
         if (!GHL_WEBHOOK_URL) throw new Error(apiError);
         // A partial API write plus a full webhook would duplicate the contact's data: only fall back if the API wrote nothing.
-        if (progress.contactId) throw new Error(`${apiError} (partial; retry resumes)`);
+        if (progress.contactId) throw new Error(`${apiError}+partial`);
       }
     }
+    await lease.guard();
     const res = await fetch(GHL_WEBHOOK_URL!, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload), signal: AbortSignal.timeout(GHL_TIMEOUT_MS) });
-    if (!res.ok) throw new Error(`${apiError ? apiError + '; ' : ''}webhook_${res.status}`);
+    if (!res.ok) throw new Error(`${apiError ? apiError + '+' : ''}webhook_${res.status}`);
   };
 }
 
@@ -175,7 +178,8 @@ function deps(db: LeadDB | null): DeliveryDeps<InquiryRecord> {
     allowDryRun: import.meta.env.DEV,
     log: (event, fields) => {
       const line = JSON.stringify({ ts: new Date().toISOString(), kind: 'lead', event, ...fields });
-      if (/(undeliverable|failed|abandoned)$/.test(event)) console.error(line);
+      // Error level = alert-worthy: a lead not delivered, given up on, crashed, or about to be deleted unresolved.
+      if (/(undeliverable|failed|abandoned|crashed|unresolved|expired)$/.test(event)) console.error(line);
       else console.info(line);
     },
   };
@@ -184,8 +188,15 @@ function deps(db: LeadDB | null): DeliveryDeps<InquiryRecord> {
 /**
  * Accepts one lead. `accepted: false` means nothing durable took it: the caller
  * must tell the visitor so (they are shown the direct email address instead).
+ * `accepted: true` means safely recorded, not necessarily delivered yet.
+ * With `defer` (Cloudflare's waitUntil), delivery runs after the response once
+ * the lead is stored, so a slow CRM never delays the visitor.
  */
-export async function processInquiry(i: Inquiry, channel: 'form' | 'scout'): Promise<{ accepted: boolean; leadId: string; tier: 'A' | 'B' | 'C'; duplicate?: boolean }> {
+export async function processInquiry(
+  i: Inquiry,
+  channel: 'form' | 'scout',
+  opts: { defer?: (work: Promise<unknown>) => void } = {},
+): Promise<{ accepted: boolean; leadId: string; tier: 'A' | 'B' | 'C'; duplicate?: boolean }> {
   const lead = scoreLead(i);
   const record: InquiryRecord = {
     leadId: `SC-${Date.now().toString(36).toUpperCase()}-${crypto.randomUUID().slice(0, 4).toUpperCase()}`,
@@ -194,7 +205,11 @@ export async function processInquiry(i: Inquiry, channel: 'form' | 'scout'): Pro
     inquiry: i,
     lead,
   };
-  const result = await acceptLead(record, deps(await leadDB()), i.event_id);
+  const db = await leadDB();
+  const d = deps(db);
+  const result = await acceptLead(record, { ...d, defer: opts.defer }, i.event_id);
+  // Retention also runs on every cron; here it keeps the 90-day promise even if the cron is not registered.
+  if (db && opts.defer) opts.defer(purgeExpired(db, d.log).catch((e) => d.log('lead_purge_failed', { error: errorCode(e) })));
   return { accepted: result.accepted, leadId: result.leadId, tier: lead.tier, duplicate: result.duplicate };
 }
 
@@ -209,4 +224,10 @@ export async function retryOpenLeads(opts: { limit?: number; cursor?: string | n
   const db = await leadDB();
   const reopened = db && opts.reopen ? await reopenAbandoned(db) : 0;
   return { reopened, ...(await retryOpen(deps(db), opts)) };
+}
+
+/** Cron: apply the retention policy (resolved leads at 90 days, unresolved at 180). */
+export async function purgeLeads() {
+  const db = await leadDB();
+  return db ? purgeExpired(db, deps(db).log) : null;
 }

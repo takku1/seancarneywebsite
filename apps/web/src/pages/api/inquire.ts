@@ -12,6 +12,7 @@ import { inquirySchema } from '../../lib/inquiry/schema';
 import { processInquiry } from '../../lib/inquiry/process';
 import { logSecurity, clientKey } from '../../lib/security/log';
 import { sendMetaEvent } from '../../lib/integrations/meta-capi';
+import { errorCode } from '../../lib/security/errors';
 
 export const prerender = false;
 
@@ -31,12 +32,12 @@ async function verifyTurnstile(token: string | undefined, ip: string | null): Pr
   body.append('secret', TURNSTILE_SECRET_KEY);
   body.append('response', token);
   if (ip) body.append('remoteip', ip);
-  const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body });
+  const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body, signal: AbortSignal.timeout(10_000) });
   const data = (await res.json()) as { success?: boolean };
   return !!data.success;
 }
 
-export const POST: APIRoute = async ({ request, clientAddress }) => {
+export const POST: APIRoute = async ({ request, clientAddress, locals }) => {
   let raw: unknown;
   try {
     raw = await request.json();
@@ -64,11 +65,16 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     return json(403, { ok: false, error: 'verification_failed' });
   }
 
-  const { accepted, leadId, tier, duplicate } = await processInquiry(i, 'form');
+  // Once the lead is stored, delivery (CRM, emails) continues after the response.
+  const cf = (locals as { cfContext?: { waitUntil(p: Promise<unknown>): void } }).cfContext;
+  const { accepted, leadId, tier, duplicate } = await processInquiry(i, 'form', { defer: cf ? (p) => cf.waitUntil(p) : undefined });
   // Nothing durable took the lead: say so, so the visitor uses the direct email instead.
   if (!accepted) return json(503, { ok: false, error: 'delivery_failed' });
   if (duplicate) return json(200, { ok: true, leadId, tier });
-  await sendMetaEvent(request, { name: 'Lead', eventId: i.event_id, adsOk: i.ads_ok, email: i.email, phone: i.phone || undefined, page: i.page, fbclid: i.attribution.last_fbclid ?? i.attribution.first_fbclid, customData: { event_type: i.event_type, lead_tier: tier } });
+  const meta = sendMetaEvent(request, { name: 'Lead', eventId: i.event_id, adsOk: i.ads_ok, email: i.email, phone: i.phone || undefined, page: i.page, fbclid: i.attribution.last_fbclid ?? i.attribution.first_fbclid, customData: { event_type: i.event_type, lead_tier: tier } })
+    .catch((e) => console.warn('[meta-capi]', errorCode(e)));
+  if (cf) cf.waitUntil(meta);
+  else await meta;
   return json(200, { ok: true, leadId, tier });
 };
 

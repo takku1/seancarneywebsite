@@ -21,7 +21,7 @@ async function load(entry) {
   return import(`data:text/javascript;base64,${Buffer.from(out.outputFiles[0].text).toString('base64')}`);
 }
 
-const {acceptLead, retryOpen, listOpen, reopenAbandoned, MAX_ATTEMPTS, LEASE_MS, CONFIRM_MAX_AGE_MS} = await load('src/lib/inquiry/deliver.ts');
+const {acceptLead, retryOpen, listOpen, reopenAbandoned, purgeExpired, MAX_ATTEMPTS, LEASE_MS, CONFIRM_MAX_AGE_MS} = await load('src/lib/inquiry/deliver.ts');
 
 /** Cloudflare D1's API over real SQLite; every call yields first, so concurrent callers interleave. */
 function d1({failOn} = {}) {
@@ -151,18 +151,18 @@ test('a runner that lost its lease stops at its next CRM step', {timeout: 10_000
   await acceptLead(record('SC-l3'), deps({db, sendToCrm: boom(), notifyOwner: ok()}).d);
   const g = gate();
   const stepsA = [];
-  const crmA = async (r, p, checkpoint) => {
-    await checkpoint(p); p.contactId = 'c1'; stepsA.push('contact'); await checkpoint(p);
+  const crmA = async (r, p, lease) => {
+    await lease.guard(); p.contactId = 'c1'; stepsA.push('contact'); await lease.save(p);
     await g.p; // stalls past its lease
-    await checkpoint(p); stepsA.push('opportunity'); p.opportunityId = 'o1'; await checkpoint(p);
+    await lease.guard(); stepsA.push('opportunity'); p.opportunityId = 'o1'; await lease.save(p);
   };
   const runA = retry({db, sendToCrm: crmA});
   await until(() => stepsA.length === 1);
   clock += LEASE_MS + 1;
   const stepsC = [];
-  await retry({db, sendToCrm: async (r, p, checkpoint) => {
-    if (!p.contactId) { await checkpoint(p); stepsC.push('contact'); p.contactId = 'c1'; await checkpoint(p); }
-    if (!p.opportunityId) { await checkpoint(p); stepsC.push('opportunity'); p.opportunityId = 'o1'; await checkpoint(p); }
+  await retry({db, sendToCrm: async (r, p, lease) => {
+    if (!p.contactId) { await lease.guard(); stepsC.push('contact'); p.contactId = 'c1'; await lease.save(p); }
+    if (!p.opportunityId) { await lease.guard(); stepsC.push('opportunity'); p.opportunityId = 'o1'; await lease.save(p); }
   }});
   g.open();
   await runA;
@@ -175,18 +175,18 @@ test('a worker that dies mid-CRM leaves its checkpoints; the next run resumes af
   const db = d1();
   const steps = [];
   const dies = gate(); // never opened: the Worker died
-  const crmDying = async (r, p, checkpoint) => {
-    p.contactId = 'c1'; steps.push('contact'); await checkpoint(p);
-    p.opportunityId = 'o1'; steps.push('opportunity'); await checkpoint(p);
+  const crmDying = async (r, p, lease) => {
+    await lease.guard(); p.contactId = 'c1'; steps.push('contact'); await lease.save(p);
+    await lease.guard(); p.opportunityId = 'o1'; steps.push('opportunity'); await lease.save(p);
     await dies.p;
   };
   acceptLead(record('SC-l4'), deps({db, sendToCrm: crmDying, notifyOwner: ok()}).d); // never settles
   await until(() => steps.length === 2 && JSON.parse(row(db, 'SC-l4').crm_progress).opportunityId);
   clock += LEASE_MS + 1;
-  await retry({db, sendToCrm: async (r, p, checkpoint) => {
+  await retry({db, sendToCrm: async (r, p, lease) => {
     if (!p.contactId) steps.push('contact');
     if (!p.opportunityId) steps.push('opportunity');
-    if (!p.noted) { steps.push('note'); p.noted = true; await checkpoint(p); }
+    if (!p.noted) { await lease.guard(); steps.push('note'); p.noted = true; await lease.save(p); }
   }});
   assert.deepEqual(steps, ['contact', 'opportunity', 'note']);
   assert.equal(row(db, 'SC-l4').crm, 'delivered');
@@ -267,14 +267,82 @@ test('two concurrent retry runs never deliver the same lead twice', {timeout: 10
   assert.equal(new Set(sent).size, 4);
 });
 
-test('leads older than the retention period are deleted', {timeout: 10_000}, async () => {
+test('retention deletes resolved leads at 90 days but keeps unresolved ones until 180', {timeout: 10_000}, async () => {
   const db = d1();
   const t = clock;
-  await acceptLead(record('SC-old', new Date(t).toISOString()), deps({db, notifyOwner: ok()}).d);
-  clock = t + 91 * 864e5;
-  await acceptLead(record('SC-new'), deps({db, notifyOwner: ok()}).d);
-  assert.equal(row(db, 'SC-old'), undefined);
-  assert.ok(row(db, 'SC-new'));
+  await acceptLead(record('SC-done', new Date(t).toISOString()), deps({db, sendToCrm: ok(), notifyOwner: ok()}).d);
+  await acceptLead(record('SC-waiting', new Date(t).toISOString()), deps({db, notifyOwner: ok()}).d); // CRM not connected
+  await acceptLead(record('SC-failing', new Date(t).toISOString()), deps({db, sendToCrm: boom(), notifyOwner: boom()}).d);
+  const logs = [];
+  const log = (e, f) => logs.push({e, ...f});
+
+  await purgeExpired(db, log, t + 91 * 864e5);
+  assert.equal(row(db, 'SC-done'), undefined, 'resolved: deleted after 90 days');
+  assert.ok(row(db, 'SC-waiting'), 'waiting for the CRM: kept');
+  assert.ok(row(db, 'SC-failing'), 'undelivered: kept');
+
+  await purgeExpired(db, log, t + 181 * 864e5);
+  assert.equal(count(db), 0, 'nothing outlives 180 days');
+  const expired = logs.find((l) => l.e === 'lead_retention_expired_unresolved');
+  assert.equal(expired.count, 2);
+});
+
+// ── Lease expiry, background delivery, retry scope ──────────────────────────
+
+test('an expired lease cannot start a new step, but an unreplaced holder still records its result', {timeout: 10_000}, async () => {
+  const db = d1();
+  await acceptLead(record('SC-x'), deps({db, sendToCrm: boom(), notifyOwner: ok()}).d);
+  const g = gate();
+  const steps = [];
+  const run = retry({db, sendToCrm: async (r, p, lease) => {
+    await lease.guard(); steps.push('contact'); p.contactId = 'c1'; await lease.save(p);
+    await g.p;
+    clock += LEASE_MS + 1; // the lease ran out while this runner was busy; nobody else claimed it
+    await lease.guard(); steps.push('opportunity');
+  }});
+  await until(() => steps.length === 1);
+  g.open();
+  await run;
+  assert.deepEqual(steps, ['contact'], 'no new remote step on an expired lease');
+  assert.equal(JSON.parse(row(db, 'SC-x').crm_progress).contactId, 'c1', 'the completed step was saved');
+  assert.equal(row(db, 'SC-x').crm, 'failed', 'the run ended as failed (lease_lost), to be resumed');
+  assert.equal(row(db, 'SC-x').crm_error, 'lease_lost');
+});
+
+test('once stored, delivery runs after the response: a slow CRM does not delay acceptance', {timeout: 10_000}, async () => {
+  const db = d1();
+  const g = gate();
+  const deferred = [];
+  const {d} = deps({db, sendToCrm: async () => { await g.p; }, notifyOwner: ok(), defer: (p) => deferred.push(p)});
+  const r = await acceptLead(record('SC-bg'), d);
+  assert.equal(r.accepted, true);
+  assert.equal(r.delivery, undefined, 'delivery outcome is not known yet');
+  assert.equal(row(db, 'SC-bg').crm, 'pending');
+  g.open();
+  await Promise.all(deferred);
+  assert.equal(row(db, 'SC-bg').crm, 'delivered');
+  assert.equal(row(db, 'SC-bg').notify, 'delivered');
+});
+
+test('the retry scan skips channels that cannot be delivered now', {timeout: 10_000}, async () => {
+  const db = d1();
+  for (let n = 0; n < 3; n++) await acceptLead(record(`SC-s${n}`), deps({db, notifyOwner: ok()}).d); // CRM not connected
+  const r = await retry({db, notifyOwner: ok()}); // CRM still not connected
+  assert.equal(r.processed, 0, 'no batch spent on leads waiting for the CRM');
+  assert.equal((await listOpen(db, {now: clock})).leads.length, 3, 'but the admin view still lists them');
+});
+
+// ── Log safety ──────────────────────────────────────────────────────────────
+
+test('error codes never carry raw messages, URLs or secrets', {timeout: 10_000}, async () => {
+  const {errorCode} = await load('src/lib/security/errors.ts');
+  assert.equal(errorCode(new Error('webhook_502')), 'webhook_502');
+  assert.equal(errorCode(new Error('ghl_/contacts/upsert_500+webhook_502')), 'ghl_/contacts/upsert_500+webhook_502');
+  assert.equal(errorCode(new TypeError('fetch failed: https://hooks.example/secret-token-123')), 'network');
+  assert.equal(errorCode(Object.assign(new Error('The operation was aborted due to timeout'), {name: 'TimeoutError'})), 'timeout');
+  assert.equal(errorCode(new Error('duplicate key couple@example.com')), 'error');
+  assert.equal(errorCode(new RangeError('bad value 555-0100')), 'RangeError');
+  assert.equal(errorCode('a string'), 'non_error_thrown');
 });
 
 test('lead logs never contain personal data', {timeout: 10_000}, async () => {

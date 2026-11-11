@@ -17,6 +17,7 @@ import { clientKey, logSecurity } from './lib/security/log';
 import { exceeds } from './lib/security/body';
 import { requireAuth } from './lib/security/auth';
 import { checkOrigin, type OriginPolicy } from './lib/security/origin';
+import { errorCode } from './lib/security/errors';
 
 interface RouteRule {
   methods: string[];
@@ -134,6 +135,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
 /** Last-resort handler (ASVS 16.5.4): log it, return a generic response, never a stack trace. */
 function handleError(err: unknown, route: string, who: string): Response {
-  logSecurity('unhandled_error', { route, message: err instanceof Error ? err.message : String(err), who });
+  logSecurity('unhandled_error', { route, code: errorCode(err), who });
   return problem(500, 'server_error');
 }

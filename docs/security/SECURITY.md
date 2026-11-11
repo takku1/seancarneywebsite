@@ -44,7 +44,7 @@ Concurrency and resources: each request makes at most 1–3 outbound calls (Scou
 | Class | Data | Where it lives | Protection | Retention |
 |---|---|---|---|---|
 | **Confidential** | API keys, tokens, signing key | Worker secrets only | Never in code or logs; least privilege | Rotate every 90 days (below) |
-| **Personal** | Inquiry contact details | GHL (system of record); `LEADS_DB` receipt for 90 days (disclosed on /privacy); in transit via TLS | Never in URLs or browser storage; masked in session replay; not sent to analytics | Per Sean's CRM policy |
+| **Personal** | Inquiry contact details | GHL (system of record); `LEADS_DB` copy for 90 days once resolved, up to 180 days while undelivered (disclosed on /privacy); in transit via TLS | Never in URLs or browser storage; masked in session replay; not sent to analytics | Per Sean's CRM policy |
 | **Personal (hashed, ads)** | SHA-256 of email/phone, IP, user agent, `_fbp`/`_fbc` on inquiry conversions | Meta Conversions API (`lib/integrations/meta-capi.ts`), server-side only | Sent only with consent + no opt-out (`ads_ok` from the browser) + no `Sec-GPC: 1`; never raw PII; token is a Worker secret; disclosed on /privacy | Meta's retention |
 | **Personal (transient)** | Scout chat text | Visitor's tab (sessionStorage), Anthropic for processing | HMAC-signed, cleared on tab close or "Clear chat", masked in replay | Tab lifetime |
 | **Internal** | Lead tier/score, attribution | GHL note; sessionStorage (tier, one page) | Not in URLs | CRM policy |
@@ -56,6 +56,7 @@ Concurrency and resources: each request makes at most 1–3 outbound calls (Scou
 ## 5. Logging inventory (ASVS 16.1.1, 16.2, 16.4)
 - **Where:** Workers Logs (Cloudflare), one JSON line per event; UTC timestamps; no raw IPs (`who` is a keyed daily HMAC of the IP with `LOG_HASH_KEY`, or a random per-instance key when unset). Encoded as JSON, so log injection isn't possible (ASVS 16.4.1). Only Cloudflare account members can read them (16.4.2).
 - **Security events** (`kind: "security"`): `rate_limited`, `body_too_large`, `origin_rejected`, `method_rejected`, `content_type_rejected`, `bad_signature`, `turnstile_failed`, `honeypot`, `auth_failed`, `validation_failed`, `csp_violation`, `unhandled_error`.
+- **Error detail:** only allowlisted codes from `lib/security/errors.ts` (e.g. `webhook_502`, `timeout`, `network`, an error class name); raw exception messages, which can carry URLs (a GHL webhook URL is a secret), parameters or personal data, are never logged. The Meta CAPI token travels in the POST body, not the URL.
 - **Operational:** `kind: "lead"` (`lead_accepted`, `lead_delivery_failed`, `lead_undeliverable`, `lead_duplicate`, `lead_retry_*`; lead id and outcomes only, never contact details), `[scout]` (provider errors), `[media]` (build-time fallbacks).
 - **Alerting (to configure):** Cloudflare notification on Worker error-rate spikes; a weekly review of `rate_limited` / `bad_signature` / `csp_violation` counts.
 

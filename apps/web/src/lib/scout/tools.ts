@@ -9,6 +9,7 @@ import { checkDay } from '../integrations/google-calendar';
 import { inquirySchema, EVENT_TYPES, BUDGETS, ROLES, FORMATS, GUESTS } from '../inquiry/schema';
 import { processInquiry } from '../inquiry/process';
 import { loadKnowledge, type CatalogItem } from './knowledge';
+import { errorCode } from '../security/errors';
 
 export interface ToolSpec {
   name: string;
@@ -185,7 +186,7 @@ export async function executeTool(name: string, input: unknown, ctx: ToolContext
         return { result: JSON.stringify({ error: `Unknown tool ${name}` }), isError: true };
     }
   } catch (err) {
-    console.warn('[scout] tool error', name, (err as Error).message);
+    console.warn('[scout] tool error', name, errorCode(err));
     return { result: JSON.stringify({ error: 'Tool unavailable right now' }), isError: true };
   }
 }
