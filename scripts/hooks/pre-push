@@ -1,0 +1,24 @@
+#!/bin/sh
+# ─────────────────────────────────────────────────────────────────────────────
+# Pre-push gate (GitHub CI is manual-only): when the push changes apps/web,
+# run the unit tests and the type check before anything reaches GitHub.
+# About a minute. Installed by scripts/setup-mac.sh, or once by hand:
+#   git config core.hooksPath scripts/hooks
+# publish.sh has already run the full gate (npm run verify), so it sets
+# SC_VERIFIED=1 and this hook steps aside.
+# ─────────────────────────────────────────────────────────────────────────────
+[ "${SC_VERIFIED:-}" = 1 ] && exit 0
+ROOT="$(git rev-parse --show-toplevel)"
+ZERO=0000000000000000000000000000000000000000
+web=0
+while read -r _local_ref local_sha _remote_ref remote_sha; do
+  [ "$local_sha" = "$ZERO" ] && continue # deleting a branch
+  if [ "$remote_sha" = "$ZERO" ]; then range="$local_sha"; else range="$remote_sha..$local_sha"; fi
+  git diff --name-only $range -- 2>/dev/null | grep -q '^apps/web/' && web=1
+done
+[ "$web" = 1 ] || exit 0
+echo "pre-push: apps/web changed; running unit tests and type check (skip with SC_VERIFIED=1)"
+cd "$ROOT/apps/web" || exit 1
+npm test --silent >/dev/null 2>&1 || { npm test; echo "pre-push: unit tests failed; nothing was pushed." >&2; exit 1; }
+npx --no-install astro check >/dev/null 2>&1 || { npx --no-install astro check | tail -30; echo "pre-push: type check failed; nothing was pushed." >&2; exit 1; }
+echo "pre-push: passed"

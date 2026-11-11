@@ -3,7 +3,7 @@
  * the cron trigger applies lead retention and retries deliveries that have not completed yet.
  */
 import astro from '@astrojs/cloudflare/entrypoints/server';
-import { purgeLeads, retryOpenLeads } from './lib/inquiry/process';
+import { overdueLeads, purgeLeads, retryOpenLeads } from './lib/inquiry/process';
 import { errorCode } from './lib/security/errors';
 
 interface Ctx { waitUntil(p: Promise<unknown>): void }
@@ -23,6 +23,8 @@ export default {
           processed += r.processed;
           console.info(JSON.stringify({ ts: new Date().toISOString(), kind: 'lead', event: 'lead_retry_batch', ...r }));
         }
+        const overdue = await overdueLeads();
+        if (overdue) console.error(JSON.stringify({ ts: new Date().toISOString(), kind: 'lead', event: 'lead_notify_overdue', count: overdue }));
         // One line per run, even when idle: proves the trigger fires (scripts/staging.sh cron),
         // and its absence for 30+ minutes is an alert condition.
         console.info(JSON.stringify({ ts: new Date().toISOString(), kind: 'lead', event: 'lead_cron_run', processed }));

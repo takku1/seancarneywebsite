@@ -17,11 +17,17 @@ export interface Experiment {
   active: boolean;
 }
 
+/**
+ * Both tests are paused (active: false; everyone sees the first variant) until there is
+ * enough traffic to read them: at launch volume a two-arm test needs months to separate
+ * a real difference from noise. Turn one back on when each arm gets a few hundred
+ * sessions a week, and judge it on booked outcomes, not clicks alone.
+ */
 export const EXPERIMENTS: Experiment[] = [
   // Hero supporting line: the arc of the day vs the rooms. Primary metric: inquiry_start rate.
-  { id: 'hero_sub', variants: ['arc', 'rooms'], active: true },
+  { id: 'hero_sub', variants: ['arc', 'rooms'], active: false },
   // Primary action label (first variant is the no-JS fallback). Primary metric: cta_click to inquiry_submit.
-  { id: 'cta_label', variants: ['check_date', 'inquire'], active: true },
+  { id: 'cta_label', variants: ['check_date', 'inquire'], active: false },
 ];
 
 const KEY = 'sc_exp_v1';

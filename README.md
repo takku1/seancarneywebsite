@@ -35,12 +35,12 @@ Copy `apps/web/.env.example` to `apps/web/.env` for local API keys. A blank key 
 | :--- | :--- |
 | Full gate (types, tests, build, audit); run before pushing | `npm run verify` |
 | Unit tests | `npm test` |
-| Browser and runtime smoke test of the listed pages and API guards (after `npm run build`; uses installed Chrome) | `npm run test:browser` |
+| Browser and runtime test: the listed pages, API guards and inquiry journeys (after `npm run build`; uses installed Chrome) | `npm run test:browser` |
 | Scout evals (needs a running server and API key) | `npm run eval:scout` |
 | Media: list, build, replace, check, report | `npm run media:<command>` (see `docs/current/11-media-management.md`) |
 | Regenerate browser/install icons | `npm run brand:icons` |
 | Publish (Mac) | `bash scripts/publish.sh "<description>"` from the repo root |
 
-Publish-script tests, from the repo root: `bash scripts/test_publish.sh`. Check without saving: `bash scripts/publish.sh --check`.
+Publish-script tests, from the repo root: `bash scripts/test_publish.sh`. Check without saving: `bash scripts/publish.sh --check`. Pre-push checks (unit tests and type check when `apps/web` changes; `setup-mac.sh` turns them on): `git config core.hooksPath scripts/hooks`.
 
 Python media tests, from the repo root: `py -m unittest scripts/media/test_media.py` (`python3` on macOS; needs Pillow).

@@ -36,7 +36,7 @@ const faqs = [
   { id: `${r.id}-sound`, data: { q: "Do you bring sound or use the venue's AV?", a: "Either. A self-contained system for smaller spaces, or plugged into the venue's or your production team's setup for larger ones." } },
 ];
 const title = `Live Wedding Music at ${name} | Sean Carney`;
-const description = `Live wedding and event music at ${name}${place ? `, ${place}` : ''}: solo for the ceremony, a trio for cocktails, the full band for the reception.`;
+const description = `Live wedding and event music at ${name}${place ? `, ${place}` : ''}: solo for the ceremony, a duo for cocktails, the full band for the reception.`;
 const jsonLd = graph(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Venues', path: '/venues' }, { name, path: `/venues/${r.id}` }]), faqSchema(faqs.map((f) => f.data)));
 ---
 

@@ -6,7 +6,7 @@
  * data. Logs therefore never contain a raw message: only a code from the
  * allowlist below (messages this app throws itself), or the error's class.
  */
-const CODE = /^(ghl_\/[\w/.-]{1,80}_\d{3}|webhook_\d{3}|resend_\d{3}|lease_lost|partial|timeout|network|error|[A-Z][A-Za-z]{0,39}Error)$/;
+const CODE = /^(ghl_\/[\w/.-]{1,80}_\d{3}|webhook_\d{3}|resend_\d{3}|google_(?:token|freebusy)_\d{3}|lease_lost|partial|timeout|network|error|[A-Z][A-Za-z]{0,39}Error)$/;
 
 /** A stable, log-safe code for any thrown value. Compound codes join with '+'. */
 export function errorCode(e: unknown): string {

@@ -28,7 +28,7 @@ scripts/        Node entry points: media.mjs (wraps ../../scripts/media/media.py
 | `npm run build` / `preview` | Production build to `dist/`, and a local preview of it |
 | `npm run check` | Astro and TypeScript diagnostics |
 | `npm test` | Unit tests in `evals/*.test.mjs` |
-| `npm run test:browser` | After a build: a smoke test of 21 listed pages at desktop and phone width, plus the API guards, against `astro preview` (installed Chrome) |
+| `npm run test:browser` | After a build: 21 listed pages at desktop and phone width, the API guards and four inquiry journeys, against `astro preview` (installed Chrome) |
 | `npm run eval:scout` | Scout concierge evaluation cases (against a running server, with an API key) |
 | `npm run verify` | check, test, build and dependency audit: the full gate (CI runs the same, manually) |
 | `npm run media:<list\|info\|build\|replace\|check\|report>` | Media catalog tool; see `docs/current/11-media-management.md` |

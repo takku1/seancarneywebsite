@@ -77,44 +77,69 @@ export const inquirySchema = z.object({
 export type Inquiry = z.infer<typeof inquirySchema>;
 
 /**
- * Lead tiering so Sean answers the highest-value inquiries first.
- * Signals: budget band, lead time, planner involvement, format, guest count.
- * Weights are a starting point; recalibrate against booked revenue after 90 days.
+ * Response priority for Sean's inbox. Three separate questions, not one budget score:
+ * - fit (0-60): budget band, a workable lead time, a date and a format in mind, event size.
+ *   Budget counts but no longer dominates; format is not ranked (Solo, Duo and Band
+ *   are all the offer).
+ * - relationship (0-30): planners and venues can bring repeat work; companies, return events.
+ * - urgency (0-30): a date within 30 days needs an answer first; within 90, soon.
+ * Tier A: strong fit, a trade partner, or an urgent date with a workable fit. Tier B:
+ * any moderate signal. Tier C: everything else.
+ *
+ * The tier is response ORDER, never neglect: every inquiry gets the same confirmation
+ * and a personal reply. Weights are a starting point; recalibrate against booked
+ * revenue (won/lost in the CRM) once there are outcomes, before trusting them further.
  */
-export function scoreLead(i: Inquiry, now = new Date()): { score: number; tier: 'A' | 'B' | 'C'; signals: string[] } {
-  let score = 0;
-  const signals: string[] = [];
-  const budgetPts: Record<string, number> = { under_5k: 0, '5k_10k': 15, '10k_20k': 30, '20k_40k': 40, '40k_plus': 50, discuss: 25 };
-  score += budgetPts[i.budget] ?? 0;
-  signals.push(`budget:${i.budget}`);
+export interface LeadScore {
+  score: number;
+  tier: 'A' | 'B' | 'C';
+  fit: number;
+  relationship: number;
+  urgency: number;
+  signals: string[];
+}
 
-  if (i.role === 'planner' || i.role === 'venue') {
-    score += 15;
-    signals.push('trade_referrer');
-  }
-  if (i.role === 'corporate') {
-    score += 10;
-    signals.push('corporate');
-  }
-  if (i.format === 'band') {
-    score += 10;
-    signals.push('full_band');
+export function scoreLead(i: Inquiry, now = new Date()): LeadScore {
+  const signals: string[] = [];
+  let fit = ({ under_5k: 5, '5k_10k': 15, '10k_20k': 25, '20k_40k': 30, '40k_plus': 35, discuss: 20 } as Record<string, number>)[i.budget] ?? 0;
+  signals.push(`budget:${i.budget}`);
+  if (i.format !== 'unsure') {
+    fit += 5;
+    signals.push(`format:${i.format}`);
   }
   if (i.guests && ['150 to 300', '300 to 1,000', 'Over 1,000'].includes(i.guests)) {
-    score += 5;
+    fit += 5;
     signals.push('large_event');
   }
+
+  let urgency = 0;
   if (i.event_date) {
     const days = (Date.parse(i.event_date) - now.getTime()) / 86_400_000;
-    if (days < 0) signals.push('date_in_past');
-    else if (days < 30) {
-      score += 5;
-      signals.push('urgent_under_30d');
-    } else if (days <= 540) {
-      score += 10;
-      signals.push('ideal_lead_time');
+    if (days < -1) signals.push('date_in_past');
+    else {
+      fit += 5; // a real date to check
+      if (days < 30) {
+        urgency = 30;
+        signals.push('urgent_under_30d');
+      } else if (days < 90) {
+        urgency = 15;
+        signals.push('soon_under_90d');
+      } else if (days <= 540) {
+        fit += 10;
+        signals.push('ideal_lead_time');
+      } else signals.push('far_out');
     }
+  } else if (i.date_flexible) signals.push('date_flexible');
+
+  let relationship = 0;
+  if (i.role === 'planner' || i.role === 'venue') {
+    relationship = 30;
+    signals.push('trade_partner');
+  } else if (i.role === 'corporate') {
+    relationship = 15;
+    signals.push('corporate');
   }
-  const tier = score >= 55 ? 'A' : score >= 30 ? 'B' : 'C';
-  return { score, tier, signals };
+
+  const tier = fit >= 45 || relationship >= 30 || (urgency >= 30 && fit >= 20) ? 'A' : fit >= 25 || relationship >= 15 || urgency >= 15 ? 'B' : 'C';
+  return { score: fit + relationship + urgency, tier, fit, relationship, urgency, signals };
 }

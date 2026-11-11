@@ -21,7 +21,7 @@ async function load(entry) {
   return import(`data:text/javascript;base64,${Buffer.from(out.outputFiles[0].text).toString('base64')}`);
 }
 
-const {acceptLead, retryOpen, listOpen, reopenAbandoned, purgeExpired, MAX_ATTEMPTS, LEASE_MS, CONFIRM_MAX_AGE_MS, RETRY_SPACING_MS} = await load('src/lib/inquiry/deliver.ts');
+const {acceptLead, retryOpen, listOpen, reopenAbandoned, purgeExpired, overdueNotifications, NOTIFY_OVERDUE_MS, MAX_ATTEMPTS, LEASE_MS, CONFIRM_MAX_AGE_MS, RETRY_SPACING_MS} = await load('src/lib/inquiry/deliver.ts');
 
 /** Cloudflare D1's API over real SQLite; every call yields first, so concurrent callers interleave. */
 function d1({failOn} = {}) {
@@ -413,4 +413,16 @@ test('pipeline: a webhook answering 500 is a failed delivery, not a success', {t
     globalThis.fetch = realFetch;
     console.error = realError;
   }
+});
+
+test('a lead whose notification to Sean is still undelivered after 30 minutes is overdue', {timeout: 10_000}, async () => {
+  const db = d1();
+  // Accepted (stored) while email is down: the visitor saw "received", Sean has not been told.
+  const {d} = deps({db, notifyOwner: boom('resend_500')});
+  assert.equal((await acceptLead(record('SC-late'), d)).accepted, true);
+  const {d: d2} = deps({db, notifyOwner: ok()});
+  await acceptLead(record('SC-fine'), d2);
+  assert.equal(await overdueNotifications(db, clock), 0, 'not overdue yet');
+  assert.equal(await overdueNotifications(db, clock + NOTIFY_OVERDUE_MS + 1), 1, 'only the undelivered one');
+  assert.equal(await overdueNotifications(db, clock + 8 * 86_400_000), 0, 'older than 7 days stops alerting (still listed)');
 });

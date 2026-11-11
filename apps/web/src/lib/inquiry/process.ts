@@ -17,7 +17,7 @@ import {
 } from 'astro:env/server';
 import { upsertContact, createOpportunity, addNote, GHL_TIMEOUT_MS } from '../integrations/ghl';
 import { scoreLead, EVENT_TYPES, BUDGETS, ROLES, FORMATS, type Inquiry } from './schema';
-import { acceptLead, listOpen, retryOpen, reopenAbandoned, purgeExpired, LeaseLost, type Lease, type CrmProgress, type DeliveryDeps, type LeadDB, type LeadRecord } from './deliver';
+import { acceptLead, listOpen, retryOpen, reopenAbandoned, purgeExpired, LeaseLost, type Lease, type CrmProgress, type DeliveryDeps, type LeadDB, type LeadRecord, type RelatedLead, overdueNotifications, relatedLeads } from './deliver';
 import { errorCode } from '../security/errors';
 
 /** Pipeline value estimate per budget band (midpoints), for GHL forecasting. */
@@ -29,7 +29,7 @@ const headerSafe = (s: string) => s.replace(/[\r\n\t]+/g, ' ').slice(0, 180);
 export const labelOf = (list: readonly { value: string; label: string }[], v?: string) => list.find((x) => x.value === v)?.label ?? v ?? '';
 const escapeHtml = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
-export function crmPayload(i: Inquiry, lead: ReturnType<typeof scoreLead>, leadId: string, channel: 'form' | 'scout') {
+export function crmPayload(i: Inquiry, lead: Lead, leadId: string, channel: 'form' | 'scout') {
   const [firstName, ...rest] = i.name.split(/\s+/);
   return {
     firstName,
@@ -39,7 +39,7 @@ export function crmPayload(i: Inquiry, lead: ReturnType<typeof scoreLead>, leadI
     phone: i.phone || undefined,
     companyName: i.company || undefined,
     source: `website:${i.attribution.last_channel || i.attribution.first_channel || 'direct'}`,
-    tags: ['website-inquiry', `via:${channel}`, `event:${i.event_type}`, `tier:${lead.tier}`, `role:${i.role}`, ...(i.sms_consent ? ['sms-consent'] : [])],
+    tags: ['website-inquiry', `via:${channel}`, `event:${i.event_type}`, `tier:${lead.tier}`, `role:${i.role}`, ...(i.sms_consent ? ['sms-consent'] : []), ...(lead.related?.length ? ['repeat-inquiry'] : [])],
     lead_id: leadId,
     inquiry_channel: channel,
     event_type: labelOf(EVENT_TYPES, i.event_type),
@@ -54,19 +54,23 @@ export function crmPayload(i: Inquiry, lead: ReturnType<typeof scoreLead>, leadI
     sms_consent: i.sms_consent,
     lead_score: lead.score,
     lead_tier: lead.tier,
+    lead_fit: lead.fit,
+    lead_relationship: lead.relationship,
+    lead_urgency: lead.urgency,
     lead_signals: lead.signals.join(', '),
+    related_leads: (lead.related ?? []).map((r) => r.leadId).join(', '),
     page: i.page ?? '',
     ...i.experiments,
     ...i.attribution,
   };
 }
 
-function notifyHtml(i: Inquiry, lead: ReturnType<typeof scoreLead>, leadId: string, channel: string): string {
+function notifyHtml(i: Inquiry, lead: Lead, leadId: string, channel: string): string {
   const row = (k: string, v: string | undefined) => (v ? `<tr><td style="padding:4px 12px 4px 0;color:#777">${k}</td><td style="padding:4px 0">${escapeHtml(v)}</td></tr>` : '');
   return `<div style="font-family:system-ui,sans-serif;font-size:15px;color:#111">
-<p style="font-size:18px"><strong>Tier ${lead.tier}</strong> inquiry (score ${lead.score}) from ${escapeHtml(i.name)}${channel === 'scout' ? ' <span style="color:#777">via Scout</span>' : ''}</p>
-<table>${row('Event', labelOf(EVENT_TYPES, i.event_type))}${row('Date', i.event_date || (i.date_flexible ? 'Flexible' : 'Not set'))}${row('Location', i.location)}${row('Guests', i.guests)}${row('Format', labelOf(FORMATS, i.format))}${row('Moments', i.moments.join(', '))}${row('Budget', labelOf(BUDGETS, i.budget))}${row('Role', labelOf(ROLES, i.role))}${row('Company', i.company)}${row('Email', i.email)}${row('Phone', i.phone)}${row('Message', i.message)}${row('Channel', i.attribution.last_channel || i.attribution.first_channel)}${row('Landing page', i.attribution.first_landing)}${row('Signals', lead.signals.join(', '))}</table>
-<p style="color:#777;font-size:13px">Lead ${leadId}. Reply directly to this email to respond.</p></div>`;
+<p style="font-size:18px"><strong>Tier ${lead.tier}</strong> inquiry (fit ${lead.fit}, relationship ${lead.relationship}, urgency ${lead.urgency}) from ${escapeHtml(i.name)}${channel === 'scout' ? ' <span style="color:#777">via Scout</span>' : ''}</p>
+<table>${row('Event', labelOf(EVENT_TYPES, i.event_type))}${row('Date', i.event_date || (i.date_flexible ? 'Flexible' : 'Not set'))}${row('Location', i.location)}${row('Guests', i.guests)}${row('Format', labelOf(FORMATS, i.format))}${row('Moments', i.moments.join(', '))}${row('Budget', labelOf(BUDGETS, i.budget))}${row('Role', labelOf(ROLES, i.role))}${row('Company', i.company)}${row('Email', i.email)}${row('Phone', i.phone)}${row('Message', i.message)}${row('Channel', i.attribution.last_channel || i.attribution.first_channel)}${row('Landing page', i.attribution.first_landing)}${row('Signals', lead.signals.join(', '))}${row('Earlier inquiries', (lead.related ?? []).map((r) => `${r.leadId} (${r.channel}, ${r.createdAt.slice(0, 10)})`).join('; '))}</table>
+<p style="color:#777;font-size:13px">Lead ${leadId}. Reply directly to this email to respond. The tier only sets the reply order: every inquiry gets a personal answer.</p></div>`;
 }
 
 function confirmHtml(i: Inquiry): string {
@@ -74,6 +78,12 @@ function confirmHtml(i: Inquiry): string {
 <p>Dear ${escapeHtml(i.name.split(/\s+/)[0])},</p>
 <p>Thank you for reaching out about your ${escapeHtml(labelOf(EVENT_TYPES, i.event_type).toLowerCase())}. Your note has been received and you will hear back personally within one business day with availability and next steps.</p>
 <p>Warmly,<br/>Sean Carney</p></div>`;
+}
+
+/** The same person across leads: SHA-256 of the trimmed, lowercased email (the email itself is already in the row). */
+export async function contactKeyOf(email: string): Promise<string> {
+  const h = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(email.trim().toLowerCase()));
+  return [...new Uint8Array(h)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
 /** Sends one email through Resend; throws unless Resend accepted it. */
@@ -87,7 +97,8 @@ async function sendEmail(to: string, subject: string, html: string, replyTo?: st
   if (!res.ok) throw new Error(`resend_${res.status}`);
 }
 
-type Lead = ReturnType<typeof scoreLead>;
+/** The score plus earlier leads from the same person, both stored with the lead. */
+type Lead = ReturnType<typeof scoreLead> & { related?: RelatedLead[] };
 export type InquiryRecord = LeadRecord<Inquiry, Lead>;
 
 /** The LEADS_DB binding (D1, wrangler.jsonc); null in plain `astro dev` or if unbound. */
@@ -172,7 +183,7 @@ function deps(db: LeadDB | null): DeliveryDeps<InquiryRecord> {
     sendToCrm: crmSink(),
     notifyOwner: emailReady() && INQUIRY_NOTIFY_EMAIL
       ? ({ inquiry: i, lead, leadId, channel }) =>
-          sendEmail(INQUIRY_NOTIFY_EMAIL!, `[Tier ${lead.tier}]${channel === 'scout' ? ' [Scout]' : ''} ${labelOf(EVENT_TYPES, i.event_type)}, ${i.event_date || 'date TBD'}, ${i.location}`, notifyHtml(i, lead, leadId, channel), i.email)
+          sendEmail(INQUIRY_NOTIFY_EMAIL!, `[Tier ${lead.tier}]${channel === 'scout' ? ' [Scout]' : ''}${lead.related?.length ? ' [Follow-up]' : ''} ${labelOf(EVENT_TYPES, i.event_type)}, ${i.event_date || 'date TBD'}, ${i.location}`, notifyHtml(i, lead, leadId, channel), i.email)
       : null,
     confirmVisitor: emailReady() ? ({ inquiry: i }) => sendEmail(i.email, 'Your inquiry for Sean Carney', confirmHtml(i)) : null,
     allowDryRun: import.meta.env.DEV,
@@ -197,15 +208,19 @@ export async function processInquiry(
   channel: 'form' | 'scout',
   opts: { defer?: (work: Promise<unknown>) => void; idempotencyKey?: string } = {},
 ): Promise<{ accepted: boolean; leadId: string; tier: 'A' | 'B' | 'C'; duplicate?: boolean }> {
-  const lead = scoreLead(i);
+  const db = await leadDB();
+  const contactKey = await contactKeyOf(i.email);
+  // Best effort: a lookup failure never blocks accepting the lead.
+  const related = db ? await relatedLeads(db, contactKey).catch(() => []) : [];
+  const lead: Lead = { ...scoreLead(i), ...(related.length ? { related } : {}) };
   const record: InquiryRecord = {
     leadId: `SC-${Date.now().toString(36).toUpperCase()}-${crypto.randomUUID().slice(0, 4).toUpperCase()}`,
     channel,
     createdAt: new Date().toISOString(),
     inquiry: i,
     lead,
+    contactKey,
   };
-  const db = await leadDB();
   const d = deps(db);
   const result = await acceptLead(record, { ...d, defer: opts.defer }, opts.idempotencyKey ?? i.event_id);
   // Retention also runs on every cron; here it keeps the 90-day promise even if the cron is not registered.
@@ -230,4 +245,10 @@ export async function retryOpenLeads(opts: { limit?: number; reopen?: boolean } 
 export async function purgeLeads() {
   const db = await leadDB();
   return db ? purgeExpired(db, deps(db).log) : null;
+}
+
+/** Cron: leads whose visitor was told "received" but whose notification to Sean is overdue. */
+export async function overdueLeads(): Promise<number | null> {
+  const db = await leadDB();
+  return db ? overdueNotifications(db) : null;
 }

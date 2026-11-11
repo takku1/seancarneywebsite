@@ -8,6 +8,11 @@
  *   exactly one <h1>;
  * - the API guards: Origin required on the inquiry route, the admin route
  *   hidden without its token, oversized and streamed bodies refused.
+ * - inquiry journeys at phone width: a refused submission keeps the answers
+ *   and shows the direct email; an accepted one lands on the thank-you page;
+ *   a 503 never shows success; a stale availability answer never reappears
+ *   after the date is cleared. Server delivery itself is covered by the unit
+ *   tests and on staging (scripts/staging.sh).
  *
  * Uses the installed Google Chrome (playwright-core, no browser download);
  * set CHROME_PATH to use another Chromium build. Screenshots: SHOTS=<dir>.
@@ -85,6 +90,88 @@ try {
     }
     await ctx.close();
   }
+
+  // ── Inquiry journeys (phone width) ──
+  console.log('inquiry journeys');
+  const journey = async (name, fn) => {
+    const ctx = await browser.newContext({ viewport: VIEWPORTS.phone, reducedMotion: 'reduce' });
+    const page = await ctx.newPage();
+    const errs = [];
+    page.on('pageerror', (e) => errs.push(`script: ${e.message.slice(0, 160)}`));
+    try { await fn(page); } catch (e) { errs.push(e.message.split('\n')[0]); }
+    errs.length ? errs.forEach((e) => fail(`journey: ${name}`, e)) : console.log(`  ok   ${name}`);
+    await ctx.close();
+  };
+  const assert = (cond, msg) => { if (!cond) throw new Error(msg); };
+  /** Walks all five steps like a visitor. Waits past the 4-second minimum fill time. */
+  const fillInquiry = async (page) => {
+    await page.goto(`${BASE}/inquire`, { waitUntil: 'networkidle' });
+    const t0 = Date.now();
+    await choose(page, 'event_type', 'wedding');
+    await page.locator('#location').waitFor({ state: 'visible' });
+    await page.locator('input[name="date_flexible"]').check();
+    await page.fill('#location', 'Santa Barbara');
+    await page.click('[data-next]');
+    await page.locator('#guests').waitFor({ state: 'visible' });
+    await page.click('[data-next]');
+    await choose(page, 'budget', 'discuss');
+    await page.click('[data-next]');
+    await page.locator('#name').waitFor({ state: 'visible' });
+    await page.fill('#name', 'Journey Test');
+    await page.fill('#email', 'journey@example.com');
+    await page.selectOption('#role', 'couple');
+    await page.waitForTimeout(Math.max(0, 4500 - (Date.now() - t0)));
+  };
+  /** Clicks the visible label of a radio or checkbox choice, as a visitor would. */
+  async function choose(page, name, value) { await page.locator('label.choice', { has: page.locator(`input[name="${name}"][value="${value}"]`) }).click(); }
+  const formError = (page) => page.locator('.form-error, [data-form-error]').first();
+
+  await journey('a refused submission keeps the answers and shows the direct email', async (page) => {
+    // The preview has no Turnstile secret, so production rules refuse the inquiry (403).
+    await fillInquiry(page);
+    const [res] = await Promise.all([page.waitForResponse((r) => r.url().endsWith('/api/inquire')), page.click('[data-submit]')]);
+    assert(res.status() === 403, `expected 403, got ${res.status()}`);
+    const err = formError(page);
+    await err.waitFor({ state: 'visible', timeout: 5000 });
+    assert(/@/.test(await err.innerText()), 'the error names the direct email address');
+    assert((await page.inputValue('#name')) === 'Journey Test', 'the answers are kept');
+    assert(await page.locator('[data-submit]').isEnabled(), 'Send can be tried again');
+  });
+
+  await journey('an accepted inquiry lands on the thank-you page with honest wording', async (page) => {
+    await page.route('**/api/inquire', (r) => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, leadId: 'SC-JOURNEY', tier: 'B' }) }));
+    await fillInquiry(page);
+    await page.click('[data-submit]');
+    await page.waitForURL(/\/inquire\/thanks/, { timeout: 10_000 });
+    const h1 = await page.locator('h1').innerText();
+    assert(/received/i.test(h1), `thank-you heading: ${h1}`);
+    assert(!/on its way to your inbox/i.test(await page.locator('.lede').innerText()), 'no promise that the email already left');
+  });
+
+  await journey('a 503 (nothing stored) never shows success', async (page) => {
+    await page.route('**/api/inquire', (r) => r.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ ok: false, error: 'delivery_failed' }) }));
+    await fillInquiry(page);
+    await page.click('[data-submit]');
+    await formError(page).waitFor({ state: 'visible', timeout: 5000 });
+    assert(!/thanks/.test(page.url()), 'stays on the form');
+  });
+
+  await journey('clearing the date hides a slow, stale availability answer', async (page) => {
+    await page.route('**/api/availability**', async (r) => { await new Promise((ok) => setTimeout(ok, 1200)); await r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, status: 'tentative' }) }); });
+    await page.goto(`${BASE}/inquire`, { waitUntil: 'networkidle' });
+    await choose(page, 'event_type', 'wedding');
+    await page.locator('#event_date').waitFor({ state: 'visible' });
+    await page.fill('#event_date', '2031-06-14');
+    await page.fill('#event_date', '');
+    await page.dispatchEvent('#event_date', 'change');
+    await page.waitForTimeout(2000);
+    assert(await page.locator('[data-avail]').isHidden(), 'a stale answer reappeared after the date was cleared');
+    // And a real answer still shows.
+    await page.fill('#event_date', '2031-06-15');
+    await page.locator('[data-avail]').waitFor({ state: 'visible', timeout: 5000 });
+    assert(/will check/.test(await page.locator('[data-avail]').innerText()), 'tentative wording');
+  });
+
   await browser.close();
 } catch (e) {
   fail('run', e.message);

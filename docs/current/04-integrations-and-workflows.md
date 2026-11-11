@@ -31,12 +31,12 @@ GHL workflows ──────────────────┘  booked 
 | Call booked | Lead books via `PUBLIC_CALL_BOOKING_URL` (GHL calendar) | Reminder 24h and 1h before (email + SMS) |
 | Proposal sent | Sean sends a GHL proposal/estimate | Follow-up at day 2 and day 5 if unopened or unsigned |
 | Contract signed | Documents & Contracts status Completed | Invoice auto-generated from the document's product line items (deposit); payment link by email and SMS |
-| Booked (deposit paid) | Stripe payment received | **Create the event on Sean's Google Calendar** (two-way sync) so the website shows the date as taken; planner info pack email |
+| Booked (deposit paid) | Stripe payment received | **Create the event on the SCE holds calendar** (`GOOGLE_HOLD_CALENDAR_IDS`, two-way sync) so the website shows the date as taken; planner info pack email |
 | Event week | 7 days before | Final timeline/run-of-show confirmation, balance invoice |
-| Completed | Day after the event | Thank-you; ask for a Google review at day 2 (direct review link); ask permission to quote them on the site (feeds `testimonials.json` with consent `granted`) |
+| Completed | Day after the event | Thank-you; ask for a Google review at day 2 (direct review link); ask permission to quote them on the site (feeds `testimonials.json`: consent `granted` plus an `approval` record, `14-decision-register.md`) |
 | Lost | Manual | Reason dropdown (price, date, chose other); 9-month nurture |
 
-The lost reasons and tiers become the data that tunes pricing bands and `scoreLead()` weights after 90 days.
+The lost reasons and tiers become the data that tunes pricing bands and `scoreLead()` weights after 90 days (owners, service levels and the outcome loop: `15-booking-operations.md`).
 
 ## Setup checklist with every key
 
@@ -44,7 +44,13 @@ The lost reasons and tiers become the data that tunes pricing bands and `scoreLe
 1. In Google Cloud Console, create a project and enable the **Google Calendar API**.
 2. Under IAM, create a **service account** and add a JSON key. From that file, `client_email` goes to `GOOGLE_SA_EMAIL` and `private_key` goes to `GOOGLE_SA_PRIVATE_KEY`.
 3. In Google Calendar, open each calendar Sean books against, then Settings > Share with specific people. Add the service account email with **"See only free/busy (hide details)"**.
-4. Put the calendar IDs (Settings > Integrate calendar) in `GOOGLE_CALENDAR_IDS`, comma-separated.
+4. Put the calendar IDs (Settings > Integrate calendar) in `GOOGLE_CALENDAR_IDS`, comma-separated. Recommended: a dedicated holds calendar of confirmed bookings and blocked dates in `GOOGLE_HOLD_CALENDAR_IDS`.
+   - Any hold in the performance window (10am to midnight local) makes the date **busy** ("may be spoken for").
+   - Personal calendars then only make it **tentative** ("Sean has something on that day; he'll confirm"), when their combined busy time, overlaps counted once, reaches an hour.
+   - Without a holds calendar, that hour makes the date busy.
+   - If any calendar returns an error, the answer is **unknown**, never open.
+   - Day boundaries follow `AVAILABILITY_TIMEZONE`, including daylight-saving days, and "past" means before today in that time zone.
+   - Rules and tests: `src/lib/integrations/google-calendar.ts`, `evals/availability.test.mjs`.
 5. Logic: a date counts as "busy" if events cover at least 60 minutes between 10:00 and 24:00 local. The site only ever says "looks open" or "may be spoken for", never "confirmed".
 
 *Why not GHL's free-slots API?* That answers "which 30-minute call slots are free", not "is this Saturday taken". Free/busy on the source calendar is simpler and private.

@@ -175,7 +175,7 @@ const data = enabled
         return h('a', { class: 'card go', href: c.href, 'data-track': 'scout_navigate', 'data-track-to': c.href }, h('strong', {}, c.label), h('span', { 'aria-hidden': 'true' }, '→'));
       }
       if (c.kind === 'availability') {
-        const msg = c.status === 'open' ? 'Looks open' : c.status === 'busy' ? 'May be spoken for' : c.status === 'past' ? 'That date has passed' : 'Sean will confirm';
+        const msg = c.status === 'open' ? 'Looks open' : c.status === 'busy' ? 'May be spoken for' : c.status === 'tentative' ? 'Sean will check' : c.status === 'past' ? 'That date has passed' : 'Sean will confirm';
         const d = new Date(`${c.date}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
         const ok = /^\d{4}-\d{2}-\d{2}$/.test(c.date);
         return h('div', { class: 'card avail', 'data-status': c.status }, h('strong', {}, d), h('span', {}, msg),
@@ -315,7 +315,7 @@ const data = enabled
         const res = await fetch(`/api/availability?date=${date}`);
         const out = (await res.json()) as { status?: string };
         const status = out.status ?? 'unknown';
-        const line = status === 'open' ? "That date looks open. Sean confirms personally, so let's get it to him." : status === 'busy' ? "That one may already be spoken for, but send it anyway. There may be options." : status === 'past' ? 'That date has already passed. Pick another?' : "I can't see the calendar right now, but Sean will confirm as soon as you send it.";
+        const line = status === 'open' ? "That date looks open. Sean confirms personally, so let's get it to him." : status === 'busy' ? "That one may already be spoken for, but send it anyway. There may be options." : status === 'tentative' ? "Sean has something on his calendar that day, so he'll need to check. Send it and he'll confirm either way." : status === 'past' ? 'That date has already passed. Pick another?' : "I can't see the calendar right now, but Sean will confirm as soon as you send it.";
         say('scout', line, [{ kind: 'availability', date, status }]);
         track('scout_tool', { tool: 'check_availability', result: status, mode });
       } catch {

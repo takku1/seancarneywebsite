@@ -1,26 +1,11 @@
 # Launch checklist
 
-Everything here is confirmed with Sean before the site goes live. Each item is a claim the site makes, an asset it needs, or a setup step.
+Technical setup and QA before the site goes live. Approvals from Sean live in `14-decision-register.md`.
 
-## Claims to confirm
-- [ ] **Event count:** 1,000+ events across fifteen years (`src/config/site.ts`). Older sources say 500+ hired and 100+ per year.
-- [ ] **Rooms named on the site:** Hotel del Coronado, The Beverly Hills Hotel, The Ritz-Carlton Laguna Niguel, Terranea, The Biltmore (category `room` in `credits.json`; shown on the home page, About and the inquiry page). Sean confirms each was a real engagement and is fine to name.
-- [ ] **Clients named:** Salesforce, Autodesk, VCA, MacLean Power Systems, Informa Markets, Hawke Media.
-- [ ] **Credentials line** on About (Paris Olympics coverage, NFL Playoffs, Netflix): wording approved by Sean.
-- [ ] **Response time:** "within one business day" (`site.responseTime`); keep only if it is always true.
-- [ ] **Insurance and paperwork:** COI naming the venue, W-9, stage plot and tech rider available on request.
-- [ ] **Named testimonials:** Jordan and Isabela, Timea and Kris, Olivia and John (public on the earlier events site); each couple confirms they are happy to appear.
-- [ ] **Formats:** the Solo, Duo and Band options Sean actually offers, and the band's name (The Scene is used throughout).
+## Approvals, claims and content
+Every claim, testimonial, media right, offer decision and sales material Sean must approve is tracked in one place: `14-decision-register.md`. Launch needs sections 1–6 there settled (approved, or removed from the site).
 
-## Content and assets
-- [ ] Usage rights and photographer credit lines for the supplied wedding photography and films (the November 10 Drive set, used on Home, Weddings and `/the-scene`). Some pages still use legacy artist portraits, marked in `media-library.json`.
 - [x] The hero film loop: the supplied `SCE WEBSITE HERO FINAL.mov`, cut to a muted 40-second loop in desktop and phone sizes.
-- [ ] The script signature logo as a vector.
-- [ ] Repertoire by moment: `src/data/repertoire.json` holds only songs already in Sean's own lists and filmed covers; Sean confirms and extends it.
-- [ ] Travel policy and destination-wedding notes.
-- [ ] The planner pack (COI sample, W-9, rider, stage plot) ready to send: `/planners` requests it by email.
-- [ ] A short story for each room in `credits.json` (`story`): the setting, the formats, a moment. Each venue page becomes indexable once its story exists.
-- [ ] The private investment guide sent after inquiry (pricing posture: `01-positioning-and-offer.md`).
 
 ## Security (from `docs/security/SECURITY.md`)
 - [x] Rate-limiting bindings `RATE_LIMITER_STRICT` / `RATE_LIMITER` KV `SCOUT_KV` and D1 `LEADS_DB` declared in `apps/web/wrangler.jsonc` (KV is provisioned on first deploy).
@@ -32,8 +17,7 @@ Everything here is confirmed with Sean before the site goes live. Each item is a
 - [ ] After turning on GA4 / Clarity / Meta / Turnstile, watch `csp_violation` logs for a week.
 - [ ] DNS: DMARC (`_dmarc` TXT `v=DMARC1; p=none; rua=mailto:<reports address>`), moving to `p=quarantine` after 2–4 clean weeks; verify the sending domain in Resend (DKIM plus a `send.` return-path subdomain) before inquiry emails go live.
 - [ ] A Cloudflare notification for Worker error-rate spikes; a weekly review of security events.
-- [ ] An alert on lead log lines at error level: `lead_undeliverable`, `lead_crm_abandoned`, `lead_notify_abandoned`, `lead_delivery_crashed` and `lead_retention_expired_unresolved` (Workers Logs); and on config lines `scout_signing_key_missing`, `turnstile_secret_missing`, `rate_limiter_unbound` and `rate_limiter_error`. An abandoned notification means Sean was never told about that lead: check `GET /api/leads`, contact the couple, then `POST /api/leads` with `{"reopen": true}` once the cause is fixed.
-- [ ] Alert when no `lead_cron_run` line has appeared for 30 minutes (the cron logs one per run, even when idle).
+- [ ] Alerts as listed in `15-booking-operations.md` (Alerts), including the absence of `lead_cron_run` for 30 minutes. Send a test alert and confirm it arrives.
 - [ ] After the first production deploy, confirm the D1 database `seancarneymusic-leads` was created and bound as `LEADS_DB` (Worker > Settings > Bindings) and the 15-minute cron is listed under Triggers. Staging proves the same for its own database first (`13-staging.md`).
 
 ## Pre-launch QA
@@ -57,13 +41,8 @@ Everything here is confirmed with Sean before the site goes live. Each item is a
 - [ ] The wedding Instagram bio links to `/links?utm_source=instagram&utm_medium=social&utm_campaign=bio`.
 - [ ] DNS points to Cloudflare Workers; the 301s for every legacy URL are in `astro.config.mjs`.
 
-## Experiments at launch (read results by `exp_*` property)
-| id | arms | primary metric |
-|---|---|---|
-| `hero_sub` | the two hero lines | `inquiry_start` per home visit |
-| `cta_label` | "Check your date" / "Inquire" | `cta_click` to `inquiry_submit` |
-
-Force an arm for QA with `?exp_<id>=<variant>`; turn on the console event log with `?debug_analytics=1`.
+## Experiments
+Paused at launch (`active: false` in `src/lib/analytics/experiments.ts`): at launch traffic a two-arm test can't separate a real difference from noise. Everyone sees the first arm ("Bespoke wedding entertainment…", "Check your date"). When traffic allows, re-enable one and read it by the `exp_*` property; force an arm for QA with `?exp_<id>=<variant>`, and see the console event log with `?debug_analytics=1`.
 
 ## Housekeeping for Sean
 - His Apple Music profile is merged with an Ohio blues musician of the same name; his distributor can split it.

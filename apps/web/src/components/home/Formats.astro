@@ -3,12 +3,12 @@
 import { Image } from 'astro:assets';
 import { photoFor } from '../../lib/media/library';
 const solo=photoFor('home.format.solo');
-const trio=photoFor('home.format.duo');
+const duo=photoFor('home.format.duo');
 const band=photoFor('home.format.band');
 
 const formats = [
   { name: 'Solo', when: 'Ceremonies, cocktail hours, dinners and intimate estates.', body: 'Voice and acoustic guitar. A personal arrangement, with room for every word.', img: solo.image, alt: solo.alt },
-  { name: 'Duo', when: 'Cocktail hours, welcome dinners and intimate receptions.', body: 'A second voice, another texture. An intimate set with a little more movement.', img: trio.image, alt: trio.alt },
+  { name: 'Duo', when: 'Cocktail hours, welcome dinners and intimate receptions.', body: 'A second voice, another texture. An intimate set with a little more movement.', img: duo.image, alt: duo.alt },
   { name: 'Band', when: 'Receptions, dance floors and galas.', body: 'The Scene, brought together for the songs that get your people on their feet.', img: band.image, alt: band.alt },
 ];
 ---

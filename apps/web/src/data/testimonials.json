@@ -5,7 +5,8 @@
     "name": "Jordan and Isabela",
     "role": "Wedding, Santa Monica",
     "eventType": "wedding",
-    "consent": "granted",
+    "source": "Earlier SCE events site (reference/current-site/text/events-home.txt)",
+    "consent": "pending",
     "featured": true
   },
   {
@@ -14,7 +15,8 @@
     "name": "Timea and Kris",
     "role": "Wedding reception, Orange County",
     "eventType": "wedding",
-    "consent": "granted",
+    "source": "Earlier SCE events site (reference/current-site/text/events-home.txt)",
+    "consent": "pending",
     "featured": true
   },
   {
@@ -23,7 +25,8 @@
     "name": "Olivia and John",
     "role": "Wedding with the full band, Fullerton",
     "eventType": "wedding",
-    "consent": "granted",
+    "source": "Earlier SCE events site (reference/current-site/text/events-home.txt)",
+    "consent": "pending",
     "featured": true
   },
   {
@@ -31,6 +34,7 @@
     "quote": "Sean and his band made our corporate event an absolute hit. Their energy and professionalism were beyond expectations.",
     "role": "Corporate client",
     "eventType": "corporate",
+    "source": "Earlier Sean Carney site, unattributed (reference/current-site/text/live-events.txt)",
     "featured": true
   },
   {
@@ -38,6 +42,7 @@
     "quote": "Thank you for making our wedding reception magical. Our guests are still talking about how much fun they had.",
     "role": "Wedding couple",
     "eventType": "wedding",
+    "source": "Earlier Sean Carney site, unattributed (reference/current-site/text/live-events.txt)",
     "featured": false
   },
   {
@@ -45,25 +50,29 @@
     "quote": "Exceeded all our expectations at our expo. His music and stage presence kept the energy high all night.",
     "role": "Expo organizer",
     "eventType": "corporate",
+    "source": "Earlier Sean Carney site, unattributed (reference/current-site/text/home.txt)",
     "featured": true
   },
   {
     "id": "anniversary",
     "quote": "We hired Sean for our anniversary party and he had everyone on their feet, singing along with every song.",
     "role": "Private client, anniversary celebration",
-    "eventType": "celebration"
+    "eventType": "celebration",
+    "source": "Earlier Sean Carney site, unattributed (reference/current-site/text/home.txt)"
   },
   {
     "id": "private-vision",
     "quote": "I explained my vision for the entertainment and it was like he read my mind. He did exactly what I wanted.",
     "role": "Private client",
-    "eventType": "celebration"
+    "eventType": "celebration",
+    "source": "Earlier Sean Carney site, unattributed (reference/current-site/text/home.txt)"
   },
   {
     "id": "private-celebration",
     "quote": "Their ability to engage the audience and create an amazing atmosphere made the event unforgettable.",
     "role": "Private client, private celebration",
-    "eventType": "estate"
+    "eventType": "estate",
+    "source": "Earlier Sean Carney site, unattributed (reference/current-site/text/live-events.txt)"
   },
   {
     "id": "sugarman",
@@ -71,7 +80,8 @@
     "name": "Alexander Sugarman",
     "role": "Client, Los Angeles",
     "eventType": "corporate",
-    "consent": "granted"
+    "source": "Bark review, 2023-12-21",
+    "consent": "pending"
   },
   {
     "id": "alisonv",
@@ -79,7 +89,8 @@
     "name": "Alison V.",
     "role": "70th birthday celebration",
     "eventType": "estate",
-    "consent": "granted",
+    "source": "Bark review, 2024-12-08",
+    "consent": "pending",
     "featured": false
   },
   {
@@ -88,7 +99,8 @@
     "name": "Gina",
     "role": "Private celebration",
     "eventType": "celebration",
-    "consent": "granted"
+    "source": "Bark review, 2025-08-13",
+    "consent": "pending"
   },
   {
     "id": "austin",
@@ -96,7 +108,8 @@
     "name": "Austin",
     "role": "Private event",
     "eventType": "estate",
-    "consent": "granted"
+    "source": "Bark review, 2026-01-27",
+    "consent": "pending"
   },
   {
     "id": "morison",
@@ -104,6 +117,7 @@
     "name": "Anthony Morison",
     "role": "Private event",
     "eventType": "celebration",
-    "consent": "granted"
+    "source": "Bark review, 2025-08-14",
+    "consent": "pending"
   }
 ]

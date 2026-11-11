@@ -4,8 +4,7 @@
  * Every tool result also yields an optional UI card for the chat panel.
  */
 import { z } from 'astro/zod';
-import { GOOGLE_SA_EMAIL, GOOGLE_SA_PRIVATE_KEY, GOOGLE_CALENDAR_IDS, AVAILABILITY_TIMEZONE } from 'astro:env/server';
-import { checkDay } from '../integrations/google-calendar';
+import { availabilityFor } from '../integrations/availability';
 import { inquirySchema, EVENT_TYPES, BUDGETS, ROLES, FORMATS, GUESTS } from '../inquiry/schema';
 import { labelOf } from '../inquiry/process';
 import { signDraft } from './draft';
@@ -130,18 +129,9 @@ export async function executeTool(name: string, input: unknown, ctx: ToolContext
       case 'check_availability': {
         const date = String(args.date ?? '');
         if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return { result: JSON.stringify({ error: 'date must be YYYY-MM-DD' }), isError: true };
-        if (date < new Date().toISOString().slice(0, 10)) return { result: JSON.stringify({ date, status: 'past' }), card: { kind: 'availability', date, status: 'past' } };
-        if (!GOOGLE_SA_EMAIL || !GOOGLE_SA_PRIVATE_KEY || !GOOGLE_CALENDAR_IDS) {
-          return { result: JSON.stringify({ date, status: 'unknown', note: 'Calendar not connected. Offer to send an inquiry so Sean can confirm.' }) };
-        }
-        const day = await checkDay({
-          date,
-          calendarIds: GOOGLE_CALENDAR_IDS.split(',').map((s) => s.trim()).filter(Boolean),
-          clientEmail: GOOGLE_SA_EMAIL,
-          privateKey: GOOGLE_SA_PRIVATE_KEY,
-          timeZone: AVAILABILITY_TIMEZONE || 'America/Los_Angeles',
-        });
-        return { result: JSON.stringify({ date, status: day.status }), card: { kind: 'availability', date, status: day.status } };
+        const status = await availabilityFor(date);
+        const note = status === 'unknown' ? 'The calendar could not be read. Offer to send an inquiry so Sean can confirm.' : status === 'tentative' ? 'Sean has something on that day; he will confirm whether it works.' : undefined;
+        return { result: JSON.stringify({ date, status, ...(note ? { note } : {}) }), card: { kind: 'availability', date, status } };
       }
       case 'show_media': {
         const { catalog } = await loadKnowledge();

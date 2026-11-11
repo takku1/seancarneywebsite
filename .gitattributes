@@ -1,2 +1,6 @@
 # Shell scripts run on macOS/Linux: always LF, even when committed from Windows.
 *.sh text eol=lf
+scripts/hooks/* text eol=lf
+
+# Research snapshots: documentation, not source (GitHub language stats, diffs collapsed).
+reference/** linguist-documentation -diff

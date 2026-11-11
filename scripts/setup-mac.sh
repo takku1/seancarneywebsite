@@ -239,6 +239,9 @@ else
   fail "$REPO_DIR isn't a git copy of the project (was it downloaded as a ZIP?). Move it aside and run this script on its own so it can download a proper copy."
 fi
 WEB_DIR="$REPO_DIR/apps/web"
+# Pre-push gate: unit tests and type check before app changes reach GitHub (CI is manual-only).
+if [ "$DRY_RUN" = 1 ]; then run git -C "$REPO_DIR" config core.hooksPath scripts/hooks
+else git -C "$REPO_DIR" config core.hooksPath scripts/hooks && ok "pre-push checks on"; fi
 
 # ── 7. Packages ──────────────────────────────────────────────────────────────
 step "Installing project packages"

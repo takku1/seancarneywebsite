@@ -17,8 +17,8 @@ const next = [
   <section class="section" data-section="thanks">
     <div class="container grid">
       <div>
-        <h1>Thank you. Your note is with Sean.</h1>
-        <p class="lede">A confirmation is on its way to your inbox. Here is what happens next.</p>
+        <h1>Thank you. Your inquiry is received.</h1>
+        <p class="lede">Sean will reply personally {site.responseTime}. A confirmation email usually follows within a few minutes; if it doesn't arrive, check your spam folder or write to <a href={`mailto:${site.email.bookings}`}>{site.email.bookings}</a>. Here is what happens next.</p>
         <ol class="next">
           {next.map((n) => <li><h2>{n.t}</h2><p>{n.b}</p></li>)}
         </ol>

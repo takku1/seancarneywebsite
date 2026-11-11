@@ -160,7 +160,7 @@ fi
 [ -n "$MSG" ] || { git reset --quiet; fail "A short description is needed."; }
 git commit --quiet -m "$MSG"
 fi
-git push --quiet origin "$BRANCH"
+SC_VERIFIED=1 git push --quiet origin "$BRANCH"
 ok "pushed to GitHub ($BRANCH): $(git log -1 --format='%h %s')"
 
 REMOTE="$(git remote get-url origin | sed -E 's#^git@github.com:#https://github.com/#; s#\.git$##')"

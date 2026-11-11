@@ -318,13 +318,15 @@ const steps = ['Occasion', 'Date and place', 'The event', 'Investment', 'Your de
     const availEl = form.querySelector<HTMLElement>('[data-avail]')!;
     const AVAIL_COPY: Record<string, string> = {
       open: 'That date looks open. Send the details and Sean will confirm.',
+      tentative: 'Sean has something on his calendar that day and will check. Send the details and he will confirm either way.',
       busy: 'That date may already be spoken for. Send it anyway: there may be options, and Sean will reply either way.',
     };
     let availSeq = 0;
     async function checkAvailability(date: string) {
       availEl.hidden = true;
-      if (!date) return;
+      // Every change, clearing included, supersedes any check still in flight.
       const seq = ++availSeq;
+      if (!date) return;
       try {
         const res = await fetch(`/api/availability?date=${encodeURIComponent(date)}`);
         const out = (await res.json()) as { status?: string };

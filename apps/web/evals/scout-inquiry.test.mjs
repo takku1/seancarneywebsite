@@ -10,7 +10,7 @@ import {build} from 'esbuild';
  *   however often the same inquiry is sent or prepared.
  * Real modules, with Astro/Cloudflare virtual modules stubbed and D1 backed by SQLite.
  */
-const ENV_NAMES = ['SCOUT_PROVIDER', 'ANTHROPIC_API_KEY', 'SCOUT_MODEL', 'SCOUT_SIGNING_KEY', 'SCOUT_DAILY_LIMIT', 'SCOUT_ADMIN_TOKEN', 'GHL_WEBHOOK_URL', 'GHL_PRIVATE_TOKEN', 'GHL_LOCATION_ID', 'GHL_PIPELINE_ID', 'GHL_STAGE_NEW_ID', 'RESEND_API_KEY', 'INQUIRY_NOTIFY_EMAIL', 'INQUIRY_FROM_EMAIL', 'LOG_HASH_KEY', 'GOOGLE_SA_EMAIL', 'GOOGLE_SA_PRIVATE_KEY', 'GOOGLE_CALENDAR_IDS', 'AVAILABILITY_TIMEZONE'];
+const ENV_NAMES = ['SCOUT_PROVIDER', 'ANTHROPIC_API_KEY', 'SCOUT_MODEL', 'SCOUT_SIGNING_KEY', 'SCOUT_DAILY_LIMIT', 'SCOUT_ADMIN_TOKEN', 'GHL_WEBHOOK_URL', 'GHL_PRIVATE_TOKEN', 'GHL_LOCATION_ID', 'GHL_PIPELINE_ID', 'GHL_STAGE_NEW_ID', 'RESEND_API_KEY', 'INQUIRY_NOTIFY_EMAIL', 'INQUIRY_FROM_EMAIL', 'LOG_HASH_KEY', 'GOOGLE_SA_EMAIL', 'GOOGLE_SA_PRIVATE_KEY', 'GOOGLE_CALENDAR_IDS', 'GOOGLE_HOLD_CALENDAR_IDS', 'AVAILABILITY_TIMEZONE'];
 const stubs = {
   name: 'stubs',
   setup(b) {
@@ -192,4 +192,47 @@ test('drafts expire after 30 minutes', {timeout: 10_000}, async () => {
   assert.equal((await verifyDraft(token, SECRET, t0 + DRAFT_TTL_MS - 1)).ok, true);
   assert.deepEqual(await verifyDraft(token, SECRET, t0 + DRAFT_TTL_MS + 1), {ok: false, error: 'expired'});
   assert.deepEqual(await verifyDraft(token, 'another-secret', t0), {ok: false, error: 'bad_signature'});
+});
+
+// ── The same person through more than one door ─────────────────────────────
+
+const {processInquiry} = await load('src/lib/inquiry/process.ts');
+const {inquirySchema} = await load('src/lib/inquiry/schema.ts');
+
+/** Like setup(), but keeps every CRM payload. */
+function setupPayloads() {
+  const env = setup();
+  const payloads = [];
+  globalThis.fetch = async (url, init) => { const p = JSON.parse(init.body); env.crm.push(p.lead_id); payloads.push(p); return new Response('ok'); };
+  return {...env, payloads};
+}
+
+test('two tabs, two different drafts: both are sent as leads, and the second is linked to the first', {timeout: 10_000}, async () => {
+  const {db, payloads} = setupPayloads();
+  try {
+    // Each tab only offers Send on its own latest draft; across tabs, each send is a real lead.
+    const tabA = (await executeTool('submit_inquiry', {...ARGS, guests: '50 to 150'}, CTX)).card.token;
+    const tabB = (await executeTool('submit_inquiry', {...ARGS, guests: '150 to 300'}, CTX)).card.token;
+    const a = await (await send(POST, tabA)).json();
+    const b = await (await send(POST, tabB)).json();
+    assert.notEqual(a.leadId, b.leadId);
+    assert.equal(leads(db), 2);
+    const pb = payloads.find((p) => p.lead_id === b.leadId);
+    assert.ok(pb.tags.includes('repeat-inquiry'), 'the CRM sees one relationship');
+    assert.equal(pb.related_leads, a.leadId);
+    assert.ok(!payloads.find((p) => p.lead_id === a.leadId).tags.includes('repeat-inquiry'));
+  } finally { restore(); }
+});
+
+test('the same inquiry through the form and through Scout: two leads, linked, neither lost', {timeout: 10_000}, async () => {
+  const {db, payloads} = setupPayloads();
+  try {
+    const form = inquirySchema.parse({...ARGS, email: 'ADA@example.com ', event_id: crypto.randomUUID()});
+    const viaForm = await processInquiry(form, 'form');
+    const viaScout = await (await send(POST, (await executeTool('submit_inquiry', ARGS, CTX)).card.token)).json();
+    assert.equal(viaForm.accepted, true);
+    assert.notEqual(viaScout.leadId, viaForm.leadId, 'separate submissions are delivered separately');
+    assert.equal(leads(db), 2);
+    assert.equal(payloads.find((p) => p.lead_id === viaScout.leadId).related_leads, viaForm.leadId, 'matched on the normalized email');
+  } finally { restore(); }
 });

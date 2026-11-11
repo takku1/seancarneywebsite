@@ -97,6 +97,7 @@ export default defineConfig({
       GOOGLE_SA_EMAIL: envField.string({ context: 'server', access: 'secret', optional: true }),
       GOOGLE_SA_PRIVATE_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
       GOOGLE_CALENDAR_IDS: envField.string({ context: 'server', access: 'secret', optional: true }),
+      GOOGLE_HOLD_CALENDAR_IDS: envField.string({ context: 'server', access: 'secret', optional: true }),
       AVAILABILITY_TIMEZONE: envField.string({ context: 'server', access: 'secret', optional: true }),
       META_CAPI_ACCESS_TOKEN: envField.string({ context: 'server', access: 'secret', optional: true }),
       // Build-time media pipeline (set as Workers Builds variables, not runtime secrets).

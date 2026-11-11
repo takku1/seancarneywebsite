@@ -23,10 +23,4 @@
 - Sanity CMS with a deploy hook, once the content model is stable.
 
 ## Open decisions (Sean)
-| Decision | Options | Recommendation |
-|---|---|---|
-| Public pricing | none / "from" per format / private guide after inquiry | private guide now; revisit a "from" figure once inquiry volume is measurable |
-| Rooms and clients named | per venue and client | name only confirmed engagements |
-| Formats offered | band sizes and line-ups | list exactly what is bookable |
-| Scout's AI backend | independent (current) / SHA-BAM Conversation AI / hybrid | keep the independent adapter until SHA-BAM's AI access is confirmed (`12-scout-backend-decision.md`) |
-| Body typeface | Geist / a humanist sans | test one alternative on the home page |
+Tracked in `14-decision-register.md` (section 4: formats, contingency, custom-song terms, travel, pricing, tier weights, typeface, Scout's backend).

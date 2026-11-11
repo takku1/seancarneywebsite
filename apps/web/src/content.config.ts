@@ -37,10 +37,17 @@ const testimonials = defineCollection({
     name: z.string().optional(),
     role: z.string(),
     eventType: z.enum(['wedding', 'corporate', 'estate', 'gala', 'destination', 'celebration']),
-    /** 'granted' required before a name is displayed */
+    /** Where the quote was published or received (provenance), e.g. "Bark review, 2023-12-21". */
+    source: z.string().min(3),
+    /**
+     * A name is displayed only when consent is 'granted', and 'granted' requires a
+     * recorded approval: who confirmed, when, and what they agreed to. A bare flag
+     * is not evidence. Register: docs/current/14-decision-register.md.
+     */
     consent: z.enum(['granted', 'pending']).default('pending'),
+    approval: z.object({ by: z.string().min(2), on: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), scope: z.string().min(3) }).optional(),
     featured: z.boolean().default(false),
-  }),
+  }).refine((t) => t.consent !== 'granted' || !!t.approval, { message: "consent 'granted' needs an approval record { by, on, scope }", path: ['approval'] }),
 });
 
 const videos = defineCollection({

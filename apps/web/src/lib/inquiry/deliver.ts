@@ -68,6 +68,8 @@ export interface LeadRecord<I = unknown, L = unknown> {
   createdAt: string;
   inquiry: I;
   lead: L;
+  /** Same person across leads (a hash of the normalized email): links a form inquiry and a Scout one. */
+  contactKey?: string;
 }
 
 /** The subset of Cloudflare's D1Database used here (a node:sqlite shim implements it in tests). */
@@ -142,6 +144,7 @@ const COLUMNS: [name: string, ddl: string][] = [
   ['confirm', `TEXT NOT NULL DEFAULT 'pending'`], ['confirm_error', 'TEXT'], ['confirm_attempts', 'INTEGER NOT NULL DEFAULT 0'],
   ['confirm_lease', 'TEXT'], ['confirm_lease_until', 'INTEGER'],
   ['last_attempt_at', 'INTEGER'],
+  ['contact_key', 'TEXT'],
 ];
 
 const ready = new WeakMap<LeadDB, Promise<void>>();
@@ -168,6 +171,7 @@ export function ensureSchema(db: LeadDB): Promise<void> {
         }
       }
       await db.prepare('CREATE INDEX IF NOT EXISTS leads_created ON leads (created_at, lead_id)').bind().run();
+      await db.prepare('CREATE INDEX IF NOT EXISTS leads_contact ON leads (contact_key, created_at)').bind().run();
     })();
     p.catch(() => ready.delete(db));
     ready.set(db, p);
@@ -244,6 +248,41 @@ export async function purgeExpired(db: LeadDB, log: DeliveryDeps['log'], now = D
   return { resolved: a.meta.changes, unresolved: b.meta.changes };
 }
 
+/**
+ * Visitors are told "received" once a lead is stored; Sean learns of it from the
+ * notification. A lead whose notification is still undelivered NOTIFY_OVERDUE_MS
+ * after acceptance (pending, failing or abandoned) is overdue: the cron logs
+ * lead_notify_overdue so an alert reaches Sean before the visitor waits a day.
+ * Only the last 7 days count, so an old abandoned lead doesn't alert forever
+ * (GET /api/leads still lists it).
+ */
+export const NOTIFY_OVERDUE_MS = 30 * 60_000;
+export async function overdueNotifications(db: LeadDB, now = Date.now()): Promise<number> {
+  await ensureSchema(db);
+  const r = await db
+    .prepare("SELECT COUNT(*) AS n FROM leads WHERE notify IN ('pending','failed','abandoned') AND created_at < ? AND created_at >= ?")
+    .bind(new Date(now - NOTIFY_OVERDUE_MS).toISOString(), isoDaysAgo(now, 7))
+    .all<{ n: number }>();
+  return r.results[0]?.n ?? 0;
+}
+
+export interface RelatedLead { leadId: string; channel: string; createdAt: string }
+
+/**
+ * Earlier leads from the same person (contact key) in the last `days`: a couple
+ * who used both the form and Scout, or a planner following up. Each is still
+ * its own lead and is delivered; this only lets Sean and the CRM see them as
+ * one relationship. Oldest first, at most 5.
+ */
+export async function relatedLeads(db: LeadDB, contactKey: string, now = Date.now(), days = 60): Promise<RelatedLead[]> {
+  await ensureSchema(db);
+  const r = await db
+    .prepare('SELECT lead_id, channel, created_at FROM leads WHERE contact_key = ? AND created_at >= ? ORDER BY created_at LIMIT 5')
+    .bind(contactKey, isoDaysAgo(now, days))
+    .all<{ lead_id: string; channel: string; created_at: string }>();
+  return r.results.map((x) => ({ leadId: x.lead_id, channel: x.channel, createdAt: x.created_at }));
+}
+
 export interface AcceptResult {
   accepted: boolean;
   leadId: string;
@@ -268,10 +307,10 @@ export async function acceptLead<R extends LeadRecord>(record: R, deps: Delivery
       await ensureSchema(db);
       const held = (ch: Channel) => (sinks[ch] ? ['pending', tok, now + LEASE_MS, 1] : ['skipped', null, null, 0]);
       const ins = await db
-        .prepare(`INSERT INTO leads (lead_id, idem_key, channel, created_at, data,
+        .prepare(`INSERT INTO leads (lead_id, idem_key, channel, created_at, data, contact_key,
             crm, crm_lease, crm_lease_until, crm_attempts, notify, notify_lease, notify_lease_until, notify_attempts, confirm, confirm_lease, confirm_lease_until, confirm_attempts)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (idem_key) DO NOTHING`)
-        .bind(record.leadId, idempotencyKey ?? null, record.channel, record.createdAt, JSON.stringify({ inquiry: record.inquiry, lead: record.lead }), ...held('crm'), ...held('notify'), ...held('confirm'))
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (idem_key) DO NOTHING`)
+        .bind(record.leadId, idempotencyKey ?? null, record.channel, record.createdAt, JSON.stringify({ inquiry: record.inquiry, lead: record.lead }), record.contactKey ?? null, ...held('crm'), ...held('notify'), ...held('confirm'))
         .run();
       if (ins.meta.changes === 0 && idempotencyKey) {
         const prior = await db.prepare('SELECT lead_id FROM leads WHERE idem_key = ?').bind(idempotencyKey).first<{ lead_id: string }>();

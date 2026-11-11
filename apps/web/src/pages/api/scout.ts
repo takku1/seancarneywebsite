@@ -110,7 +110,7 @@ export const POST: APIRoute = async ({ request }) => {
     const sig = await signTranscript(out.transcript, SCOUT_SIGNING_KEY);
     return json(200, { ok: true, reply: out.reply, cards: out.cards, transcript: out.transcript, sig, toolCalls: out.toolCalls, intents, handoff: out.stop === 'limit', model: provider.model });
   } catch (err) {
-    console.warn('[scout]', errorCode(err));
+    console.error(JSON.stringify({ ts: new Date().toISOString(), kind: 'scout', event: 'scout_provider_error', error: errorCode(err) }));
     await signal;
     return json(200, { ok: false, mode: 'guided', error: 'provider_error', reply: "I lost the trail for a second. You can keep going with the quick options below, or use the inquiry form." });
   }

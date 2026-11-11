@@ -11,7 +11,7 @@ async function load(entry) {
       b.onLoad({filter: /.*/, namespace: 'stub'}, (a) => ({
         contents: a.path === 'cloudflare:workers' ? 'export const env = {};'
           : a.path === 'astro:content' ? 'export const getCollection = async () => [];'
-          : `const e = globalThis.__env ?? {}; export const {${['SCOUT_PROVIDER', 'ANTHROPIC_API_KEY', 'SCOUT_MODEL', 'SCOUT_SIGNING_KEY', 'SCOUT_DAILY_LIMIT', 'SCOUT_ADMIN_TOKEN', 'GHL_WEBHOOK_URL', 'GHL_PRIVATE_TOKEN', 'GHL_LOCATION_ID', 'GHL_PIPELINE_ID', 'GHL_STAGE_NEW_ID', 'RESEND_API_KEY', 'INQUIRY_NOTIFY_EMAIL', 'INQUIRY_FROM_EMAIL', 'LOG_HASH_KEY', 'GOOGLE_SA_EMAIL', 'GOOGLE_SA_PRIVATE_KEY', 'GOOGLE_CALENDAR_IDS', 'AVAILABILITY_TIMEZONE'].join(',')}} = e;`,
+          : `const e = globalThis.__env ?? {}; export const {${['SCOUT_PROVIDER', 'ANTHROPIC_API_KEY', 'SCOUT_MODEL', 'SCOUT_SIGNING_KEY', 'SCOUT_DAILY_LIMIT', 'SCOUT_ADMIN_TOKEN', 'GHL_WEBHOOK_URL', 'GHL_PRIVATE_TOKEN', 'GHL_LOCATION_ID', 'GHL_PIPELINE_ID', 'GHL_STAGE_NEW_ID', 'RESEND_API_KEY', 'INQUIRY_NOTIFY_EMAIL', 'INQUIRY_FROM_EMAIL', 'LOG_HASH_KEY', 'GOOGLE_SA_EMAIL', 'GOOGLE_SA_PRIVATE_KEY', 'GOOGLE_CALENDAR_IDS', 'GOOGLE_HOLD_CALENDAR_IDS', 'AVAILABILITY_TIMEZONE'].join(',')}} = e;`,
         loader: 'js',
       }));
     },
