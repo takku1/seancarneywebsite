@@ -663,7 +663,16 @@ const data = enabled
     border: 0;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+    /* The clipped label still sizes the button: only what is visible takes clicks, so the
+       dock and the listening bar beside it stay usable on phones. */
+    pointer-events: none;
   }
+  .pick-shape,
+  .pick:hover .pick-label,
+  .pick:focus-visible .pick-label,
+  .pick.strum .pick-label { pointer-events: auto; }
+  .pick.hidden .pick-shape, .pick.hidden .pick-label,
+  :global(html.menu-open) .pick .pick-shape, :global(html.menu-open) .pick .pick-label { pointer-events: none; }
   .pick.hidden,
   :global(html.menu-open) .pick { opacity: 0; pointer-events: none; transform: translateY(12px); }
   .pick-shape {

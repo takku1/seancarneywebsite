@@ -4,7 +4,7 @@ import { imageAsset } from '../../lib/media/library';
 import musicians from '../../data/musicians.json';
 ---
 <section class="section players" data-section="our_players">
-  <div class="container"><div class="heading"><div><h2>Extraordinary players.<br />A sound that belongs to you.</h2><p>Meet a few of the voices and musicians who make up The Scene.</p></div><a href="/the-scene" class="link-arrow">Explore the roster</a></div>
+  <div class="container"><div class="heading"><div><h2>Extraordinary players.<br />A sound that belongs to you.</h2><p>Meet a few of the voices and musicians who make up The SCENE.</p></div><a href="/the-scene" class="link-arrow">Explore the roster</a></div>
     <ul>{musicians.slice(0,4).map(m=><li><a href={`/the-scene#${m.id}`}><Image src={imageAsset(m.image.replace('.jpg',''))} alt={m.name} widths={[320,480,640]} sizes="(min-width:900px) 22vw, 45vw" /><span>{m.name}</span><small>{m.role}</small></a></li>)}</ul>
   </div>
 </section>

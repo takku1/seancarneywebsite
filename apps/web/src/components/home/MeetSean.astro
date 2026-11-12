@@ -4,17 +4,23 @@ import { photoFor } from '../../lib/media/library';
 const {image:portrait,alt:portraitAlt}=photoFor('home.intro');
 import { PUBLIC_CALL_BOOKING_URL } from 'astro:env/client';
 ---
-<section class="section meet" data-section="meet_sean">
+<section class="section meet" data-section="meet_sean" aria-labelledby="meet-title">
   <div class="container grid">
     <Image src={portrait} alt={portraitAlt} widths={[480,800,1200]} sizes="(min-width:900px) 40vw, 92vw" />
-    <div><h2>A musician for the day.<br />A familiar face through it all.</h2><p>SCE is led by Los Angeles songwriter and performer Sean Carney. With more than 700 sync placements behind him, he brings a writer’s ear to your songs, your story, and the way the celebration unfolds.</p><div class="links"><a href="/about" class="link-arrow">Meet Sean</a>{PUBLIC_CALL_BOOKING_URL && <a href={PUBLIC_CALL_BOOKING_URL} target="_blank" rel="noopener" class="link-arrow" data-track="call_booking_click" data-track-location="home">Arrange a conversation</a>}</div></div>
+    <div>
+      <h2 id="meet-title" class="visually-hidden">Meet Sean Carney</h2>
+      <p class="lead">SCE is led by Los Angeles songwriter and performer Sean Carney. Sean is a voting member for The Grammy Awards, a billboard-charting Singer, Songwriter and Guitarist specializing in creating polished, high-energy performances for weddings, corporate events and more!</p>
+      <p>From elegant ceremonies to electrifying afterparties, we bring your vision to life with a celebration as sophisticated as it is unforgettable.</p>
+      <p>Sean performs over 100 events per year, we guarantee an amazing time for you and your guests!</p>
+      <div class="links"><a href="/about" class="link-arrow">Meet Sean</a>{PUBLIC_CALL_BOOKING_URL && <a href={PUBLIC_CALL_BOOKING_URL} target="_blank" rel="noopener" class="link-arrow" data-track="call_booking_click" data-track-location="home">Arrange a conversation</a>}</div>
+    </div>
   </div>
 </section>
 <style>
   .grid { display:grid; grid-template-columns:4fr 5fr; gap:clamp(2rem,8vw,8rem); align-items:center; }
   .grid :global(img) { width:100%; height:auto; aspect-ratio:4/5; object-fit:cover; }
-  h2 { font-size:var(--step-3); line-height:1.08; }
-  p { max-width:45ch; margin-block:1.5rem 2rem; color:var(--text-muted); line-height:1.8; }
-  .links { display:flex; flex-wrap:wrap; gap:1rem 2rem; }
+  p { max-width:48ch; margin-top:1.25rem; color:var(--text-muted); line-height:1.8; }
+  p.lead { margin-top:0; font-family:var(--font-display); font-size:var(--step-1); line-height:1.45; color:var(--text); }
+  .links { display:flex; flex-wrap:wrap; gap:1rem 2rem; margin-top:2rem; }
   @media(max-width:899px) { .grid { grid-template-columns:minmax(0,1fr); } .grid :global(img) { aspect-ratio:3/2; } }
 </style>

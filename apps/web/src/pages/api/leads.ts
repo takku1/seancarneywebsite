@@ -3,6 +3,9 @@
  *
  *   GET  /api/leads[?cursor=&limit=]   open leads (CRM not yet taken, or Sean not yet
  *                                      notified) and per-state counts; no personal data
+ *   GET  /api/leads?report=sources[&days=90]
+ *                                      inquiries per "how did you hear" answer and tier
+ *                                      (the 90-day source review); counts only
  *   POST /api/leads                    one retry batch; body (optional JSON):
  *                                      { "limit": 25, "reopen": true }
  *                                      reopen puts abandoned deliveries back in the queue.
@@ -13,7 +16,7 @@
  * Auth: the admin gate in src/middleware.ts (requireAuth) runs before this handler.
  */
 import type { APIRoute } from 'astro';
-import { openLeads, retryOpenLeads } from '../../lib/inquiry/process';
+import { openLeads, retryOpenLeads, leadSources } from '../../lib/inquiry/process';
 
 export const prerender = false;
 
@@ -24,6 +27,10 @@ const num = (v: unknown) => (typeof v === 'number' || typeof v === 'string') && 
 const cursorOf = (v: unknown) => (typeof v === 'string' && v.length <= 200 ? v : null);
 
 export const GET: APIRoute = async ({ url }) => {
+  if (url.searchParams.get('report') === 'sources') {
+    const report = await leadSources({ days: num(url.searchParams.get('days')) });
+    return report ? json(200, report) : json(503, { ok: false, error: 'lead_store_unavailable' });
+  }
   const page = await openLeads({ limit: num(url.searchParams.get('limit')), cursor: cursorOf(url.searchParams.get('cursor')) });
   return page ? json(200, page) : json(503, { ok: false, error: 'lead_store_unavailable' });
 };

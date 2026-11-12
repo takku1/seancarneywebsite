@@ -5,12 +5,12 @@
  * reduced-motion or Save-Data, and has a visible pause control (WCAG 2.2.2).
  */
 import { Image } from 'astro:assets';
-import { photoFor, heroSources, publicFile } from '../../lib/media/library';
+import { photoFor, heroSources } from '../../lib/media/library';
 const {image:poster,alt:posterAlt}=photoFor('home.hero.poster');
 const sources=heroSources();
-const reelSrc=publicFile('film.live.video');
 import Icon from '../ui/Icon.astro';
-const reel = { video: { title: 'Sean Carney · Live weddings and events', note: 'Solo, duo and full band' } };
+import { SCE_EXPERIENCE } from '../../lib/media/experience';
+const reel = { video: { title: SCE_EXPERIENCE.title, note: 'Solo, duo and full band' } };
 import InquireLabel from '../ui/InquireLabel.astro';
 ---
 
@@ -33,16 +33,13 @@ import InquireLabel from '../ui/InquireLabel.astro';
   </div>
 
   <div class="container content">
-    <h1 id="hero-title">One team.<br />Your whole celebration.</h1>
-    <p class="sub">
-      <span class="exp" data-exp="hero_sub" data-variant="arc">Bespoke wedding entertainment, from acoustic cocktail sets to a full-band reception.</span>
-      <span class="exp" data-exp="hero_sub" data-variant="rooms">Your people. Your music. A celebration shaped around the two of you.</span>
-    </p>
-    <p class="formats" aria-label="Formats">Solo <span aria-hidden="true">·</span> Duo <span aria-hidden="true">·</span> Band</p>
+    <h1 id="hero-title">Your story. Your song. Anywhere in the world.</h1>
+    <p class="sub">Luxury live music for weddings, private celebrations, and corporate events.</p>
+    <p class="formats" aria-label="Formats">Solo <span aria-hidden="true">·</span> Duo <span aria-hidden="true">·</span> Band <span aria-hidden="true">·</span> <a href="/custom-song">Custom Written Songs</a></p>
     <div class="ctas">
       <a href="/inquire" class="btn" data-track="cta_click" data-track-location="hero"><InquireLabel /></a>
       {reel && (
-        <button type="button" class="watch" data-reel-open data-track="watch_live_click" data-track-location="hero"><Icon name="play" /> Watch the live film</button>
+        <button type="button" class="watch" data-reel-open data-track="watch_live_click" data-track-location="hero"><Icon name="play" /> Watch The SCE Experience</button>
       )}
     </div>
   </div>
@@ -54,7 +51,7 @@ import InquireLabel from '../ui/InquireLabel.astro';
 </section>
 
 {reel && (
-  <dialog class="reel" aria-label={`${reel.video.title}, video`} data-reel data-src={reelSrc}>
+  <dialog class="reel" aria-label={`${reel.video.title}, video`} data-reel data-yt={SCE_EXPERIENCE.youtubeId}>
     <button type="button" class="reel-x" data-reel-close aria-label="Close video"><Icon name="x" /></button>
     <div class="reel-frame" data-reel-frame></div>
     <p class="reel-cap">{reel.video.title}{reel.video.note && <span>{reel.video.note}</span>}</p>
@@ -65,30 +62,29 @@ import InquireLabel from '../ui/InquireLabel.astro';
   import { track } from '../../lib/analytics/track';
   import { onPage } from '../../lib/lifecycle';
   import { pause as pausePlayer } from '../../lib/media/player';
+  import { embedUrl } from '../../lib/media/yt-player';
 
   onPage(() => {
-    // ---------- Watch live lightbox (hear Sean in one tap, without leaving home) ----------
+    // ---------- The SCE Experience lightbox (YouTube, without leaving home) ----------
     const reelDlg = document.querySelector<HTMLDialogElement>('[data-reel]');
     const reelFrame = reelDlg?.querySelector<HTMLElement>('[data-reel-frame]');
     document.querySelector('[data-reel-open]')?.addEventListener('click', () => {
       if (!reelDlg || !reelFrame) return;
-      const frame = document.createElement('video');
-      frame.src = reelDlg.dataset.src!;
-      frame.controls = true;
-      frame.playsInline = true;
-      frame.setAttribute('aria-label', 'Sean Carney live weddings and events');
+      const frame = document.createElement('iframe');
+      frame.src = embedUrl(reelDlg.dataset.yt!);
+      frame.title = 'The SCE Experience';
+      frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+      frame.allowFullscreen = true;
       reelFrame.replaceChildren(frame);
       reelDlg.showModal();
       pausePlayer(); // one thing playing at a time
       document.querySelector<HTMLVideoElement>('[data-hero-video]')?.pause();
-      void frame.play().catch(() => {});
-      track('video_play', { video_id: 'sce-live-film', location: 'hero_lightbox' });
+      track('video_play', { video_id: reelDlg.dataset.yt!, location: 'hero_lightbox' });
     });
     const closeReel = () => {
       if (!reelDlg) return;
       reelDlg.close();
-      reelFrame?.querySelector('video')?.pause();
-      reelFrame?.replaceChildren();
+      reelFrame?.replaceChildren(); // removing the iframe stops playback
     };
     reelDlg?.querySelector('[data-reel-close]')?.addEventListener('click', closeReel);
     reelDlg?.addEventListener('click', (e) => { if (e.target === reelDlg) closeReel(); });
@@ -176,7 +172,7 @@ import InquireLabel from '../ui/InquireLabel.astro';
     font-weight: 500;
     line-height: 0.98;
     letter-spacing: -0.02em;
-    max-width: 12ch;
+    max-width: 14ch;
     text-wrap: balance;
   }
   .sub {
@@ -193,6 +189,8 @@ import InquireLabel from '../ui/InquireLabel.astro';
     color: var(--text-muted);
   }
   .formats span { margin-inline: 0.5em; }
+  .formats a { color: inherit; text-decoration-color: var(--line-strong); text-underline-offset: 0.25em; }
+  .formats a:hover { color: var(--text); }
   .watch {
     display: inline-flex;
     align-items: center;
@@ -229,7 +227,7 @@ import InquireLabel from '../ui/InquireLabel.astro';
   .reel { width: min(1200px, 94vw); max-width: none; padding: 0; margin: auto; background: #000; border: 0; color: var(--on-image); overflow: visible; }
   .reel::backdrop { background: rgb(5 4 3 / 0.88); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
   .reel-frame { aspect-ratio: 16 / 9; }
-  .reel-frame :global(video) { width: 100%; height: 100%; border: 0; display: block; }
+  .reel-frame :global(iframe) { width: 100%; height: 100%; border: 0; display: block; }
   .reel-x { position: absolute; top: -52px; right: 0; width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 1px solid rgb(241 235 224 / 0.35); color: var(--on-image); cursor: pointer; }
   .reel-x :global(svg) { width: 20px; height: 20px; }
   .reel-cap { position: absolute; left: 0; bottom: -40px; font-family: var(--font-display); font-size: 1.2rem; }

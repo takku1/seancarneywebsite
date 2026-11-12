@@ -22,12 +22,12 @@ export function personSchema() {
     image: `${site.url}/og/default.jpg`,
     jobTitle: 'Wedding and private event musician',
     description:
-      'Los Angeles singer and guitarist leading a live-music house for luxury weddings and private events: solo for ceremonies, duo for cocktails and dinner, and his full band, The Scene, for receptions.',
+      'Los Angeles singer and guitarist leading a live-music house for luxury weddings and private events: solo for ceremonies, duo for cocktails and dinner, and his full band, The SCENE, for receptions.',
     homeLocation: { '@type': 'Place', name: site.home },
     email: `mailto:${site.email.bookings}`,
     sameAs: site.socials.map((s) => s.url),
     knowsAbout: ['Wedding ceremony music', 'Cocktail hour music', 'Wedding reception bands', 'Private event entertainment'],
-    memberOf: { '@type': 'MusicGroup', '@id': ID.band, name: 'Sean Carney and The Scene' },
+    memberOf: { '@type': 'MusicGroup', '@id': ID.band, name: 'Sean Carney and The SCENE' },
   };
 }
 

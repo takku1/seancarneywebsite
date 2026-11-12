@@ -6,7 +6,7 @@
  */
 import { getCollection } from 'astro:content';
 import { site } from '../../config/site';
-import { EVENT_TYPES, BUDGETS, ROLES, FORMATS, GUESTS } from '../inquiry/schema';
+import { EVENT_TYPES, BUDGETS, ROLES, FORMATS, GUESTS, HEARD_VIA } from '../inquiry/schema';
 
 export interface CatalogItem {
   type: 'video';
@@ -60,7 +60,7 @@ export function loadKnowledge() {
 5. Answer questions using only the facts below.
 
 # Taking an inquiry
-- Needed: event type, date (or that it's flexible), city or venue, budget range, full name, email, and who they are (couple/family, planner, company, venue). Helpful: guest count, preferred format, phone, company, a short message.
+- Needed: event type, date (or that it's flexible), city or venue, budget range, full name, email, and who they are (couple/family, planner, company, venue). Helpful: guest count, preferred format, phone, company, a short message, and how they heard about Sean (with who referred them, if someone did). Ask how they heard once, lightly, near the end; it is optional, so never press.
 - Ask for two or three things at a time, naturally. Never interrogate.
 - Budget: ask for a range, offering the bands below. If they hesitate, "prefer to discuss" is fine. Never quote prices, packages or rates yourself; say Sean sends a tailored proposal.
 - Before calling submit_inquiry, read the details back in one or two sentences and get a clear yes. Only then call it with visitor_confirmed set to true. Afterwards, ask them to check the details and press Send; never say the inquiry has been sent.
@@ -80,7 +80,7 @@ export function loadKnowledge() {
 # Facts
 - Sean Carney: singer and guitarist based in ${site.home}, leading a live-music house for weddings and private events. "${site.tagline}"
 - Experience: ${site.stats.years} years, ${site.stats.events} events, ${site.stats.countries} countries. ${site.bookingSeason}
-- Formats: solo (voice and acoustic guitar), duo, or the full band, Sean Carney and The Scene. One booking can cover the whole day, with the format changing from ceremony to reception.
+- Formats: solo (voice and acoustic guitar), duo, or the full band, Sean Carney and The SCENE. One booking can cover the whole day, with the format changing from ceremony to reception.
 - Rooms he has played: ${credit('room')}.
 - Companies that have hosted him: ${credit('client')}.
 - Credentials (mention only if asked about his background): his music has been heard in the Paris Olympics coverage, the NFL Playoffs and on Netflix.
@@ -114,6 +114,7 @@ event_type: ${EVENT_TYPES.map((e) => `${e.value} (${e.label})`).join(', ')}
 budget: ${BUDGETS.map((b) => `${b.value} (${b.label})`).join(', ')}
 role: ${ROLES.map((r) => `${r.value} (${r.label})`).join(', ')}
 format: ${FORMATS.map((f) => `${f.value} (${f.label})`).join(', ')}
+heard_via: ${HEARD_VIA.map((h) => `${h.value} (${h.label})`).join(', ')}
 guests: ${GUESTS.join(', ')}`;
 
     return { system, catalog };

@@ -169,14 +169,18 @@
     "name": "Terranea Resort",
     "detail": "Palos Verdes",
     "category": "room",
-    "order": 23
+    "order": 23,
+    "logo": "terranea",
+    "logoApproved": true
   },
   {
     "id": "ritz-laguna",
     "name": "The Ritz-Carlton, Laguna Niguel",
     "detail": "Dana Point",
     "category": "room",
-    "order": 22
+    "order": 22,
+    "logo": "ritz-carlton",
+    "logoApproved": true
   },
   {
     "id": "hotel-del",
@@ -198,6 +202,55 @@
     "detail": "Los Angeles",
     "category": "room",
     "order": 24
+  },
+  {
+    "id": "amangiri",
+    "name": "Amangiri",
+    "detail": "Canyon Point, Utah",
+    "category": "room",
+    "order": 10
+  },
+  {
+    "id": "hotel-bel-air",
+    "name": "Hotel Bel-Air",
+    "detail": "Bel Air",
+    "category": "room",
+    "order": 25
+  },
+  {
+    "id": "montage-laguna",
+    "name": "Montage Laguna Beach",
+    "detail": "Laguna Beach",
+    "category": "room",
+    "order": 26
+  },
+  {
+    "id": "pelican-hill",
+    "name": "The Resort at Pelican Hill",
+    "detail": "Newport Coast",
+    "category": "room",
+    "order": 27
+  },
+  {
+    "id": "fairmont-grand-del-mar",
+    "name": "Fairmont Grand Del Mar",
+    "detail": "San Diego",
+    "category": "room",
+    "order": 28
+  },
+  {
+    "id": "rancho-valencia",
+    "name": "Rancho Valencia",
+    "detail": "Rancho Santa Fe",
+    "category": "room",
+    "order": 29
+  },
+  {
+    "id": "casa-del-mar",
+    "name": "Hotel Casa del Mar",
+    "detail": "Santa Monica",
+    "category": "room",
+    "order": 30
   },
   {
     "id": "salesforce",

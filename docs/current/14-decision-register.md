@@ -11,12 +11,14 @@ The site does not invent claims. Each one stays in place only while its row is p
 | ID | Claim | Where it appears | Owner | Status | Proof required |
 |---|---|---|---|---|---|
 | C1 | 1,000+ events across fifteen years | `src/config/site.ts` | Sean | Pending | Sean's figure (older sources say 500+ and 100+ a year) |
-| C2 | Rooms named: Hotel del Coronado, The Beverly Hills Hotel, The Ritz-Carlton Laguna Niguel, Terranea, The Biltmore | `credits.json` (`room`), home, About, inquiry | Sean | Pending | Per room: a real engagement, fine to name |
+| C2 | Rooms named: Amangiri, Hotel del Coronado, The Beverly Hills Hotel, The Ritz-Carlton Laguna Niguel, Terranea, The Biltmore, Hotel Bel-Air, Montage Laguna Beach, The Resort at Pelican Hill, Fairmont Grand Del Mar, Rancho Valencia, Hotel Casa del Mar | `credits.json` (`room`), home strip, About, venue pages, inquiry | Sean | Pending | Sean's 2026-11-12 review asked for Amangiri first and more LA, OC and San Diego rooms ("I've played all of them"); the six additions come from his own draft list in the brief. Sean confirms that selection or strikes any name |
 | C3 | Clients named: Salesforce, Autodesk, VCA, MacLean Power Systems, Informa Markets, Hawke Media | `credits.json` | Sean | Pending | Per client: fine to name (and any contract restriction) |
 | C4 | Credentials line (Paris Olympics coverage, NFL Playoffs, Netflix) | About | Sean | Pending | Approved wording |
 | C5 | Reply "within one business day" | `site.responseTime`, thank-you page, confirmation email | Sean | Pending | Always true, including weekends and event days; otherwise a different promise |
 | C6 | COI, W-9, stage plot and rider on request | `/planners`, FAQ | Sean | Pending | The documents exist (see P2) |
-| C7 | Formats: Solo, Duo, Band with The Scene | Throughout | Sean | Pending | The bookable line-ups (see O1) |
+| C7 | Formats: Solo, Duo, Band with The SCENE | Throughout | Sean | Pending | The bookable line-ups (see O1) |
+| C8 | Recording Academy (Grammy) voting member; Billboard-charting singer, songwriter and guitarist; over 100 events a year; "we guarantee an amazing time" | Home introduction | Sean | Approved (Sean's own wording, review of 2026-11-12) | Keep the wording in step with C1 (1,000+ events) |
+| C9 | "The biggest venues in the world choose Sean Carney and The SCENE" | Home formats (Band) | Sean | Approved (Sean's own wording, review of 2026-11-12) | |
 
 ## 2. Testimonials (provenance)
 
@@ -39,6 +41,8 @@ When approved, record the approval in JSON, for example `"consent": "granted", "
 | M1 | November 10 Drive wedding photography and films | Pending | Usage rights and photographer credit lines (`media-library.json` holds the credits) |
 | M2 | Legacy artist portraits still on some pages | Pending | Keep or replace (marked in `media-library.json`) |
 | M3 | Script signature logo | Open | A vector file |
+| M4 | Venue logos in the rooms strip (The Ritz-Carlton, Terranea; supplied in the Drive archive) | Pending | Shown at Sean's request (`logoApproved`); each venue's permission to use its mark. More logos (Amangiri first) as Sean supplies them |
+| M5 | A better Duo photograph and a full-band photograph for the home formats | Open | Sean supplies them; swap with `media.py replace` for `home.format.duo` and `home.format.band` |
 
 ## 4. Offer and product decisions
 
@@ -60,11 +64,12 @@ The FAQ and Scout answer these only in general terms until a row is approved. Sc
 | ID | Material | Owner | Status | What it needs |
 |---|---|---|---|---|
 | P1 | Private investment guide (PDF, sent after inquiry) | Sean | Open | O1, O5 |
-| P2 | Planner pack: COI sample, W-9, rider, stage plot, a one-page capabilities sheet, an example day timeline, a named contact | Sean | Open | O1, O2 |
+| P2 | Planner pack: COI sample, W-9, rider, stage plot, a one-page capabilities sheet, an example day timeline, a named contact | Sean | Open | O1, O2. `/planners` lists the pack from `src/data/planner-pack.json`: a document becomes a download once its file is in `public/downloads/` and its `file` is set (the song list is live). The COI and W-9 stay private, sent on request (a test enforces it) |
+| F1 | Post-event and rebooking emails T1 to T7 (`16-follow-ups-and-referrals.md`) | Sean | Open | Approve or edit each template, choose what T3 delivers and whether T7 runs, then switch the workflows on in SHA-BAM |
 | P3 | Three event stories: one full wedding day, one private or corporate event, one planner collaboration | Sean | Open | Footage, photos and the clients' consent |
 | P4 | A story for each room in `credits.json` | Sean | Open | Each venue page becomes indexable once its story exists |
 | P5 | Repertoire by moment (`repertoire.json`) | Sean | Pending | Sean confirms and extends it |
-| P6 | Mark and Aimee's story, missing player bios, format montages, the new YouTube and SHA-BAM consultation URLs | Sean | Open | From the November 10 brief (`10-sce-build-brief.md`) |
+| P6 | Mark and Aimee's story, missing player bios, format montages, the SHA-BAM consultation URL | Sean | Open | From the November 10 brief (`10-sce-build-brief.md`); the SCE YouTube channel is live in `site.ts` |
 
 ## 6. Brand migration (at launch)
 

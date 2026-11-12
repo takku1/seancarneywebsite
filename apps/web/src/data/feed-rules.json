@@ -13,7 +13,7 @@
       "stargazing"
     ],
     "event_corporate": [
-      "reel-2025",
+      "hotel-del-my-girl",
       "ritz-shut-up-and-dance",
       "elevated-live"
     ],
@@ -30,7 +30,7 @@
       "perfect"
     ],
     "hero": [
-      "reel-2025"
+      "sce-experience"
     ]
   },
   "excludeYoutubeIds": [
@@ -40,7 +40,8 @@
     "TLuOObXzf6M",
     "iBLdS53jpa4",
     "k58Zuc_MmMY",
-    "uq9IdUhf7W4"
+    "uq9IdUhf7W4",
+    "ui_WlqtfgRc"
   ],
   "minDurationSec": 60,
   "showViewsAbove": 10000,

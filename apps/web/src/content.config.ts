@@ -16,9 +16,9 @@ const credits = defineCollection({
     category: z.enum(['sync', 'broadcast', 'chart', 'room', 'venue', 'client', 'endorsement']),
     year: z.number().optional(),
     date: z.coerce.date().optional(),
-    /** simple-icons slug for the monochrome mark, when one exists. */
+    /** Rooms: file stem of a single-ink logo in src/assets/logos/ (media-library.json). Other credits: simple-icons slug. */
     logo: z.string().optional(),
-    /** CONFIRM per brand before launch (current live site already shows these marks). */
+    /** A logo is shown only once Sean approves it (recorded in 14-decision-register.md). */
     logoApproved: z.boolean().default(false),
     headline: z.boolean().default(false),
     order: z.number().default(100),

@@ -1,8 +1,10 @@
 ---
 /**
  * /planners: the planner toolkit. Every line restates something the site
- * already commits to (FAQs, the weddings checklist); documents are sent on
- * request rather than published.
+ * already commits to (FAQs, the weddings checklist).
+ * The planner pack (src/data/planner-pack.json): a public document becomes a
+ * download once its file is in public/downloads/; until then, and always for
+ * private ones (insurance, W-9), it is sent on request.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/ui/PageHeader.astro';
@@ -12,6 +14,7 @@ import InquireLabel from '../components/ui/InquireLabel.astro';
 import { site } from '../config/site';
 import { faqsFor, rooms } from '../lib/content';
 import { graph, breadcrumbSchema, faqSchema } from '../lib/seo/schema';
+import pack from '../data/planner-pack.json';
 
 const faqs = await faqsFor('planners');
 const roomList = await rooms();
@@ -26,6 +29,7 @@ const essentials = [
   { k: 'Lead time', v: 'Peak Saturdays are often reserved nine to eighteen months out.' },
 ];
 const packHref = `mailto:${site.email.bookings}?subject=${encodeURIComponent('Planner pack request')}&body=${encodeURIComponent('Event date:\nVenue:\nWhat you need (COI, W-9, stage plot, tech rider):\n')}`;
+const requestHref = (title: string) => `mailto:${site.email.bookings}?subject=${encodeURIComponent(`Planner pack: ${title}`)}&body=${encodeURIComponent('Event date:\nVenue:\n')}`;
 const jsonLd = graph(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Planners', path: '/planners' }]), faqSchema(faqs.map((f) => f.data)));
 ---
 
@@ -46,6 +50,25 @@ const jsonLd = graph(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Pla
           <div><dt>{e.k}</dt><dd>{e.v}</dd></div>
         ))}
       </dl>
+    </div>
+  </section>
+
+  <section class="section pack" data-section="planner_pack" aria-labelledby="pack-title">
+    <div class="container cols">
+      <div>
+        <h2 id="pack-title">The planner pack</h2>
+        <p class="note">Insurance and tax forms are sent directly for your event, never published.</p>
+      </div>
+      <ul>
+        {pack.map((d) => (
+          <li>
+            <span class="doc"><span>{d.title}</span><small>{d.description}</small></span>
+            {d.public && 'file' in d && d.file
+              ? <a class="link-arrow" href={d.file} download data-track="planner_pack_download" data-track-doc={d.id}>Download</a>
+              : <a class="link-arrow" href={requestHref(d.title)} data-track="planner_pack_click" data-track-doc={d.id} data-track-location="planners_pack">On request</a>}
+          </li>
+        ))}
+      </ul>
     </div>
   </section>
 
@@ -73,6 +96,12 @@ const jsonLd = graph(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Pla
   dl div { padding-block: 1.1rem; border-top: 1px solid var(--line); }
   dt { font-family: var(--font-display); font-size: var(--step-1); }
   dd { margin: 0.35rem 0 0; color: var(--text-muted); }
+  .pack ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .pack li { display: flex; align-items: center; justify-content: space-between; gap: 1rem 2rem; padding-block: 1rem; border-bottom: 1px solid var(--line); }
+  .doc { display: grid; gap: 0.2rem; }
+  .doc span { font-family: var(--font-display); font-size: var(--step-1); }
+  .doc small, .note { color: var(--text-muted); font-size: var(--step--1); }
+  .note { margin-top: 1rem; max-width: 30ch; }
   .rooms { background: var(--bg-raised); border-block: 1px solid var(--line); }
   .rooms ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
   .rooms a { display: flex; align-items: baseline; gap: 1rem; min-height: 64px; padding-block: 1rem; border-bottom: 1px solid var(--line); text-decoration: none; }

@@ -33,7 +33,7 @@ GHL workflows ──────────────────┘  booked 
 | Contract signed | Documents & Contracts status Completed | Invoice auto-generated from the document's product line items (deposit); payment link by email and SMS |
 | Booked (deposit paid) | Stripe payment received | **Create the event on the SCE holds calendar** (`GOOGLE_HOLD_CALENDAR_IDS`, two-way sync) so the website shows the date as taken; planner info pack email |
 | Event week | 7 days before | Final timeline/run-of-show confirmation, balance invoice |
-| Completed | Day after the event | Thank-you; ask for a Google review at day 2 (direct review link); ask permission to quote them on the site (feeds `testimonials.json`: consent `granted` plus an `approval` record, `14-decision-register.md`) |
+| Completed | Day after the event | The post-event workflows W1 to W7 (`16-follow-ups-and-referrals.md`): thank-you, Google review request and permission to quote (feeds `testimonials.json`: consent `granted` plus an `approval` record, `14-decision-register.md`), the custom-song or first-dance delivery, planner and venue thanks, corporate rebooking at about ten months |
 | Lost | Manual | Reason dropdown (price, date, chose other); 9-month nurture |
 
 The lost reasons and tiers become the data that tunes pricing bands and `scoreLead()` weights after 90 days (owners, service levels and the outcome loop: `15-booking-operations.md`).
@@ -59,7 +59,7 @@ The lost reasons and tiers become the data that tunes pricing bands and `scoreLe
 1. In the sub-account, go to Settings > **Private Integrations**, create one with scopes contacts read/write and opportunities read/write, and copy the token to `GHL_PRIVATE_TOKEN`. It is shown only once.
 2. Copy the location ID to `GHL_LOCATION_ID`.
 3. Create the **Bookings** pipeline (stages above). Copy the pipeline ID to `GHL_PIPELINE_ID` and the "New inquiry" stage ID to `GHL_STAGE_NEW_ID`.
-4. Leads arrive with tags (`website-inquiry`, `event:wedding`, `tier:A`, `role:planner`, `sms-consent`), an opportunity named `Wedding | 2027-09-18 | Malibu | Tier A` valued from the budget band, and a note holding every field plus attribution (first and last channel, UTMs, gclid/fbclid, landing page, experiment arms).
+4. Leads arrive with tags (`website-inquiry`, `event:wedding`, `tier:A`, `role:planner`, `heard:planner`, `sms-consent`), the visitor's own `heard_via` answer and `referred_by` name (create both as contact custom fields; `16-follow-ups-and-referrals.md`), an opportunity named `Wedding | 2027-09-18 | Malibu | Tier A` valued from the budget band, and a note holding every field plus attribution (first and last channel, UTMs, gclid/fbclid, landing page, experiment arms).
 5. Optional fallback: a workflow with an **Inbound Webhook** trigger (a premium action) as `GHL_WEBHOOK_URL`. Create custom fields first, avoid apostrophes in field names, send a test lead, then "fetch sample" to map fields.
 6. Connect Google Calendar in GHL (Settings > Calendars > Connections). Set it as the **conflict calendar** and use **two-way sync** so GHL bookings appear in Google and Google events block GHL.
 

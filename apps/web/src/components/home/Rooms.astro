@@ -1,39 +1,78 @@
 ---
 /**
- * The rooms Sean has played, typeset by name: the luxury-correct proof.
- * Names set in the display face read as provenance, not advertising, and
- * need no logo permissions. Source: credits.json, category "room".
+ * The rooms Sean has played, drifting slowly past. A room shows its logo when
+ * Sean has supplied and approved one (credits.json `logo` + `logoApproved`,
+ * file in src/assets/logos/); otherwise its name is set as a wordmark in the
+ * display face. Order comes from credits.json (Amangiri leads).
+ * Reduced motion: a still, centred list. The second copy exists only so the
+ * loop is seamless, so it is hidden from assistive technology.
  */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import { rooms } from '../../lib/content';
 
-const list = await rooms();
+const logos = import.meta.glob<{ default: ImageMetadata }>('../../assets/logos/*.png', { eager: true });
+const logoFor = (slug?: string, approved?: boolean) =>
+  slug && approved ? logos[`../../assets/logos/${slug}.png`]?.default : undefined;
+
+const list = (await rooms()).map((r) => ({ id: r.id, name: r.data.name, logo: logoFor(r.data.logo, r.data.logoApproved) }));
 ---
 
 {list.length > 0 && (
-  <section class="rooms" data-section="rooms" aria-label="Rooms Sean has played">
-    <div class="container">
-      <ul>
-        {list.map((r) => <li>{r.data.name}</li>)}
-      </ul>
+  <section class="rooms" data-section="rooms" aria-labelledby="rooms-title">
+    <h2 id="rooms-title" class="visually-hidden">Venues Sean has played</h2>
+    <div class="viewport">
+      <div class="track">
+        {[0, 1].map((copy) => (
+          <ul aria-hidden={copy === 1 ? 'true' : undefined}>
+            {list.map((r) => (
+              <li>
+                <a href={`/venues/${r.id}`} tabindex={copy === 1 ? -1 : undefined} data-track="room_click" data-track-room={r.id} data-track-location="home_rooms">
+                  {r.logo
+                    ? <Image src={r.logo} alt={r.name} height={72} widths={[r.logo.width / 2, r.logo.width]} sizes="160px" class="logo" />
+                    : <span class="wordmark">{r.name}</span>}
+                </a>
+              </li>
+            ))}
+          </ul>
+        ))}
+      </div>
     </div>
   </section>
 )}
 
 <style>
-  .rooms { border-bottom: 1px solid var(--line); padding-block: clamp(2rem, 4vw, 3rem); }
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.4rem 0;
+  .rooms { border-bottom: 1px solid var(--line); padding-block: clamp(1.75rem, 3.5vw, 2.75rem); overflow: hidden; }
+  .viewport {
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+  .track { display: flex; width: max-content; }
+  ul { list-style: none; margin: 0; padding: 0; display: flex; align-items: center; flex: none; }
+  li { flex: none; padding-inline: clamp(1.75rem, 3.5vw, 3rem); }
+  a { display: flex; align-items: center; height: 72px; text-decoration: none; color: var(--text-muted); opacity: 0.85; transition: opacity 0.3s, color 0.3s; }
+  a:hover, a:focus-visible { opacity: 1; color: var(--text); }
+  .logo { height: 72px; width: auto; max-width: none; }
+  .wordmark {
     font-family: var(--font-display);
     font-size: var(--step-1);
-    color: var(--text-muted);
-    text-align: center;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
   }
-  li { white-space: nowrap; }
-  li + li::before { content: '·'; margin-inline: 1rem; color: var(--line-strong); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* About five seconds per room (13 today): slow enough to read every name. Inline styles are barred by the CSP. */
+    .track { animation: drift 65s linear infinite; }
+    .viewport:hover .track, .viewport:focus-within .track { animation-play-state: paused; }
+  }
+  @keyframes drift { to { transform: translateX(-50%); } }
+
+  /* Still: one centred, wrapping list, no duplicate. */
+  @media (prefers-reduced-motion: reduce) {
+    .viewport { mask-image: none; -webkit-mask-image: none; }
+    .track { width: auto; justify-content: center; }
+    ul { flex-wrap: wrap; justify-content: center; row-gap: 1rem; }
+    ul[aria-hidden] { display: none; }
+  }
 </style>

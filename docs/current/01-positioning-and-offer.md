@@ -15,12 +15,12 @@
 |---|---|---|
 | **Solo** (voice and guitar) | ceremonies, cocktail hours, dinners, intimate estates | the most-booked format |
 | **Duo** | cocktail hours, welcome dinners, intimate receptions | harmony and rhythm, still quiet enough to talk over |
-| **Band** (The Scene) | receptions, dance floors, galas | the whole night |
+| **Band** (The SCENE) | receptions, dance floors, galas | the whole night |
 
 The site sells the **arc** of the day rather than a single format: ceremony (solo) → cocktails (duo) → dinner (solo or duo) → first dance → reception (band). Couples book once and the music changes with the day.
 
 ## Proof
-- **Rooms:** the venues Sean has played, typeset by name: Hotel del Coronado, The Beverly Hills Hotel, The Ritz-Carlton Laguna Niguel, Terranea, The Biltmore. Named rooms are the luxury-correct proof; they need no logo permissions.
+- **Rooms:** the venues Sean has played, drifting slowly under the hero with Amangiri first: Amangiri, Hotel del Coronado, The Beverly Hills Hotel, The Ritz-Carlton Laguna Niguel, Terranea, The Biltmore, Hotel Bel-Air, Montage Laguna Beach, The Resort at Pelican Hill, Fairmont Grand Del Mar, Rancho Valencia and Hotel Casa del Mar. A room shows its logo when Sean has supplied and approved one (The Ritz-Carlton and Terranea today); the rest are set as wordmarks (`14-decision-register.md` C2, M4).
 - **Couples and planners:** named testimonials with the occasion and place, used only with consent.
 - **Scale and craft:** more than 1,000 events across fifteen years (confirm the figure; see the launch checklist).
 - **Credentials:** one restrained line on About: Sean's music has been heard in the Paris Olympics coverage, the NFL Playoffs and on Netflix.

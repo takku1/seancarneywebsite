@@ -65,7 +65,7 @@ POST routes state an Origin policy (`lib/security/origin.ts`): the inquiry form 
 | `credits.json` | `room` (luxury rooms, typeset on home, About and inquiry, each with a venue page and an optional `story`), `venue` (stages, for the galas list), `client`, and broadcast/sync credits behind the About credentials line |
 | `songbook.json` | full supplied 2026–2027 song list: 192 entries across nine styles |
 | `audio.json` | 15 direct acoustic recordings, compressed from supplied WAV masters |
-| `musicians.json` | supplied biographies and portraits for The Scene |
+| `musicians.json` | supplied biographies and portraits for The SCENE |
 | `faqs.json` | per-page FAQs (scopes include `weddings`, `planners`, each event type and `scout`), shared with Scout |
 | `feed-rules.json` | pinned and excluded videos per placement |
 | `src/config/site.ts` | name, contacts, socials, stats, response time |

@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[2]
 CATALOG = ROOT / 'apps/web/src/data/media-library.json'
 RES = ROOT / 'resources'
 CACHE = RES / '.media-build-cache.json'
-ALLOWED = [ROOT / p for p in ['apps/web/src/assets/photos','apps/web/src/assets/covers','apps/web/public/media','apps/web/public/downloads']]
+ALLOWED = [ROOT / p for p in ['apps/web/src/assets/photos','apps/web/src/assets/covers','apps/web/src/assets/logos','apps/web/public/media','apps/web/public/downloads']]
 
 def inside(root, value):
     root=root.resolve(); path=(root / value).resolve()

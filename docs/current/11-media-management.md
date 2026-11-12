@@ -51,7 +51,7 @@ Edit only `placements` in `media-library.json`, choosing an existing asset ID:
 "home.format.band": "wedding-evening"
 ```
 
-Other named placements cover the hero/poster, custom song, About, The Scene and the main live film. Run `npm run check` and `npm run build`; no media conversion is needed when the selected image is already prepared. Avoid repeating the same image in adjacent sections. Hero posters and film posters are independent assets even when extracted from the same master.
+Other named placements cover the hero/poster, custom song, About, The SCENE and the main live film. Run `npm run check` and `npm run build`; no media conversion is needed when the selected image is already prepared. Avoid repeating the same image in adjacent sections. Hero posters and film posters are independent assets even when extracted from the same master.
 
 ## Change a hero edit or poster frame
 

@@ -1,16 +1,31 @@
 ---
-import NativeFilm from '../media/NativeFilm.astro';
-import { photoFor, publicFile, placement } from '../../lib/media/library';
-const {image:poster}=photoFor('film.live.poster');
-const film=placement('film.live.video');
-interface Props { location?: string; }
-const { location = 'home' } = Astro.props;
+/**
+ * A featured film, on YouTube (click to load). By default The SCE Experience,
+ * the brand film (Home, Watch); a page can feature another, e.g. The SCENE live
+ * on /the-scene, so pages don't repeat the same video.
+ */
+import YouTubeFacade from '../media/YouTubeFacade.astro';
+import { SCE_EXPERIENCE } from '../../lib/media/experience';
+interface Props {
+  location?: string;
+  film?: { youtubeId: string; title: string };
+  heading?: string;
+  intro?: string;
+  caption?: string;
+}
+const {
+  location = 'home',
+  film = SCE_EXPERIENCE,
+  heading = 'From a single guitar<br />to a room on its feet.',
+  intro = 'Sean, The SCENE, and the people they play for. Watch The SCE Experience.',
+  caption = 'Solo, duo and full band · Sean Carney Entertainment',
+} = Astro.props;
 ---
-<section class="section supplied-film" data-section="supplied_live_film" aria-labelledby={`live-film-${location}`}>
+<section class="section supplied-film" data-section="featured_film" data-film={film.youtubeId} aria-labelledby={`live-film-${location}`}>
   <div class="container">
-    <div class="head"><h2 id={`live-film-${location}`}>From a single guitar<br />to a room on its feet.</h2><p>Sean, the band, and the people they play for. Watch the live performance film.</p></div>
-    <NativeFilm id="sce-live-film" src={publicFile('film.live.video')} title={film.label} poster={poster} location={location} />
-    <p class="caption">Solo, duo and full band · Sean Carney Entertainment</p>
+    <div class="head"><h2 id={`live-film-${location}`} set:html={heading} /><p>{intro}</p></div>
+    <YouTubeFacade id={film.youtubeId} title={film.title} location={location} large />
+    <p class="caption">{caption}</p>
   </div>
 </section>
 <style>

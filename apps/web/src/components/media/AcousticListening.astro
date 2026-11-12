@@ -1,9 +1,9 @@
 ---
 import tracks from '../../data/audio.json';
 import Icon from '../ui/Icon.astro';
-interface Props { compact?: boolean; location: string; }
-const { compact = false, location } = Astro.props;
-const songs = compact ? tracks.slice(0, 4) : tracks;
+interface Props { location: string; }
+const { location } = Astro.props;
+const songs = tracks;
 ---
 <section class="section listening" data-section="acoustic_listening" aria-labelledby={`listening-${location}`}>
   <div class="container listening-grid">
@@ -11,8 +11,6 @@ const songs = compact ? tracks.slice(0, 4) : tracks;
       <h2 id={`listening-${location}`}>A familiar song.<br />A personal arrangement.</h2>
       <p>Sean’s voice and guitar, recorded in acoustic arrangements for the aisle, the first dance, and the hours in between.</p>
       <p class="hint">Choose a song. Keep listening as you explore.</p>
-      {compact && <a href="/repertoire#listen" class="link-arrow">Hear all {tracks.length} recordings <Icon name="arrow-right" /></a>}
-      {compact && <p><a href="/repertoire#find-your-sound" class="link-arrow">Find your sound with the music quiz</a></p>}
     </div>
     <ol aria-label="Acoustic recordings">
       {songs.map((s, i) => <li data-media-id={`audio-${s.id}`} data-media-src={s.src} data-media-type="audio" data-title={`${s.title} · Sean Carney`} data-location={location}>

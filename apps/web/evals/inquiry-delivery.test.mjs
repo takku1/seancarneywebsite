@@ -18,8 +18,11 @@ async function load(entry) {
     },
   };
   const out = await build({entryPoints: [entry], bundle: true, write: false, format: 'esm', platform: 'node', plugins: [stubs], define: {'import.meta.env.DEV': 'false'}});
-  return import(`data:text/javascript;base64,${Buffer.from(out.outputFiles[0].text).toString('base64')}`);
+  // A unique suffix per load: env values are read at import, and identical data: URLs would reuse the first import.
+  return import(`data:text/javascript;base64,${Buffer.from(`${out.outputFiles[0].text}
+// load ${++loads}`).toString('base64')}`);
 }
+let loads = 0;
 
 const {acceptLead, retryOpen, listOpen, reopenAbandoned, purgeExpired, overdueNotifications, NOTIFY_OVERDUE_MS, MAX_ATTEMPTS, LEASE_MS, CONFIRM_MAX_AGE_MS, RETRY_SPACING_MS} = await load('src/lib/inquiry/deliver.ts');
 
@@ -425,4 +428,54 @@ test('a lead whose notification to Sean is still undelivered after 30 minutes is
   assert.equal(await overdueNotifications(db, clock), 0, 'not overdue yet');
   assert.equal(await overdueNotifications(db, clock + NOTIFY_OVERDUE_MS + 1), 1, 'only the undelivered one');
   assert.equal(await overdueNotifications(db, clock + 8 * 86_400_000), 0, 'older than 7 days stops alerting (still listed)');
+});
+
+test('the 90-day source review counts inquiries per answer and tier, inside the window, with no personal data', {timeout: 10_000}, async () => {
+  const {sourceReport} = await load('src/lib/inquiry/deliver.ts');
+  const db = d1();
+  const {d} = deps({db});
+  const add = async (heard, tier, createdAt) => {
+    const r = {...record(undefined, createdAt), inquiry: {email: `p${seq}@example.com`, name: 'Private Person', ...(heard ? {heard_via: heard, referrer: 'Jane Doe'} : {})}, lead: {tier}};
+    await acceptLead(r, d, `evt-${seq}`);
+  };
+  const t = new Date(clock).toISOString();
+  await add('planner', 'A', t);
+  await add('planner', 'B', t);
+  await add('search', 'C', t);
+  await add(null, 'B', t);
+  await add('planner', 'A', new Date(clock - 120 * 86_400_000).toISOString()); // outside 90 days
+  const r = await sourceReport(db, {now: clock});
+  assert.equal(r.total, 4);
+  assert.deepEqual(r.bySource.planner, {total: 2, A: 1, B: 1, C: 0});
+  assert.deepEqual(r.bySource.search, {total: 1, A: 0, B: 0, C: 1});
+  assert.equal(r.bySource.unknown.total, 1);
+  const text = JSON.stringify(r);
+  assert.ok(!/example\.com|Private Person|Jane Doe/.test(text), 'counts only');
+  assert.equal((await sourceReport(db, {now: clock, days: 180})).total, 5);
+});
+
+test('pipeline: the CRM and Sean see how the lead heard, and the referrer is escaped in the email', {timeout: 10_000}, async () => {
+  globalThis.__env = {GHL_WEBHOOK_URL: 'https://hooks.example/lead', RESEND_API_KEY: 're_test', INQUIRY_FROM_EMAIL: 'site@example.com', INQUIRY_NOTIFY_EMAIL: 'sean@example.com'};
+  globalThis.__cf = {};
+  const realFetch = globalThis.fetch;
+  const sent = [];
+  globalThis.fetch = async (url, init) => { sent.push({url: String(url), body: JSON.parse(init.body)}); return new Response('{}'); };
+  const realInfo = console.info;
+  console.info = () => {};
+  try {
+    const {processInquiry} = await load('src/lib/inquiry/process.ts');
+    const i = {name: 'Ada Lovelace', email: 'couple@example.com', event_type: 'wedding', location: 'Malibu', budget: 'discuss', role: 'couple', format: 'unsure', moments: [], sms_consent: false, attribution: {}, experiments: {}, heard_via: 'venue', referrer: '<b>Terranea</b> events'};
+    const r = await processInquiry(i, 'form');
+    assert.equal(r.accepted, true);
+    const crm = sent.find((s) => s.url.startsWith('https://hooks.example')).body;
+    assert.equal(crm.heard_via, 'The venue');
+    assert.equal(crm.referred_by, '<b>Terranea</b> events');
+    assert.ok(crm.tags.includes('heard:venue'));
+    const notify = sent.find((s) => s.url.includes('resend') && s.body.to[0] === 'sean@example.com').body;
+    assert.match(notify.html, /Referred by/);
+    assert.ok(notify.html.includes('&lt;b&gt;Terranea&lt;/b&gt; events') && !notify.html.includes('<b>Terranea'), 'visitor text is escaped');
+  } finally {
+    globalThis.fetch = realFetch;
+    console.info = realInfo;
+  }
 });

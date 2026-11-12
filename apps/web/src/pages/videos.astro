@@ -3,14 +3,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/ui/PageHeader.astro';
 import SuppliedFilm from '../components/home/SuppliedFilm.astro';
 import FilmGrid from '../components/home/FilmGrid.astro';
-import AcousticListening from '../components/media/AcousticListening.astro';
+import StickyListen from '../components/media/StickyListen.astro';
 import { graph,breadcrumbSchema } from '../lib/seo/schema';
-const jsonLd=graph(breadcrumbSchema([{name:'Home',path:'/'},{name:'Videos',path:'/videos'}]));
+const jsonLd=graph(breadcrumbSchema([{name:'Home',path:'/'},{name:'Watch',path:'/videos'}]));
 ---
-<BaseLayout pageType="videos" title="See SCE Live" description="See Sean Carney Entertainment in performance: acoustic arrangements, a second voice, the full band, and the people on the dance floor." jsonLd={jsonLd}>
+<BaseLayout pageType="videos" title="Watch SCE Live" description="Watch Sean Carney Entertainment in performance: acoustic arrangements, a second voice, the full band, and the people on the dance floor." jsonLd={jsonLd}>
   <PageHeader title="Let the music introduce us." intro="A quiet arrangement. A room singing along. See and hear what a celebration with SCE can feel like." />
   <SuppliedFilm location="videos" />
-  <FilmGrid placement="videos_acoustic" heading="Acoustic, up close" ids={['perfect','tennessee-whiskey','stargazing']} />
-  <FilmGrid placement="videos_live" heading="When the room comes alive" ids={['reel-2025','ritz-shut-up-and-dance','hotel-del-my-girl']} />
-  <AcousticListening compact location="videos" />
+  <FilmGrid id="acoustic" placement="videos_acoustic" heading="Acoustic, up close" ids={['perfect','tennessee-whiskey','stargazing','lose-control-acoustic','cant-help-falling-acoustic']} />
+  <FilmGrid id="live" placement="videos_live" heading="High-energy performances for the perfect moment" ids={['hotel-del-my-girl','valerie-live','dreams-live','hotel-del-as-it-was','ritz-shut-up-and-dance']} />
+  <StickyListen location="videos" />
 </BaseLayout>

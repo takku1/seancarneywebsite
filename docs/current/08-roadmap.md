@@ -4,7 +4,7 @@
 - Ivory maison as the only theme; navigation: Weddings · Private events · Repertoire · About · Check your date.
 - Home: the wedding hero (the promise, *Solo · Duo · Band*, the film loop), typeset rooms, the arc of the day, formats, film, couples' words.
 - `/weddings` leads; `/private-events` and its four types restyled to match.
-- `/repertoire` from `repertoire.json`; About covers The Scene, the rooms and the one credentials line.
+- `/repertoire` from `repertoire.json`; About covers The SCENE, the rooms and the one credentials line.
 - Scout's knowledge, intents and voice set to weddings and private events.
 - 301s for every legacy artist URL; JSON-LD, `llms.txt` and the sitemap for weddings and private events.
 - `/links` as the wedding Instagram link-in-bio.

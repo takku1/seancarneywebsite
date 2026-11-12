@@ -463,6 +463,40 @@ export async function listOpen(db: LeadDB, opts: { limit?: number; cursor?: stri
   return { leads: rows.map((r) => summary(r, opts.now ?? Date.now())), nextCursor: rows.length === limit && last ? `${last.created_at}|${last.lead_id}` : null, counts };
 }
 
+export interface SourceReport {
+  since: string;
+  total: number;
+  /** heard_via value ("unknown" when not given) -> inquiries per tier, and the total. */
+  bySource: Record<string, { total: number; A: number; B: number; C: number }>;
+}
+
+/**
+ * Inquiries per self-reported source and tier over the last `days` (default 90, the
+ * retention window for resolved leads). Counts only, no personal data. Bookings live in
+ * the CRM: compare these with won opportunities tagged heard:<source> there.
+ */
+export async function sourceReport(db: LeadDB, opts: { days?: number; now?: number } = {}): Promise<SourceReport> {
+  const days = Math.min(Math.max(opts.days ?? 90, 1), 180);
+  const since = new Date((opts.now ?? Date.now()) - days * 86_400_000).toISOString();
+  const rows = (
+    await db
+      .prepare(`SELECT COALESCE(json_extract(data, '$.inquiry.heard_via'), 'unknown') AS source, COALESCE(json_extract(data, '$.lead.tier'), '?') AS tier, COUNT(*) AS n
+        FROM leads WHERE created_at >= ? GROUP BY source, tier`)
+      .bind(since)
+      .all<{ source: string; tier: string; n: number }>()
+  ).results;
+  const bySource: SourceReport['bySource'] = {};
+  let total = 0;
+  for (const r of rows) {
+    const s = (bySource[r.source] ??= { total: 0, A: 0, B: 0, C: 0 });
+    const n = Number(r.n);
+    s.total += n;
+    total += n;
+    if (r.tier === 'A' || r.tier === 'B' || r.tier === 'C') s[r.tier] += n;
+  }
+  return { since, total, bySource };
+}
+
 /**
  * Takes the lease for one channel if it is free (none, or expired) and the
  * attempt budget allows. Atomic: of any number of concurrent runners, at most

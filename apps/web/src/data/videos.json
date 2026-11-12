@@ -1,10 +1,10 @@
 [
   {
-    "id": "reel-2025",
-    "title": "Live Performance Reel 2025",
-    "youtubeId": "ui_WlqtfgRc",
+    "id": "sce-experience",
+    "title": "The SCE Experience",
+    "youtubeId": "bfN64mYoPCI",
     "context": "live",
-    "note": "Sean Carney and The Scene",
+    "note": "Sean Carney Entertainment",
     "order": 0
   },
   {
@@ -69,5 +69,37 @@
     "context": "live",
     "note": "Fleetwood Mac, live in San Diego",
     "order": 12
+  },
+  {
+    "id": "lose-control-acoustic",
+    "title": "Lose Control",
+    "youtubeId": "KtklCnOl6pI",
+    "context": "cover",
+    "note": "Teddy Swims",
+    "order": 13
+  },
+  {
+    "id": "cant-help-falling-acoustic",
+    "title": "Can’t Help Falling in Love",
+    "youtubeId": "BDDzj8S2nug",
+    "context": "cover",
+    "note": "Elvis Presley",
+    "order": 14
+  },
+  {
+    "id": "valerie-live",
+    "title": "Valerie",
+    "youtubeId": "vqpwnA9hI98",
+    "context": "live",
+    "note": "Amy Winehouse, live in San Diego",
+    "order": 15
+  },
+  {
+    "id": "hotel-del-as-it-was",
+    "title": "As It Was",
+    "youtubeId": "U7tlt-ojizY",
+    "context": "live",
+    "note": "Live at Hotel del Coronado",
+    "order": 16
   }
 ]

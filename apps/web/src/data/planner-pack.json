@@ -1,0 +1,45 @@
+[
+  {
+    "id": "song-list",
+    "title": "Song list, 2026 to 2027",
+    "description": "The full repertoire, by style.",
+    "public": true,
+    "file": "/downloads/sean-carney-song-list-2026-2027.docx"
+  },
+  {
+    "id": "capabilities",
+    "title": "Capabilities sheet",
+    "description": "One page: the formats, the rooms Sean knows, and how a booking works.",
+    "public": true
+  },
+  {
+    "id": "stage-plot",
+    "title": "Stage plot",
+    "description": "Footprint and power for each format.",
+    "public": true
+  },
+  {
+    "id": "tech-rider",
+    "title": "Tech rider",
+    "description": "Sound and production requirements.",
+    "public": true
+  },
+  {
+    "id": "example-timeline",
+    "title": "Example day timeline",
+    "description": "How the music runs from the ceremony to the last dance.",
+    "public": true
+  },
+  {
+    "id": "coi",
+    "title": "Certificate of insurance",
+    "description": "Naming your venue, issued for your event.",
+    "public": false
+  },
+  {
+    "id": "w9",
+    "title": "W-9",
+    "description": "For your accounts team.",
+    "public": false
+  }
+]

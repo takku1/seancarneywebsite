@@ -19,7 +19,7 @@ export const GUESTS = ['Under 50', '50 to 150', '150 to 300', '300 to 1,000', 'O
 export const FORMATS = [
   { value: 'solo', label: 'Solo acoustic' },
   { value: 'small', label: 'Duo' },
-  { value: 'band', label: 'Full band, The Scene' },
+  { value: 'band', label: 'Full band, The SCENE' },
   { value: 'unsure', label: 'Not sure yet' },
 ] as const;
 
@@ -43,6 +43,24 @@ export const ROLES = [
   { value: 'other', label: 'Other' },
 ] as const;
 
+/**
+ * How the visitor heard about Sean, in their own words (self-reported). It complements the
+ * automatic attribution: a referral from a planner or a past couple never shows up as a
+ * referring website. The first four are referrals and ask for the referrer's name.
+ */
+export const HEARD_VIA = [
+  { value: 'planner', label: 'My planner or coordinator' },
+  { value: 'venue', label: 'The venue' },
+  { value: 'past_client', label: 'A past client, or a guest at an event Sean played' },
+  { value: 'friend', label: 'A friend or family member' },
+  { value: 'search', label: 'Google or another search' },
+  { value: 'social', label: 'Instagram, YouTube or other social media' },
+  { value: 'directory', label: 'A wedding directory or review site' },
+  { value: 'other', label: 'Something else' },
+] as const;
+/** Referral answers: the form asks who referred them. */
+export const REFERRAL_SOURCES = ['planner', 'venue', 'past_client', 'friend'] as const;
+
 const values = <T extends readonly { value: string }[]>(arr: T) => arr.map((a) => a.value) as [T[number]['value'], ...T[number]['value'][]];
 
 export const inquirySchema = z.object({
@@ -60,6 +78,9 @@ export const inquirySchema = z.object({
   role: z.enum(values(ROLES)),
   company: z.string().trim().max(160).optional().or(z.literal('')),
   message: z.string().trim().max(3000).optional().or(z.literal('')),
+  // Self-reported source (optional). Context, not content: it does not change a Scout draft's idempotency key.
+  heard_via: z.enum(values(HEARD_VIA)).optional(),
+  referrer: z.string().trim().max(120).optional().or(z.literal('')),
   sms_consent: z.boolean().default(false),
   // Context
   attribution: z.record(z.string(), z.string()).default({}),
@@ -81,7 +102,9 @@ export type Inquiry = z.infer<typeof inquirySchema>;
  * - fit (0-60): budget band, a workable lead time, a date and a format in mind, event size.
  *   Budget counts but no longer dominates; format is not ranked (Solo, Duo and Band
  *   are all the offer).
- * - relationship (0-30): planners and venues can bring repeat work; companies, return events.
+ * - relationship (0-30): planners and venues can bring repeat work; companies, return events;
+ *   a referral from a planner or venue counts like one (the strongest booking signal in this
+ *   market), a referral from a past client or friend half as much. The larger of the two applies.
  * - urgency (0-30): a date within 30 days needs an answer first; within 90, soon.
  * Tier A: strong fit, a trade partner, or an urgent date with a workable fit. Tier B:
  * any moderate signal. Tier C: everything else.
@@ -138,6 +161,13 @@ export function scoreLead(i: Inquiry, now = new Date()): LeadScore {
   } else if (i.role === 'corporate') {
     relationship = 15;
     signals.push('corporate');
+  }
+  if (i.heard_via === 'planner' || i.heard_via === 'venue') {
+    relationship = Math.max(relationship, 30);
+    signals.push(`referral:${i.heard_via}`);
+  } else if (i.heard_via === 'past_client' || i.heard_via === 'friend') {
+    relationship = Math.max(relationship, 15);
+    signals.push(`referral:${i.heard_via}`);
   }
 
   const tier = fit >= 45 || relationship >= 30 || (urgency >= 30 && fit >= 20) ? 'A' : fit >= 25 || relationship >= 15 || urgency >= 15 ? 'B' : 'C';

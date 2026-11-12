@@ -1,0 +1,166 @@
+---
+/**
+ * Sticky listening bar: Sean's acoustic recordings, one tap away. It slides in
+ * once the visitor reaches the page's third section and stays pinned
+ * bottom-left. Playing hands the recording to the persistent dock
+ * (src/lib/media/player.ts), so it keeps playing across pages; the bar steps
+ * aside while the dock is showing and returns when the dock closes. A finished
+ * recording moves on to the next one.
+ */
+import tracks from '../../data/audio.json';
+import Icon from '../ui/Icon.astro';
+interface Props { location: string; }
+const { location } = Astro.props;
+const list = tracks.map((t) => ({ id: `audio-${t.id}`, src: t.src, title: t.title, artist: t.artist }));
+---
+
+{list.length > 0 && (
+  <aside class="listen" aria-label="Listen to Sean's acoustic recordings" data-listen data-location={location} data-tracks={JSON.stringify(list)} hidden>
+    <span data-listen-tile data-media-type="audio" data-location={location} hidden></span>
+    <button type="button" class="play" data-listen-play aria-label={`Play ${list[0].title}, Sean Carney's acoustic arrangement`}><Icon name="play" /></button>
+    <div class="now">
+      <p class="label">Listen · acoustic</p>
+      <p class="song"><span data-listen-title>{list[0].title}</span> <small data-listen-artist>{list[0].artist}</small></p>
+    </div>
+    <button type="button" class="ctl" data-listen-next aria-label="Next recording"><Icon name="arrow-right" /></button>
+    <button type="button" class="ctl" data-listen-close aria-label="Hide the listening bar"><Icon name="x" /></button>
+  </aside>
+)}
+
+<script>
+  import { onPage } from '../../lib/lifecycle';
+  import { playNative } from '../../lib/media/player';
+  import { track } from '../../lib/analytics/track';
+
+  interface Track { id: string; src: string; title: string; artist: string }
+  let dismissed = false; // for this visit, across client navigations
+
+  onPage(() => {
+    const bar = document.querySelector<HTMLElement>('[data-listen]');
+    if (!bar || dismissed) return;
+    const tracks = JSON.parse(bar.dataset.tracks || '[]') as Track[];
+    let tile = bar.querySelector<HTMLElement>('[data-listen-tile]')!;
+    const playBtn = bar.querySelector<HTMLButtonElement>('[data-listen-play]')!;
+    const titleEl = bar.querySelector<HTMLElement>('[data-listen-title]')!;
+    const artistEl = bar.querySelector<HTMLElement>('[data-listen-artist]')!;
+    const dockEl = document.querySelector<HTMLElement>('[data-dock]');
+    let i = 0;
+    let reached = false;
+
+    const show = (on: boolean) => {
+      bar.hidden = !on;
+      if (on) requestAnimationFrame(() => bar.classList.add('in'));
+      else bar.classList.remove('in');
+    };
+    // Visible once the third section is reached, unless the dock is already playing something.
+    const sync = () => show(reached && !dismissed && (!dockEl || dockEl.hasAttribute('hidden')));
+
+    const select = (n: number) => {
+      i = (n + tracks.length) % tracks.length;
+      const t = tracks[i];
+      tile.dataset.mediaId = t.id;
+      tile.dataset.mediaSrc = t.src;
+      tile.dataset.title = `${t.title} · Sean Carney`;
+      titleEl.textContent = t.title;
+      artistEl.textContent = t.artist;
+      playBtn.setAttribute('aria-label', `Play ${t.title}, Sean Carney's acoustic arrangement`);
+    };
+    const play = (how: string) => {
+      // A fresh element per play: the player treats the same element as "already playing".
+      const fresh = tile.cloneNode() as HTMLElement;
+      tile.replaceWith(fresh);
+      tile = fresh;
+      playNative(tile, true);
+      track('listen_bar_play', { track_id: tracks[i].id, location: bar.dataset.location, how });
+    };
+    select(0);
+
+    playBtn.addEventListener('click', () => play('click'));
+    bar.querySelector('[data-listen-next]')?.addEventListener('click', () => select(i + 1));
+    bar.querySelector('[data-listen-close]')?.addEventListener('click', () => {
+      dismissed = true;
+      sync();
+      track('listen_bar_close', { location: bar.dataset.location });
+    });
+
+    // A recording started here that finishes moves on to the next one ('ended' does not bubble: capture it).
+    const onEnded = (e: Event) => {
+      const media = e.target;
+      if (media instanceof HTMLAudioElement && media.getAttribute('src') === tracks[i].src) {
+        select(i + 1);
+        play('auto');
+      }
+    };
+    document.addEventListener('ended', onEnded, true);
+
+    // Step aside while the dock shows; come back when it closes.
+    const mo = dockEl ? new MutationObserver(sync) : null;
+    if (dockEl) mo!.observe(dockEl, { attributes: true, attributeFilter: ['hidden'] });
+
+    // The trigger: the third section of the page (or the last, on a short page).
+    const sections = [...document.querySelectorAll<HTMLElement>('main section')];
+    const trigger = sections[2] ?? sections.at(-1);
+    let io: IntersectionObserver | undefined;
+    if (trigger) {
+      io = new IntersectionObserver(([en]) => {
+        if (en.isIntersecting || en.boundingClientRect.top < 0) {
+          reached = true;
+          io?.disconnect();
+          sync();
+          track('listen_bar_shown', { location: bar.dataset.location });
+        }
+      });
+      io.observe(trigger);
+    }
+
+    return () => {
+      io?.disconnect();
+      mo?.disconnect();
+      document.removeEventListener('ended', onEnded, true);
+    };
+  }, '[data-listen]');
+</script>
+
+<style>
+  .listen {
+    position: fixed;
+    z-index: var(--z-header);
+    left: max(var(--gutter), env(safe-area-inset-left));
+    bottom: max(1.25rem, env(safe-area-inset-bottom));
+    width: min(24rem, calc(100vw - 2 * var(--gutter) - 4.5rem)); /* bottom-right belongs to the Scout pick */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.25rem 0.5rem 0.5rem;
+    background: var(--bg-raised);
+    border: 1px solid var(--line-strong);
+    box-shadow: 0 24px 60px rgb(0 0 0 / 0.35);
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.35s var(--ease-out), transform 0.45s var(--ease-out);
+  }
+  .listen.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .listen { transform: none; } }
+  .play {
+    flex: none;
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
+    background: none;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .play:hover { background: var(--text); color: var(--bg-raised); }
+  .play :global(svg) { width: 18px; height: 18px; margin-left: 2px; }
+  .now { flex: 1; min-width: 0; }
+  .label { font-size: var(--step--1); color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .song { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-display); font-size: var(--step-1); line-height: 1.2; }
+  .song small { font-family: var(--font-body); font-size: var(--step--1); color: var(--text-muted); }
+  .ctl { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: none; border: 0; color: var(--text-muted); cursor: pointer; }
+  .ctl:hover { color: var(--text); }
+  .ctl :global(svg) { width: 18px; height: 18px; }
+</style>

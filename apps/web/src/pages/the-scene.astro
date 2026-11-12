@@ -8,10 +8,10 @@ import musicians from '../data/musicians.json';
 const {image:bandPhoto}=photoFor('scene.hero');
 import { graph, breadcrumbSchema } from '../lib/seo/schema';
 const og = await getImage({src:bandPhoto,width:1200,height:630,fit:'cover',format:'jpg'});
-const jsonLd = graph(breadcrumbSchema([{name:'Home',path:'/'},{name:'The Scene',path:'/the-scene'}]));
+const jsonLd = graph(breadcrumbSchema([{name:'Home',path:'/'},{name:'The SCENE',path:'/the-scene'}]));
 ---
-<BaseLayout pageType="the_scene" title="Meet The Scene | Sean Carney’s Wedding & Event Band" description="Meet the vocalists and musicians behind The Scene, Sean Carney’s live band for wedding receptions, private celebrations and corporate events." image={og.src} jsonLd={jsonLd}>
-  <section class="section intro"><div class="container intro-grid"><div><h1>Meet The Scene</h1><p class="lede">The musicians behind<br />the moments you remember.</p><p>A voice you know. A rhythm you feel. Sean brings together a house of experienced musicians, with the ensemble shaped around your room and your day.</p><a href="/inquire?format=band" class="btn"><InquireLabel /></a></div><Image src={bandPhoto} alt="Sean Carney on electric guitar alongside a vocalist at a garden performance" widths={[640,960,1440]} sizes="(min-width:900px) 55vw, 92vw" loading="eager" /></div></section>
+<BaseLayout pageType="the_scene" title="Meet The SCENE | Sean Carney’s Wedding & Event Band" description="Meet the vocalists and musicians behind The SCENE, Sean Carney’s live band for wedding receptions, private celebrations and corporate events." image={og.src} jsonLd={jsonLd}>
+  <section class="section intro"><div class="container intro-grid"><div><h1>Meet The SCENE</h1><p class="lede">The musicians behind<br />the moments you remember.</p><p>A voice you know. A rhythm you feel. Sean brings together a house of experienced musicians, with the ensemble shaped around your room and your day.</p><a href="/inquire?format=band" class="btn"><InquireLabel /></a></div><Image src={bandPhoto} alt="Sean Carney on electric guitar alongside a vocalist at a garden performance" widths={[640,960,1440]} sizes="(min-width:900px) 55vw, 92vw" loading="eager" /></div></section>
   <section class="section roster" aria-label="Meet the musicians"><div class="container">
     {musicians.map((m,i) => <article id={m.id} class:list={['member',{reverse:i%2===1}]}>
       <div class="portrait"><Image src={imageAsset(m.image.replace('.jpg',''))} alt={m.name} widths={[400,640,960]} sizes="(min-width:900px) 35vw, 92vw" /></div>
@@ -19,7 +19,7 @@ const jsonLd = graph(breadcrumbSchema([{name:'Home',path:'/'},{name:'The Scene',
     </article>)}
     <p class="roster-note">The lineup is tailored to each event. Sean confirms the musicians and instrumentation with your proposal.</p>
   </div></section>
-  <SuppliedFilm location="the_scene" />
+  <SuppliedFilm location="the_scene" film={{ youtubeId: 'U7tlt-ojizY', title: 'As It Was · Sean Carney and The SCENE, live at Hotel del Coronado' }} heading="The SCENE, live." intro="Sean Carney and The SCENE playing Harry Styles’ “As It Was” at Hotel del Coronado." caption="Live at Hotel del Coronado, San Diego" />
   <section class="section closing"><div class="container"><h2>One house. Your kind of celebration.</h2><p>Begin with a single guitar, add a second voice, or bring the full band to the floor.</p><a href="/weddings" class="link-arrow">Plan the music for your day</a></div></section>
 </BaseLayout>
 <style>

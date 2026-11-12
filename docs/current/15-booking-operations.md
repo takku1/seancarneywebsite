@@ -13,7 +13,7 @@ The site's job ends when an inquiry reaches Sean, but the business only succeeds
 | Contract and deposit | Sean (SHA-BAM workflows) | Proposal accepted | Contract signed; deposit paid; **the date goes on the holds calendar** so the site shows it as taken |
 | Planning | Sean with the couple or planner | Deposit paid | Timeline, songs and sound; planner pack (P2) to the planner |
 | Event | Sean and the musicians | Event week | Run of show confirmed; balance invoice |
-| Completed | Sean (SHA-BAM workflows) | Day after | Thank-you; review request; testimonial permission recorded with an approval (`14-decision-register.md`, section 2) |
+| Completed | Sean (SHA-BAM workflows) | Day after | Workflows W1 to W7 (`16-follow-ups-and-referrals.md`): thank-you, review request, the ending, planner and venue thanks, corporate rebooking; testimonial permission recorded with an approval (`14-decision-register.md`, section 2) |
 | Lost | Sean | Manual | Reason recorded (price, date, chose other, no reply) |
 | Date released or moved | Sean | Cancellation, reschedule, or a hold that lapses | The holds calendar is updated the same day: the old date removed, the new one added |
 
@@ -52,6 +52,7 @@ When an "act now" alert fires: open `GET /api/leads` (admin token), contact the 
 Each CRM contact carries the lead ID, tier, the fit, relationship and urgency scores, related leads, and first- and last-touch attribution. Each opportunity carries its won value. Together they answer:
 
 - **Which channels produce booked revenue**, not just inquiries (the KPI in `04`).
+- **Which referral sources produce bookings:** the 90-day source review (`16-follow-ups-and-referrals.md`), from `GET /api/leads?report=sources` and SHA-BAM's won opportunities by `heard:` tag.
 - **Whether the tiers predict bookings.** After about 90 days, compare win rate and value by tier and by dimension, then adjust `scoreLead` (O6 in the register).
 - **Where visitors abandon the form**, from the step events (`inquiry_step_complete`) in Plausible.
 - **Why proposals are lost**, from the lost reasons.

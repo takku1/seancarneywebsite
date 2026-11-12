@@ -20,8 +20,8 @@ export const site = {
   responseTime: 'within one business day',
   bookingSeason: 'Sean accepts a limited number of weddings and private events each season.',
   socials: [
-    { id: 'instagram', label: 'Instagram', handle: '@seancarneyentertainment', url: 'https://www.instagram.com/seancarneyentertainment' },
-    { id: 'youtube', label: 'YouTube', handle: '@seanshredseverything', url: 'https://youtube.com/channel/UCx8Os2NEcWuAIf2nlaH9-yw' },
+    { id: 'instagram', label: 'Instagram', handle: '@seancarneyentertainment', url: 'https://www.instagram.com/seancarneyentertainment/' },
+    { id: 'youtube', label: 'YouTube', handle: 'Sean Carney Entertainment', url: 'https://www.youtube.com/channel/UC9lmqGx1fhvh4un4BjbgDLQ' },
     { id: 'facebook', label: 'Facebook', handle: 'Sean Carney Music', url: 'https://www.facebook.com/seancarneymusic2' },
   ],
   stats: { years: '15+', events: '1,000+', countries: '50+' },

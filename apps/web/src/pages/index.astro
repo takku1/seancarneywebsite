@@ -5,7 +5,7 @@ import Rooms from '../components/home/Rooms.astro';
 import DayArc from '../components/home/DayArc.astro';
 import Formats from '../components/home/Formats.astro';
 import SuppliedFilm from '../components/home/SuppliedFilm.astro';
-import AcousticListening from '../components/media/AcousticListening.astro';
+import StickyListen from '../components/media/StickyListen.astro';
 import MeetSean from '../components/home/MeetSean.astro';
 import PlayersPreview from '../components/home/PlayersPreview.astro';
 import CustomSongTeaser from '../components/home/CustomSongTeaser.astro';
@@ -20,7 +20,7 @@ const jsonLd = graph(personSchema(), websiteSchema(), serviceSchema());
   pageType="home"
   overlayHeader
   title="Luxury Wedding Entertainment | SCE"
-  description="Sean Carney Entertainment: one team for your whole celebration. Solo, duo and band, full production, and a custom song written for the two of you."
+  description="Sean Carney Entertainment: luxury live music for weddings, private celebrations and corporate events. Solo, duo and band with The SCENE, and custom written songs."
   jsonLd={jsonLd}
 >
   <Hero />
@@ -31,10 +31,10 @@ const jsonLd = graph(personSchema(), websiteSchema(), serviceSchema());
   <CustomSongTeaser />
   <PlayersPreview />
   <SuppliedFilm />
-  <AcousticListening compact location="home" />
   <Testimonials ids={['jordan-isabela', 'timea-kris', 'olivia-john']} />
   <div class="container scout-row"><ScoutInvite source="home" text="Have a date in mind? Scout, Sean's AI assistant, can check it and answer questions in a minute." prompts={['Check a date', 'Which format suits our day?']} /></div>
   <EventsBand />
+  <StickyListen location="home" />
 </BaseLayout>
 
 <style>

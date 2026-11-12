@@ -2,7 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/ui/Icon.astro';
 import { PUBLIC_TURNSTILE_SITE_KEY, PUBLIC_CALL_BOOKING_URL } from 'astro:env/client';
-import { EVENT_TYPES, GUESTS, FORMATS, MOMENTS, BUDGETS, ROLES } from '../../lib/inquiry/schema';
+import { EVENT_TYPES, GUESTS, FORMATS, MOMENTS, BUDGETS, ROLES, HEARD_VIA, REFERRAL_SOURCES } from '../../lib/inquiry/schema';
 import { site } from '../../config/site';
 import { rooms } from '../../lib/content';
 import ScoutInvite from '../../components/scout/ScoutInvite.astro';
@@ -138,6 +138,19 @@ const steps = ['Occasion', 'Date and place', 'The event', 'Investment', 'Your de
             <label for="company">Company or planning firm <span class="opt">(optional)</span></label>
             <input type="text" id="company" name="company" autocomplete="organization" />
           </div>
+          <div class="row">
+            <div class="field">
+              <label for="heard_via">How did you hear about Sean? <span class="opt">(optional)</span></label>
+              <select id="heard_via" name="heard_via">
+                <option value="">Select</option>
+                {HEARD_VIA.map((h) => <option value={h.value}>{h.label}</option>)}
+              </select>
+            </div>
+            <div class="field" data-referrer-field data-referral-sources={REFERRAL_SOURCES.join(' ')} hidden>
+              <label for="referrer">Who referred you? <span class="opt">(optional)</span></label>
+              <input type="text" id="referrer" name="referrer" maxlength="120" placeholder="So Sean can thank them" />
+            </div>
+          </div>
           <div class="field">
             <label for="message">Anything else? <span class="opt">(optional)</span></label>
             <textarea id="message" name="message" rows="4" placeholder="Songs you love, the feel of the night, timings"></textarea>
@@ -243,7 +256,7 @@ const steps = ['Occasion', 'Date and place', 'The event', 'Investment', 'Your de
         const obj: Record<string, unknown> = { step: current };
         for (const el of form.elements as unknown as Iterable<HTMLInputElement>) {
           // Contact details are never written to browser storage (ASVS 14.3.3).
-          if (!el.name || ['website', 'name', 'email', 'phone', 'company', 'message'].includes(el.name)) continue;
+          if (!el.name || ['website', 'name', 'email', 'phone', 'company', 'message', 'referrer'].includes(el.name)) continue;
           if (el.type === 'radio') { if (el.checked) obj[el.name] = el.value; }
           else if (el.type === 'checkbox') { if (el.name === 'moments') { ((obj.moments as string[]) ||= []); if (el.checked) (obj.moments as string[]).push(el.value); } else obj[el.name] = el.checked; }
           else obj[el.name] = el.value;
@@ -348,7 +361,16 @@ const steps = ['Occasion', 'Date and place', 'The event', 'Investment', 'Your de
       if (t.name === 'event_date') void checkAvailability(t.value);
       if (t.name === 'event_type' && current === 0) setTimeout(() => btnNext.click(), 180); // one tap advances
       if (t.name === 'role') (form.querySelector('[data-company-field]') as HTMLElement).hidden = t.value === 'couple';
+      if (t.name === 'heard_via') syncReferrer();
     });
+
+    // "Who referred you?" only for referral answers; cleared when hidden so a stale name is never sent.
+    function syncReferrer() {
+      const field = form.querySelector<HTMLElement>('[data-referrer-field]')!;
+      const show = (field.dataset.referralSources ?? '').split(' ').includes(val('heard_via'));
+      field.hidden = !show;
+      if (!show) form.querySelector<HTMLInputElement>('[name="referrer"]')!.value = '';
+    }
 
     btnNext.addEventListener('click', () => {
       if (!validate(current)) return;
@@ -382,6 +404,8 @@ const steps = ['Occasion', 'Date and place', 'The event', 'Investment', 'Your de
         role: val('role'),
         company: val('company'),
         message: val('message'),
+        heard_via: val('heard_via') || undefined,
+        referrer: val('referrer'),
         sms_consent: data.get('sms_consent') === 'on',
         attribution: getAttribution(),
         experiments: getExperimentProps(),
@@ -397,7 +421,7 @@ const steps = ['Occasion', 'Date and place', 'The event', 'Investment', 'Your de
         const out = (await res.json()) as { ok: boolean; tier?: string; error?: string };
         if (!res.ok || !out.ok) throw new Error(out.error || `http_${res.status}`);
         submitted = true;
-        track('inquiry_submit', { event_type: payload.event_type, budget: payload.budget, role: payload.role, format: payload.format, lead_tier: out.tier, ms_total: Date.now() - startedAt, event_id: payload.event_id });
+        track('inquiry_submit', { event_type: payload.event_type, budget: payload.budget, role: payload.role, format: payload.format, heard_via: payload.heard_via, lead_tier: out.tier, ms_total: Date.now() - startedAt, event_id: payload.event_id });
         removeItem(DRAFT);
         setItem('sc_lead_tier', out.tier ?? '');
         await navigate(`/inquire/thanks?type=${encodeURIComponent(payload.event_type)}`);
@@ -419,6 +443,7 @@ const steps = ['Occasion', 'Date and place', 'The event', 'Investment', 'Your de
     addEventListener('pagehide', abandon);
 
     restore();
+    syncReferrer();
     track('inquiry_view', { prefilled: !!new URLSearchParams(location.search).get('type') });
     render();
     // Leaving through the client router does not fire pagehide.

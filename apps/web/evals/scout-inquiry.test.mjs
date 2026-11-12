@@ -236,3 +236,24 @@ test('the same inquiry through the form and through Scout: two leads, linked, ne
     assert.equal(payloads.find((p) => p.lead_id === viaScout.leadId).related_leads, viaForm.leadId, 'matched on the normalized email');
   } finally { restore(); }
 });
+
+test('a referral reaches Sean: heard_via and a typed referrer travel with the lead; an untyped referrer is dropped', {timeout: 10_000}, async () => {
+  const {db} = setup();
+  const bodies = [];
+  globalThis.fetch = async (url, init) => { bodies.push(JSON.parse(init.body)); return new Response('ok'); };
+  try {
+    const typed = {...CTX, visitorText: `${CTX.visitorText}. Our planner Jane Doe of Laurel Events sent us`};
+    const {card} = await executeTool('submit_inquiry', {...ARGS, heard_via: 'planner', referrer: 'Jane Doe of Laurel Events'}, typed);
+    assert.equal((await (await send(POST, card.token)).json()).ok, true);
+    const lead = JSON.parse(db.raw.prepare('SELECT data FROM leads').get().data);
+    assert.equal(lead.inquiry.heard_via, 'planner');
+    assert.equal(lead.inquiry.referrer, 'Jane Doe of Laurel Events');
+    assert.ok(lead.lead.signals.includes('referral:planner'));
+    assert.equal(lead.lead.relationship, 30, 'a planner referral counts like a trade partner');
+    assert.equal(bodies[0].referred_by, 'Jane Doe of Laurel Events');
+    assert.ok(bodies[0].tags.includes('heard:planner'));
+
+    const guessed = await executeTool('submit_inquiry', {...ARGS, email: 'ada2@example.com', heard_via: 'friend', referrer: 'Someone Invented'}, {...CTX, visitorText: 'I am Ada, ada2@example.com'});
+    assert.equal(JSON.parse(Buffer.from(guessed.card.token.split('.')[0], 'base64url').toString()).inquiry.referrer, '', 'a name the visitor never typed is not kept');
+  } finally { restore(); }
+});

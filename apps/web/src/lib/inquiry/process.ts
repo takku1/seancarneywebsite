@@ -16,8 +16,8 @@ import {
   INQUIRY_FROM_EMAIL,
 } from 'astro:env/server';
 import { upsertContact, createOpportunity, addNote, GHL_TIMEOUT_MS } from '../integrations/ghl';
-import { scoreLead, EVENT_TYPES, BUDGETS, ROLES, FORMATS, type Inquiry } from './schema';
-import { acceptLead, listOpen, retryOpen, reopenAbandoned, purgeExpired, LeaseLost, type Lease, type CrmProgress, type DeliveryDeps, type LeadDB, type LeadRecord, type RelatedLead, overdueNotifications, relatedLeads } from './deliver';
+import { scoreLead, EVENT_TYPES, BUDGETS, ROLES, FORMATS, HEARD_VIA, type Inquiry } from './schema';
+import { acceptLead, listOpen, sourceReport, retryOpen, reopenAbandoned, purgeExpired, LeaseLost, type Lease, type CrmProgress, type DeliveryDeps, type LeadDB, type LeadRecord, type RelatedLead, overdueNotifications, relatedLeads } from './deliver';
 import { errorCode } from '../security/errors';
 
 /** Pipeline value estimate per budget band (midpoints), for GHL forecasting. */
@@ -39,7 +39,7 @@ export function crmPayload(i: Inquiry, lead: Lead, leadId: string, channel: 'for
     phone: i.phone || undefined,
     companyName: i.company || undefined,
     source: `website:${i.attribution.last_channel || i.attribution.first_channel || 'direct'}`,
-    tags: ['website-inquiry', `via:${channel}`, `event:${i.event_type}`, `tier:${lead.tier}`, `role:${i.role}`, ...(i.sms_consent ? ['sms-consent'] : []), ...(lead.related?.length ? ['repeat-inquiry'] : [])],
+    tags: ['website-inquiry', `via:${channel}`, `event:${i.event_type}`, `tier:${lead.tier}`, `role:${i.role}`, ...(i.heard_via ? [`heard:${i.heard_via}`] : []), ...(i.sms_consent ? ['sms-consent'] : []), ...(lead.related?.length ? ['repeat-inquiry'] : [])],
     lead_id: leadId,
     inquiry_channel: channel,
     event_type: labelOf(EVENT_TYPES, i.event_type),
@@ -51,6 +51,8 @@ export function crmPayload(i: Inquiry, lead: Lead, leadId: string, channel: 'for
     budget: labelOf(BUDGETS, i.budget),
     role: labelOf(ROLES, i.role),
     message: i.message ?? '',
+    heard_via: labelOf(HEARD_VIA, i.heard_via),
+    referred_by: i.referrer ?? '',
     sms_consent: i.sms_consent,
     lead_score: lead.score,
     lead_tier: lead.tier,
@@ -69,7 +71,7 @@ function notifyHtml(i: Inquiry, lead: Lead, leadId: string, channel: string): st
   const row = (k: string, v: string | undefined) => (v ? `<tr><td style="padding:4px 12px 4px 0;color:#777">${k}</td><td style="padding:4px 0">${escapeHtml(v)}</td></tr>` : '');
   return `<div style="font-family:system-ui,sans-serif;font-size:15px;color:#111">
 <p style="font-size:18px"><strong>Tier ${lead.tier}</strong> inquiry (fit ${lead.fit}, relationship ${lead.relationship}, urgency ${lead.urgency}) from ${escapeHtml(i.name)}${channel === 'scout' ? ' <span style="color:#777">via Scout</span>' : ''}</p>
-<table>${row('Event', labelOf(EVENT_TYPES, i.event_type))}${row('Date', i.event_date || (i.date_flexible ? 'Flexible' : 'Not set'))}${row('Location', i.location)}${row('Guests', i.guests)}${row('Format', labelOf(FORMATS, i.format))}${row('Moments', i.moments.join(', '))}${row('Budget', labelOf(BUDGETS, i.budget))}${row('Role', labelOf(ROLES, i.role))}${row('Company', i.company)}${row('Email', i.email)}${row('Phone', i.phone)}${row('Message', i.message)}${row('Channel', i.attribution.last_channel || i.attribution.first_channel)}${row('Landing page', i.attribution.first_landing)}${row('Signals', lead.signals.join(', '))}${row('Earlier inquiries', (lead.related ?? []).map((r) => `${r.leadId} (${r.channel}, ${r.createdAt.slice(0, 10)})`).join('; '))}</table>
+<table>${row('Event', labelOf(EVENT_TYPES, i.event_type))}${row('Date', i.event_date || (i.date_flexible ? 'Flexible' : 'Not set'))}${row('Location', i.location)}${row('Guests', i.guests)}${row('Format', labelOf(FORMATS, i.format))}${row('Moments', i.moments.join(', '))}${row('Budget', labelOf(BUDGETS, i.budget))}${row('Role', labelOf(ROLES, i.role))}${row('Company', i.company)}${row('Email', i.email)}${row('Phone', i.phone)}${row('Message', i.message)}${row('Heard via', labelOf(HEARD_VIA, i.heard_via))}${row('Referred by', i.referrer)}${row('Channel', i.attribution.last_channel || i.attribution.first_channel)}${row('Landing page', i.attribution.first_landing)}${row('Signals', lead.signals.join(', '))}${row('Earlier inquiries', (lead.related ?? []).map((r) => `${r.leadId} (${r.channel}, ${r.createdAt.slice(0, 10)})`).join('; '))}</table>
 <p style="color:#777;font-size:13px">Lead ${leadId}. Reply directly to this email to respond. The tier only sets the reply order: every inquiry gets a personal answer.</p></div>`;
 }
 
@@ -232,6 +234,12 @@ export async function processInquiry(
 export async function openLeads(opts: { limit?: number; cursor?: string | null }) {
   const db = await leadDB();
   return db ? listOpen(db, opts) : null;
+}
+
+/** Admin: inquiries per self-reported source and tier, last `days` (default 90). null = no database bound. */
+export async function leadSources(opts: { days?: number } = {}) {
+  const db = await leadDB();
+  return db ? sourceReport(db, opts) : null;
 }
 
 /** One bounded retry batch: cron every 15 minutes, or POST /api/leads (e.g. once SHA-BAM is connected). */

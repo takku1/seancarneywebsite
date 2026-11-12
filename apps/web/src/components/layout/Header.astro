@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import Icon from '../ui/Icon.astro';
 import InquireLabel from '../ui/InquireLabel.astro';
 import Brand from './Brand.astro';
+import { site } from '../../config/site';
 
 interface Props {
   overlay?: boolean;
@@ -20,9 +21,11 @@ const primary = [
   { href: '/repertoire', label: 'Repertoire' },
   { href: '/custom-song', label: 'Your song' },
   { href: '/the-scene', label: 'Our players' },
-  { href: '/videos', label: 'Films' },
+  { href: '/videos', label: 'Watch' },
   { href: '/about', label: 'About' },
 ];
+// Instagram and YouTube sit at the very top of every page.
+const topSocials = site.socials.filter((s) => s.id === 'instagram' || s.id === 'youtube');
 const norm = path.replace(/\/$/, '') || '/';
 const onEvent = (slug: string) => norm === `/${slug}`;
 // "page" = this exact page; "true" = the section you're in (an event page under Private Events).
@@ -53,6 +56,12 @@ const eventsCurrent = norm === '/private-events' ? 'page' : events.some((e) => o
         ))}
       </ul>
     </nav>
+
+    <ul class="top-socials" aria-label="Follow SCE">
+      {topSocials.map((s) => (
+        <li><a href={s.url} rel="me noopener" target="_blank" data-track="social_click" data-track-network={s.id} data-track-location="header"><Icon name={s.id} label={s.label} /></a></li>
+      ))}
+    </ul>
 
     <a href="/inquire" class="btn header-cta" data-track="cta_click" data-track-location="header"><InquireLabel /></a>
 
@@ -209,9 +218,13 @@ const eventsCurrent = norm === '/private-events' ? 'page' : events.some((e) => o
 
   .header-cta { min-height: 42px; }
 
+  .top-socials { display: flex; list-style: none; margin: 0; padding: 0; }
+  .top-socials a { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; color: var(--text-muted); transition: color 0.2s; }
+  .top-socials a:hover { color: var(--text); }
+  .top-socials :global(svg) { width: 22px; height: 22px; }
+
   .menu-toggle {
     display: none;
-    margin-left: auto;
     width: 48px;
     height: 48px;
     align-items: center;
@@ -259,5 +272,6 @@ const eventsCurrent = norm === '/private-events' ? 'page' : events.some((e) => o
   @media (max-width: 1199px) {
     .nav, .header-cta { display: none; }
     .menu-toggle { display: inline-flex; }
+    .top-socials { margin-left: auto; }
   }
 </style>

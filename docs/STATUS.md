@@ -7,7 +7,7 @@
 | State | Where it stands |
 |---|---|
 | Implemented | All pages, the inquiry pipeline with durable acceptance, Scout (guided and Claude), media tooling |
-| Locally tested | `npm run verify` (types, 80 unit tests, including lead-table upgrades, calendar rules across daylight-saving days, lead scoring and linked repeat inquiries; build, audit); a pre-push hook runs the unit tests and type check when `apps/web` changes; `scripts/test_publish.sh` (11 cases); `npm run test:browser` (21 pages at desktop and phone width, API guards in the Workers runtime, and four inquiry journeys: refused, accepted, 503 and a stale date check; not Scout, the player or keyboard journeys); in the built Worker under `wrangler dev`: concurrent duplicate submissions produce one lead, and the cron backfills a pre-CRM lead to a stand-in webhook (2026-11-10) |
+| Locally tested | `npm run verify` (types, 89 unit tests, including lead-table upgrades, referral capture and the source report, the planner-pack privacy guard, calendar rules across daylight-saving days, lead scoring and linked repeat inquiries; build, audit); a pre-push hook runs the unit tests and type check when `apps/web` changes; `scripts/test_publish.sh` (11 cases); `npm run test:browser` (21 pages at desktop and phone width, API guards in the Workers runtime, and four inquiry journeys: refused, accepted, 503 and a stale date check; not Scout, the player or keyboard journeys); in the built Worker under `wrangler dev`: concurrent duplicate submissions produce one lead, and the cron backfills a pre-CRM lead to a stand-in webhook (2026-11-10) |
 | Deployed | Not yet. Staging is scripted and dry-run locally (`scripts/staging.sh`, `13-staging.md`); it waits on the Cloudflare login |
 | Production verified | Not yet: needs a real inquiry through Resend and SHA-BAM on staging |
 | Externally approved | Not yet: claims, testimonials (names hidden until each is approved), media rights, offer scope and sales materials (`14-decision-register.md`) |
@@ -25,6 +25,8 @@
 **Architecture Summary:** An Astro 7 static site (`apps/web`) on Cloudflare Workers; prerendered pages (`build.format: 'file'`) are swapped by the ClientRouter, while Scout, the consent bar and a persistent audio/video dock survive navigation. The Worker runs only the APIs behind `src/middleware.ts`: inquiry (success only once the lead is held in the lead store, SHA-BAM or Sean's inbox), availability (Google Calendar free/busy), Scout, signal and CSP reports. Content is typed JSON in `src/data/`, validated at build; `media-library.json` is the media catalog, prepared by `scripts/media/media.py` from private originals in `resources/`. Analytics are first-party under an enforced hash-based CSP. Details: `docs/current/03-architecture.md`.
 
 **Key Decisions:**
+- 2026-11-12: Referrals are recorded and acted on (`16-follow-ups-and-referrals.md`): the form's last step and Scout ask, optionally, how the visitor heard about Sean and who referred them; the answer travels to the CRM (`heard:` tag, `heard_via`, `referred_by`) and Sean's notification, and a planner or venue referral scores like a trade partner. `GET /api/leads?report=sources` gives the 90-day inquiries-by-source review. Post-event and corporate rebooking follow-ups are SHA-BAM workflows with draft templates awaiting Sean (F1). `/planners` lists the planner pack from `planner-pack.json`; insurance and tax forms are never published.
+- 2026-11-12: Sean's site review (`review.md`) is applied: hero "Your story. Your song. Anywhere in the world." with Custom Written Songs among the formats; "Watch The SCE Experience" and every film slot play the YouTube brand film (`src/lib/media/experience.ts`); Instagram and YouTube (the new SCE channel) sit at the top of every page; the rooms drift past as a slow strip, Amangiri first, with approved venue logos and wordmarks; Sean's own introduction and format copy; the band is always "The SCENE"; the nav says Watch. Home and Watch have no listening section: a sticky listening bar appears at the third section and hands playback to the persistent dock. The Hustlers-era reel is gone (excluded from the YouTube feed). New claims, rooms and logos are in `14` (C2, C8, C9, M4, M5).
 - 2026-11-11: From the fresh repository audit:
   - Availability reads a dedicated holds calendar (any hold = busy) apart from personal calendars (tentative: Sean checks). Any calendar error reads as unknown, day boundaries are DST-aware, and the form and Scout share one rule set.
   - Lead scoring separates fit, relationship and urgency. The tier sets reply order only.
@@ -43,12 +45,12 @@
 - 2026-11-10: Server logs carry allowlisted error codes only, never raw exception messages; the Meta access token travels in the request body, not the URL.
 - 2026-11-10: Hardening from the repository audit: Turnstile fails closed in production, keyed HMAC log pseudonyms, streamed-body size limits, Scout's daily cap documented as soft with the Claude Console limit as the hard cap.
 - 2026-11-10: TypeScript 7 held until `@astrojs/check` supports it (Dependabot ignores TypeScript majors).
-- 2026-11-10: `resources/briefs/SCE Website.docx` governs brand and offer: SCE is the public brand, formats are Solo, Duo and Band (The Scene), and the offer includes a custom song (`/custom-song`) with Sean's songwriting credits in context. Prices stay private. (`10-sce-build-brief.md`)
+- 2026-11-10: `resources/briefs/SCE Website.docx` governs brand and offer: SCE is the public brand, formats are Solo, Duo and Band (The SCENE), and the offer includes a custom song (`/custom-song`) with Sean's songwriting credits in context. Prices stay private. (`10-sce-build-brief.md`)
 - 2026-11-10: Media is catalog-driven: 53 assets and 15 named placements in `media-library.json`; originals are never edited or committed (`11-media-management.md`).
 - 2026-11-10: Repo layout: app in `apps/web`, docs in `docs/`, media tooling in `scripts/media/`, Sean's Mac workflow in `scripts/`, private sources in git-ignored `resources/`. The release gate is local (`scripts/publish.sh`, `npm run verify`); GitHub CI is manual-only because Actions minutes are shared across the account's private repos.
 - 2026-11-03: A luxury live-music house for weddings, with private events served quietly; one booking covers the day. No rock, country or western framing. (`01-positioning-and-offer.md`)
 - 2026-11-03: Visual direction "Ivory maison" (Aman-like restraint), the only theme; the Nov 10 brief adds Élan Artists as the roster/presentation reference. (`02-site-structure-and-design.md`)
-- 2026-11-03: Proof is rooms and couples (typeset venue names, named testimonials) plus one credentials line; no marketplace badges or logo walls.
+- 2026-11-03: Proof is rooms and couples (the rooms strip, named testimonials) plus one credentials line; no marketplace badges.
 - 2026-11-03: Client router with a persistent dock; every page script uses `onPage(setup, when)` (`src/lib/lifecycle.ts`). `build.format: 'file'` avoids Cloudflare's trailing-slash redirects.
 - 2026-11-03: Malformed `src/data/*.json` is fatal in dev, build, check and CI (`integrations/validate-data.mjs`).
 - 2026-11-03: The CRM is SHA-BAM, a white-labeled GoHighLevel; the GoHighLevel API v2 integration works unchanged (`04-integrations-and-workflows.md`).
@@ -56,13 +58,16 @@
 - 2026-11-01: Google Calendar is the date source of truth (free/busy only). Scout is provider-agnostic (guided mode without AI; Claude adapter when keyed), governed by OWASP LLM/Agentic Top 10 and NIST AI RMF.
 
 **Deprecated/Legacy:**
+- Typeset-only rooms and the "no logos" rule: Sean asked for venue logos (2026-11-12). The `hero_sub` A/B test, the native live-film player and the home/Watch listening sections are retired with the review.
 - The artist hub (release pages, Music, Shows, Merch, Press kit, fan list, Spotify follows, logo marquee): out of scope for a wedding house; URLs 301. History: `docs/archive/2026-11-03-artist-hub-to-luxury-events/`.
-- The band name "The Hustlers" and the duo/trio format: replaced by The Scene and Solo/Duo/Band; research reports keep their original wording.
+- The band name "The Hustlers" and the duo/trio format: replaced by The SCENE and Solo/Duo/Band; research reports keep their original wording.
 - The dark "night" theme and the `events_theme` A/B test: one ivory theme by decision.
 - GoHighLevel SmartSite and its events sub-site: replaced by this site (snapshot in `reference/current-site/`, old URLs 301).
 
-**Key docs:** `README.md` (repo map and commands); `docs/current/01`–`15` (positioning, design, architecture, integrations, Scout, launch checklist, Mac publishing, roadmap, Drive content update, SCE brief, media management, Scout backend decision, staging, decision register, booking operations); `docs/security/SECURITY.md`; `docs/research/reports/`; `apps/web/.env.example`.
+**Key docs:** `README.md` (repo map and commands); `docs/current/01`–`16` (positioning, design, architecture, integrations, Scout, launch checklist, Mac publishing, roadmap, Drive content update, SCE brief, media management, Scout backend decision, staging, decision register, booking operations, follow-ups and referrals); `docs/security/SECURITY.md`; `docs/research/reports/` (including "Trust, referrals and repeat business", 2026-11-12); `apps/web/.env.example`.
 
 **Run locally:** `cd apps/web && npm run dev` (http://localhost:4321); `npm run verify` is the full gate. Publish: `bash scripts/publish.sh "<description>"`.
 
-**Last Updated:** 2026-11-11
+**Last Updated:** 2026-11-12
+
+**2026-11-12 session recovery:** Resumed Claude session 3f18547b-4ade-4bfd-bab7-332f3bec1bcd after its usage-limit interruption. Final verification passed: npm run verify (89 tests, Astro check, production build, zero dependency vulnerabilities); recovered referral-check and review-check on desktop and phone; npm run test:browser (all pages, API guards and inquiry journeys). Referral capture, planner-pack scaffold, distinct Our Players video and follow-up workflow specifications are complete locally. External approvals and deployment dependencies above still apply.

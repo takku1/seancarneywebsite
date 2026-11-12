@@ -50,3 +50,29 @@ test('a past date is flagged, not rewarded', () => {
   assert.ok(r.signals.includes('date_in_past'));
   assert.equal(r.urgency, 0);
 });
+
+test('a referral from a planner or venue ranks like a trade partner; from a past client or friend, half as much', () => {
+  const base = {budget: '10k_20k', event_date: '2027-09-18'};
+  const planner = scoreLead(inq({...base, heard_via: 'planner', referrer: 'Laurel Events'}), NOW);
+  assert.equal(planner.relationship, 30);
+  assert.equal(planner.tier, 'A');
+  assert.ok(planner.signals.includes('referral:planner'));
+  const friend = scoreLead(inq({...base, heard_via: 'friend'}), NOW);
+  assert.equal(friend.relationship, 15);
+  const search = scoreLead(inq({...base, heard_via: 'search'}), NOW);
+  assert.equal(search.relationship, 0, 'self-found visitors are not penalised, just not boosted');
+});
+
+test('relationship is the larger signal, never a sum past its 30-point cap', () => {
+  const r = scoreLead(inq({role: 'planner', heard_via: 'friend'}), NOW);
+  assert.equal(r.relationship, 30);
+  const c = scoreLead(inq({role: 'corporate', heard_via: 'venue'}), NOW);
+  assert.equal(c.relationship, 30);
+});
+
+test('how they heard is optional and validated', () => {
+  assert.equal(inq({}).heard_via, undefined);
+  assert.throws(() => inq({heard_via: 'billboard'}));
+  assert.throws(() => inq({referrer: 'x'.repeat(121)}));
+  assert.equal(inq({referrer: '  Laurel Events  '}).referrer, 'Laurel Events');
+});

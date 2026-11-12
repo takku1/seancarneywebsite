@@ -649,6 +649,28 @@
       "outputs": [
         "apps/web/public/downloads/sean-carney-song-list-2026-2027.docx"
       ]
+    },
+    "logo-ritz-carlton": {
+      "kind": "image",
+      "label": "Logo: The Ritz-Carlton",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/logos/ritz-carlton.png"
+      ],
+      "alt": "The Ritz-Carlton",
+      "notes": "Venue logo supplied by Sean (originals/drive-2026-11-10/PHOTOS/RITZ.png), trimmed and recoloured to one ink tone for the venues strip. Shown with Sean's approval (credits.json logoApproved)."
+    },
+    "logo-terranea": {
+      "kind": "image",
+      "label": "Logo: Terranea Resort",
+      "source": null,
+      "profile": "legacy",
+      "outputs": [
+        "apps/web/src/assets/logos/terranea.png"
+      ],
+      "alt": "Terranea Resort",
+      "notes": "Venue logo supplied by Sean (originals/drive-2026-11-10/PHOTOS/terranea-pv-logo-082024.png), trimmed and recoloured to one ink tone for the venues strip. Shown with Sean's approval (credits.json logoApproved)."
     }
   }
 }

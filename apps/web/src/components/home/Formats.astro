@@ -7,9 +7,9 @@ const duo=photoFor('home.format.duo');
 const band=photoFor('home.format.band');
 
 const formats = [
-  { name: 'Solo', when: 'Ceremonies, cocktail hours, dinners and intimate estates.', body: 'Voice and acoustic guitar. A personal arrangement, with room for every word.', img: solo.image, alt: solo.alt },
-  { name: 'Duo', when: 'Cocktail hours, welcome dinners and intimate receptions.', body: 'A second voice, another texture. An intimate set with a little more movement.', img: duo.image, alt: duo.alt },
-  { name: 'Band', when: 'Receptions, dance floors and galas.', body: 'The Scene, brought together for the songs that get your people on their feet.', img: band.image, alt: band.alt },
+  { name: 'Solo', when: 'Ceremonies, cocktail hours, dinners and intimate estates.', body: 'Voice, acoustic guitar and live looping. The perfect fit for your most intimate setting.', img: solo.image, alt: solo.alt, href: '/videos#acoustic', cta: 'Watch now' },
+  { name: 'Duo', when: 'Cocktail hours, welcome dinners and intimate receptions.', body: 'Choose between another vocalist or second instrument to heighten your experience.', img: duo.image, alt: duo.alt, href: '/the-scene', cta: 'Meet The SCENE' },
+  { name: 'Band', when: 'Receptions, dance floors and galas.', body: 'The biggest venues in the world choose Sean Carney and The SCENE for their most important moments.', img: band.image, alt: band.alt, href: '/inquire?format=band', cta: 'Book full band service' },
 ];
 ---
 
@@ -23,7 +23,7 @@ const formats = [
           <h3>{f.name}</h3>
           <p class="when">{f.when}</p>
           <p class="body">{f.body}</p>
-          <a class="format-link link-arrow" href={f.name === 'Solo' ? '/repertoire#listen' : f.name === 'Duo' ? '/the-scene#melody-ebner' : '/the-scene'}>{f.name === 'Solo' ? 'Hear the acoustic recordings' : f.name === 'Duo' ? 'Meet the voices' : 'Explore our players'}</a>
+          <a class="format-link link-arrow" href={f.href} data-track="format_click" data-track-format={f.name.toLowerCase()} data-track-location="home_formats">{f.cta}</a>
         </li>
       ))}
     </ul>

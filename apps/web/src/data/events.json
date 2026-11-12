@@ -5,7 +5,7 @@
     "label": "Weddings",
     "navLabel": "Weddings",
     "seoTitle": "Live Wedding Music in Los Angeles | Sean Carney",
-    "seoDescription": "Ceremony, cocktail hour and reception music from Sean Carney, solo or with his band The Scene. Fifteen years of weddings across Los Angeles and abroad.",
+    "seoDescription": "Ceremony, cocktail hour and reception music from Sean Carney, solo or with his band The SCENE. Fifteen years of weddings across Los Angeles and abroad.",
     "headline": "Ceremony to last dance",
     "intro": "One SCE team for your whole celebration: acoustic ceremony music, a duo or jazz ensemble over cocktails, then a full-band reception with sound and lighting. A custom song, written and recorded by Sean, makes the story yours.",
     "image": "../assets/photos/wedding-evening.jpg",
@@ -23,7 +23,7 @@
           },
           {
             "title": "Cocktail hour",
-            "body": "Sinatra and modern standards while guests find their drinks and each other."
+            "body": "Sinatra, Michael Bublé and modern standards while guests find their drinks and each other."
           },
           {
             "title": "Dinner",
@@ -35,7 +35,7 @@
           },
           {
             "title": "Reception",
-            "body": "The Scene take the floor, and keep it full."
+            "body": "The SCENE take the floor, and keep it full."
           }
         ]
       },
@@ -61,7 +61,7 @@
       {
         "type": "repertoire",
         "title": "Most requested",
-        "note": "Frank Sinatra and modern standards for the cocktail hour. Full set lists, and your own requests, on request.",
+        "note": "Frank Sinatra, Michael Bublé and modern standards for the cocktail hour. Full set lists, and your own requests, on request.",
         "playlist": "playlist/6rKY5Yzd33JAzxDwVttojd",
         "solo": [
           "Can't Help Falling in Love, Elvis Presley",
@@ -163,7 +163,7 @@
         "type": "film",
         "title": "Live, in rooms like yours",
         "ids": [
-          "reel-2025",
+          "hotel-del-my-girl",
           "ritz-shut-up-and-dance",
           "elevated-live"
         ]
@@ -318,7 +318,7 @@
     "seoTitle": "Destination Wedding and Event Musician | Sean Carney",
     "seoDescription": "Sean Carney has performed in more than 50 countries and travels for destination weddings, retreats and private events worldwide.",
     "headline": "Wherever the vows are",
-    "intro": "For destination weddings, retreats and offsites, Sean travels light as a soloist or brings The Scene, and works through logistics early with your team.",
+    "intro": "For destination weddings, retreats and offsites, Sean travels light as a soloist or brings The SCENE, and works through logistics early with your team.",
     "image": "../assets/photos/beach-sunset.jpg",
     "imageAlt": "Sean Carney with a guitar on the beach at sunset",
     "formType": "destination",

@@ -5,7 +5,7 @@
  */
 import { z } from 'astro/zod';
 import { availabilityFor } from '../integrations/availability';
-import { inquirySchema, EVENT_TYPES, BUDGETS, ROLES, FORMATS, GUESTS } from '../inquiry/schema';
+import { inquirySchema, EVENT_TYPES, BUDGETS, ROLES, FORMATS, GUESTS, HEARD_VIA } from '../inquiry/schema';
 import { labelOf } from '../inquiry/process';
 import { signDraft } from './draft';
 import { draftSecret } from './draft-secret';
@@ -31,7 +31,7 @@ export const SITE_PAGES: Record<string, string> = {
   '/planners': 'For planners',
   '/venues': 'Venues',
   '/about': 'About Sean',
-  '/the-scene': 'Meet The Scene',
+  '/the-scene': 'Meet The SCENE',
   '/custom-song': 'Your custom wedding song',
   '/videos': 'Watch SCE live',
   '/contact': 'Contact',
@@ -76,7 +76,7 @@ export const TOOL_SPECS: ToolSpec[] = [
   },
   {
     name: 'show_media',
-    description: 'Show the visitor up to three videos or releases as playable cards in the chat. Use ids exactly as listed in the catalog, e.g. "video:reel-2025".',
+    description: 'Show the visitor up to three videos or releases as playable cards in the chat. Use ids exactly as listed in the catalog, e.g. "video:hotel-del-my-girl".',
     input_schema: {
       type: 'object',
       properties: { ids: { type: 'array', items: { type: 'string' }, minItems: 1, maxItems: 3 } },
@@ -115,6 +115,8 @@ export const TOOL_SPECS: ToolSpec[] = [
         role: { type: 'string', enum: enumOf(ROLES) },
         company: { type: 'string' },
         message: { type: 'string', description: 'Short summary of anything else they shared' },
+        heard_via: { type: 'string', enum: enumOf(HEARD_VIA), description: 'How they heard about Sean, only if they said' },
+        referrer: { type: 'string', description: 'Who referred them (a planner, venue or person), exactly as they typed it' },
       },
       required: ['visitor_confirmed', 'event_type', 'location', 'budget', 'name', 'email', 'role'],
       additionalProperties: false,
@@ -158,8 +160,11 @@ export async function executeTool(name: string, input: unknown, ctx: ToolContext
         if (!email || !said.includes(email) || !firstName || !said.includes(firstName)) {
           return { result: JSON.stringify({ error: 'Ask the visitor to type their name and email in the chat before submitting.' }), isError: true };
         }
+        // The referrer is a third party's name: keep it only if the visitor typed it, never a model guess.
+        const referrer = String(args.referrer ?? '').trim();
         const parsed = inquirySchema.safeParse({
           ...args,
+          referrer: referrer && said.includes(referrer.toLowerCase()) ? referrer : '',
           event_date: args.event_date ?? '',
           date_flexible: Boolean(args.date_flexible) || !args.event_date,
           format: args.format ?? 'unsure',
