@@ -1,3 +1,5 @@
+> Direction update (2026-11-12): SHA-BAM is the selected hosting and client-portal target. Cloudflare instructions below describe the existing Astro implementation, not the active deployment plan. Follow [17-sha-bam-migration.md](17-sha-bam-migration.md) for replacement mapping and release gates. Native parity is pending account access.
+
 # Architecture
 
 ## System

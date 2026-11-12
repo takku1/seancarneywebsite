@@ -1,3 +1,5 @@
+> Direction update (2026-11-12): SHA-BAM is the selected hosting and client-portal target. Cloudflare instructions below describe the existing Astro implementation, not the active deployment plan. Follow [17-sha-bam-migration.md](current/17-sha-bam-migration.md) for replacement mapping and release gates. Native parity is pending account access.
+
 # STATUS: Sean Carney Entertainment (SCE), luxury weddings and private events
 
 **Current Phase:** Pre-launch, release hardening. Phases 1 and 2 are built, the November 10 SCE brief and Drive content are applied, and the code matches `docs/current/`. Growth work (phase 3) waits until launch (`08-roadmap.md`).
@@ -71,3 +73,5 @@
 **Last Updated:** 2026-11-12
 
 **2026-11-12 session recovery:** Resumed Claude session 3f18547b-4ade-4bfd-bab7-332f3bec1bcd after its usage-limit interruption. Final verification passed: npm run verify (89 tests, Astro check, production build, zero dependency vulnerabilities); recovered referral-check and review-check on desktop and phone; npm run test:browser (all pages, API guards and inquiry journeys). Referral capture, planner-pack scaffold, distinct Our Players video and follow-up workflow specifications are complete locally. External approvals and deployment dependencies above still apply.
+
+**SHA-BAM preparation:** Native setup kit: [18-sha-bam-setup-kit.md](current/18-sha-bam-setup-kit.md). Public page/redirect/asset inventory generator: scripts/prepare-shabam.mjs. Account access, native implementation and acceptance remain pending; prior Astro tests apply to the reference only.

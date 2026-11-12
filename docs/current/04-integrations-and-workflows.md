@@ -1,3 +1,5 @@
+> Direction update (2026-11-12): SHA-BAM is the selected hosting and client-portal target. Cloudflare instructions below describe the existing Astro implementation, not the active deployment plan. Follow [17-sha-bam-migration.md](17-sha-bam-migration.md) for replacement mapping and release gates. Native parity is pending account access.
+
 # Integrations and booking workflows
 
 How an inquiry becomes a booked, paid, reviewed wedding or event with as little manual work as possible. GoHighLevel specifics come largely from third-party guides, so **verify the exact menu and trigger names in Sean's sub-account**.

@@ -1,3 +1,5 @@
+> Direction update (2026-11-12): SHA-BAM is the selected hosting and client-portal target. Cloudflare instructions below describe the existing Astro implementation, not the active deployment plan. Follow [17-sha-bam-migration.md](17-sha-bam-migration.md) for replacement mapping and release gates. Native parity is pending account access.
+
 # Staging
 
 Staging is a separate copy of the site on Cloudflare (`seancarneymusic-staging` on workers.dev). It has its own Worker, lead database (`seancarneymusic-leads-staging`), KV namespace and rate-limit counters, and no custom domain. It proves what local tests cannot: D1 provisioning and binding, the 15-minute cron trigger, background delivery after the response (`waitUntil`), secrets, and real email.

@@ -1,6 +1,6 @@
 # Sean Carney Entertainment website
 
-The website for SCE, a luxury live-music house for weddings and private events (Solo, Duo and Band). An Astro static site on Cloudflare Workers, with a small API layer for inquiries, availability and the Scout concierge.
+The website for SCE, a luxury live-music house for weddings and private events (Solo, Duo and Band). The existing Astro/Cloudflare implementation is the working design and behavior reference. SHA-BAM is the selected production hosting and client-portal target; native migration and account acceptance are pending. See [the migration plan](docs/current/17-sha-bam-migration.md) and [setup kit](docs/current/18-sha-bam-setup-kit.md).
 
 Start with **[docs/STATUS.md](docs/STATUS.md)**, the single source of truth for project state.
 

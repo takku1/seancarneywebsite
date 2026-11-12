@@ -1,3 +1,5 @@
+> SHA-BAM target update (2026-11-12): Technical evidence A1–A8 below belongs to the Astro reference where it names D1, Workers or Resend. Native replacements must pass doc 18 before A9 can be approved. B3 requires verified SHA-BAM redirects and website mapping, not a presumed DNS migration. Existing business approvals remain open.
+
 # Decision and acceptance register
 
 This register owns every outstanding decision, approval and proof the site depends on. `STATUS.md` summarizes it, the launch checklist (`06`) covers technical setup and QA, and every other document links here instead of repeating an item. When something is settled, update its row (status, date, evidence) and the data file it governs.
